@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <>
     
-<h2>Oi</h2>
+<h2>BOM DIAAAAAAAA</h2>
     
     </>
   );
