@@ -44,7 +44,7 @@ CREATE TABLE reservas (
     usuario_id INT NOT NULL,
     ferramenta_id INT NOT NULL,
     data_prevista DATETIME NOT NULL,
-    status_reserva ENUM('PENDENTE', 'CONCLUIDA', 'CANCELADA') DEFAULT 'PENDENTE',
+    status_reserva ENUM('PENDENTE', 'CONCLUIDA', 'ATRASADA') DEFAULT 'PENDENTE',
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (ferramenta_id) REFERENCES ferramentas(id) ON DELETE CASCADE

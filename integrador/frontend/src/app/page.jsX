@@ -1,11 +1,16 @@
 import Image from "next/image";
+import SidebarNav from "./components/Sidebar/page";
 
 export default function Home() {
   return (
     <>
     
-<h2>BOM DIAAAAAAAA</h2>
+    <SidebarNav/>
+
     
     </>
+
+
   );
 }
+
