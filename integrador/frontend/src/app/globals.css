@@ -131,4 +131,5 @@
 @theme {
   --color-primaria: #121212; 
   --color-segundaria: #7033ff;
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
 }
