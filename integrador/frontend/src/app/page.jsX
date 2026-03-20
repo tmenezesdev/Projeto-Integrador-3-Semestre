@@ -1,16 +1,6 @@
-import Image from "next/image";
-import SidebarNav from "../components/Sidebar/page";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return (
-    <>
-    
-    <SidebarNav/>
-
-    
-    </>
-
-
-  );
+  // Redireciona o usuário automaticamente para a página de login
+  redirect("/login");
 }
-
