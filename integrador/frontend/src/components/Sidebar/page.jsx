@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation"; // Hook para identificar a página atual
 import {
   LayoutGrid,
   Wrench,
@@ -10,27 +12,21 @@ import {
   Radio
 } from "lucide-react";
 
-export default function SidebarNav({ setConteudo }) {
-  const [ativo, setAtivo] = useState("historico");
-
-  const handleClick = (id) => {
-    setAtivo(id);
-    if (setConteudo) setConteudo(id);
-  };
+export default function SidebarNav() {
+  const pathname = usePathname(); // Obtém a rota atual
 
   const navItems = [
-    { id: "dashboard", label: "Dashboard", icon: LayoutGrid },
-    { id: "ferramentas", label: "Ferramentas Fora", icon: Wrench },
-    { id: "historico", label: "Histórico", icon: History },
-    { id: "alertas", label: "Alertas", icon: AlertTriangle },
-    { id: "configuracoes", label: "Configurações", icon: Settings },
+    { id: "dashboard", label: "Dashboard", href: "/dashboard", icon: LayoutGrid },
+    { id: "ferramentas", label: "Ferramentas Fora", href: "/FerramentasDeFora", icon: Wrench },
+    { id: "historico", label: "Histórico", href: "/historico", icon: History },
+    { id: "alertas", label: "Alertas", href: "/alertas", icon: AlertTriangle },
+    { id: "configuracoes", label: "Configurações", href: "/configuracoes", icon: Settings },
   ];
 
   return (
-    /* Apliquei 'font-["Inter"]' para garantir que use a fonte nova */
-    <aside className="w-[260px] h-screen bg-[#121212] border-r border-[#2a2a2a] flex flex-col justify-between select-none font-['Inter',sans-serif]">
+    <aside className="w-[260px] h-screen bg-[#121212] border-r border-[#2a2a2a] flex flex-col justify-between select-none font-['Inter',sans-serif] sticky top-0">
       <div>
-        {/* CABEÇALHO / LOGO */}
+        {/* CABEÇALHO */}
         <div className="flex items-center gap-3 px-6 pt-8 pb-10">
           <div className="bg-[#7033ff] p-2 rounded-xl flex items-center justify-center shadow-lg shadow-[#7033ff]/20">
             <Radio className="text-white" size={24} />
@@ -50,13 +46,13 @@ export default function SidebarNav({ setConteudo }) {
           <ul className="flex flex-col gap-1.5 list-none p-0 m-0">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = ativo === item.id;
+              const isActive = pathname === item.href;
               
               return (
                 <li key={item.id}>
-                  <button
-                    onClick={() => handleClick(item.id)}
-                    className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-[14px] font-medium transition-all duration-200 border-none cursor-pointer ${
+                  <Link
+                    href={item.href}
+                    className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-[14px] font-medium transition-all duration-200 border-none cursor-pointer no-underline ${
                       isActive
                         ? "bg-[#7033ff] text-white shadow-md shadow-[#7033ff]/20" 
                         : "bg-transparent text-[#a1a1aa] hover:bg-[#8b5cf6]/10 hover:text-[#8b5cf6]"
@@ -64,14 +60,13 @@ export default function SidebarNav({ setConteudo }) {
                   >
                     <Icon size={18} strokeWidth={isActive ? 2.5 : 2} />
                     {item.label}
-                  </button>
+                  </Link>
                 </li>
               );
             })}
           </ul>
         </nav>
       </div>
-
     </aside>
   );
 }
