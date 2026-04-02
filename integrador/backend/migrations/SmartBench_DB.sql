@@ -1,32 +1,32 @@
--- 1. Criação do Banco de Dados
+-- =========================================================================
+-- PARTE 1: CONSTRUÇÃO DA ESTRUTURA (A CASA)
+-- =========================================================================
+
 CREATE DATABASE IF NOT EXISTS smartbench;
 USE smartbench;
 
--- 2. Tabela de Usuários
--- Armazena o Líder, Supervisor e Mecânicos
-CREATE TABLE usuarios (
+-- Tabela de Usuários
+CREATE TABLE IF NOT EXISTS usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
-    tag_cracha VARCHAR(50) UNIQUE NOT NULL, -- Tag RFID do crachá do usuário
+    tag_cracha VARCHAR(50) UNIQUE NOT NULL, 
     tipo_perfil ENUM('ADMIN', 'SUPERVISOR', 'MECANICO') NOT NULL,
-    senha VARCHAR(255) NOT NULL, -- Senha criptografada (hash)
+    senha VARCHAR(255) NOT NULL, 
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 3. Tabela de Ferramentas
--- Armazena o inventário físico da bancada
-CREATE TABLE ferramentas (
+-- Tabela de Ferramentas
+CREATE TABLE IF NOT EXISTS ferramentas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
-    tag_rfid VARCHAR(50) UNIQUE NOT NULL, -- Tag colada/embutida na ferramenta
-    peso_referencia DECIMAL(10, 2), -- Usado para o RF13 (Identificação por peso)
+    tag_rfid VARCHAR(50) UNIQUE NOT NULL, 
+    peso_referencia DECIMAL(10, 2), 
     status ENUM('DISPONIVEL', 'EM_USO', 'MANUTENCAO') DEFAULT 'DISPONIVEL',
     data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 4. Tabela de Transações (Log de Eventos)
--- O "coração" da rastreabilidade: registra quem pegou o quê e quando
-CREATE TABLE transacoes (
+-- Tabela de Transações (Log de Eventos)
+CREATE TABLE IF NOT EXISTS transacoes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL,
     ferramenta_id INT NOT NULL,
@@ -37,9 +37,8 @@ CREATE TABLE transacoes (
     FOREIGN KEY (ferramenta_id) REFERENCES ferramentas(id) ON DELETE RESTRICT
 );
 
--- 5. Tabela de Reservas
--- Permite que o mecânico reserve uma ferramenta via App antes do turno
-CREATE TABLE reservas (
+-- Tabela de Reservas
+CREATE TABLE IF NOT EXISTS reservas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL,
     ferramenta_id INT NOT NULL,
@@ -50,9 +49,8 @@ CREATE TABLE reservas (
     FOREIGN KEY (ferramenta_id) REFERENCES ferramentas(id) ON DELETE CASCADE
 );
 
--- 6. Tabela de Alertas
--- Registra avisos de ferramentas esquecidas ou tempo limite excedido
-CREATE TABLE alertas (
+-- Tabela de Alertas
+CREATE TABLE IF NOT EXISTS alertas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     ferramenta_id INT NOT NULL,
     mensagem TEXT NOT NULL,
@@ -61,8 +59,17 @@ CREATE TABLE alertas (
     FOREIGN KEY (ferramenta_id) REFERENCES ferramentas(id) ON DELETE CASCADE
 );
 
--- (Opcional) Trigger para atualizar o status da ferramenta automaticamente 
--- ao inserir uma nova transação
+CREATE TABLE IF NOT EXISTS configuracoes_sistema (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tempo_limite_horas INT DEFAULT 4,
+    tempo_aviso_minutos INT DEFAULT 30,
+    modo_manutencao BOOLEAN DEFAULT FALSE,
+    ultima_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+INSERT INTO configuracoes_sistema (tempo_limite_horas, tempo_aviso_minutos) VALUES (4, 30);
+
+-- Trigger para atualizar o status da ferramenta automaticamente
 DELIMITER //
 CREATE TRIGGER trg_atualiza_status_ferramenta
 AFTER INSERT ON transacoes
@@ -76,3 +83,48 @@ BEGIN
 END;
 //
 DELIMITER ;
+
+-- =========================================================================
+-- PARTE 2: INSERÇÃO DOS DADOS (OS MÓVEIS)
+-- =========================================================================
+
+-- Inserindo Usuários (Senha de todos: 123456)
+INSERT INTO usuarios (nome, tag_cracha, tipo_perfil, senha) VALUES
+('Thiago Menezes Teixeira', 'TAG-ADMIN-001', 'ADMIN', '$2a$12$R9h/cIPz0gi.URNNX3cx2e7jSM0c3FEVyLC5yO62hGUu/O9O9v1iW'),
+('Juliana Oliveira', 'TAG-SUP-002', 'SUPERVISOR', '$2a$12$R9h/cIPz0gi.URNNX3cx2e7jSM0c3FEVyLC5yO62hGUu/O9O9v1iW'),
+('Carlos Silva', 'TAG-MEC-003', 'MECANICO', '$2a$12$R9h/cIPz0gi.URNNX3cx2e7jSM0c3FEVyLC5yO62hGUu/O9O9v1iW'),
+('Bávaro', 'TAG-MEC-004', 'MECANICO', '$2a$12$R9h/cIPz0gi.URNNX3cx2e7jSM0c3FEVyLC5yO62hGUu/O9O9v1iW'),
+('Lucas Mendes', 'TAG-MEC-005', 'MECANICO', '$2a$12$R9h/cIPz0gi.URNNX3cx2e7jSM0c3FEVyLC5yO62hGUu/O9O9v1iW');
+
+-- Inserindo Ferramentas
+INSERT INTO ferramentas (nome, tag_rfid, peso_referencia, status) VALUES
+('Torquímetro Digital 200Nm', 'RFID-FER-001', 1.25, 'DISPONIVEL'),
+('Alicate Amperímetro', 'RFID-FER-002', 0.45, 'DISPONIVEL'),
+('Chave de Impacto Pneumática', 'RFID-FER-003', 2.10, 'DISPONIVEL'),
+('Multímetro Digital Fluke', 'RFID-FER-004', 0.60, 'DISPONIVEL'),
+('Paquímetro Analógico 150mm', 'RFID-FER-005', 0.30, 'DISPONIVEL'),
+('Kit Chaves Torx (Jogo 9 peças)', 'RFID-FER-006', 0.85, 'DISPONIVEL'),
+('Macaco Hidráulico Garrafa 2T', 'RFID-FER-007', 4.50, 'DISPONIVEL'),
+('Lanterna de Inspeção LED', 'RFID-FER-008', 0.20, 'MANUTENCAO');
+
+-- Inserindo Transações
+INSERT INTO transacoes (usuario_id, ferramenta_id, tipo, metodo, data_hora) VALUES
+(1, 4, 'RETIRADA', 'RFID_AUTOMATICO', DATE_SUB(NOW(), INTERVAL 1 DAY)),
+(1, 4, 'DEVOLUCAO', 'RFID_AUTOMATICO', DATE_SUB(NOW(), INTERVAL 22 HOUR)),
+(3, 2, 'RETIRADA', 'MANUAL', DATE_SUB(NOW(), INTERVAL 8 HOUR)),
+(3, 2, 'DEVOLUCAO', 'MANUAL', DATE_SUB(NOW(), INTERVAL 7 HOUR)),
+(4, 1, 'RETIRADA', 'RFID_AUTOMATICO', DATE_SUB(NOW(), INTERVAL 5 HOUR)), 
+(3, 3, 'RETIRADA', 'RFID_AUTOMATICO', DATE_SUB(NOW(), INTERVAL 2 HOUR)), 
+(2, 6, 'RETIRADA', 'MANUAL', DATE_SUB(NOW(), INTERVAL 30 MINUTE));
+
+-- Inserindo Alertas
+INSERT INTO alertas (ferramenta_id, mensagem, status_alerta) VALUES
+(1, 'Ferramenta fora da bancada há mais de 4 horas. Limite de tempo excedido.', 'ATIVO'),
+(8, 'Ferramenta enviada para calibração. Retorno previsto para amanhã.', 'ATIVO'),
+(2, 'Aviso de calibração próxima: Faltam 5 dias úteis.', 'RESOLVIDO');
+
+-- Inserindo Reservas
+INSERT INTO reservas (usuario_id, ferramenta_id, data_prevista, status_reserva) VALUES
+(4, 5, DATE_ADD(NOW(), INTERVAL 1 DAY), 'PENDENTE'), 
+(5, 7, DATE_ADD(NOW(), INTERVAL 2 HOUR), 'PENDENTE'), 
+(1, 4, DATE_SUB(NOW(), INTERVAL 2 DAY), 'CONCLUIDA');

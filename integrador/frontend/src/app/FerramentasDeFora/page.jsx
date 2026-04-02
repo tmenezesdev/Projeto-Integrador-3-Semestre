@@ -1,97 +1,88 @@
+"use client"
+
 import React from "react";
-import { User, Clock, Wrench } from "lucide-react";
-import SidebarNav from "@/components/Sidebar/page.jsx";
+import { User, Clock, Wrench, ShieldAlert } from "lucide-react";
+import SidebarNav from "@/components/Sidebar/page";
 
 const ferramentas = [
   {
-    id: "FT-001",
+    tag_rfid: "RFID-FER-001",
     nome: "Torquímetro Digital 200Nm",
-    status: "Atrasada",
+    status: "ATRASADA",
+    responsavel: "Bávaro",
+    perfil: "MECANICO",
+    retirada: "Hoje, 05:00",
+    tempoDecorrido: "5h 15min",
+  },
+  {
+    tag_rfid: "RFID-FER-003",
+    nome: "Chave de Impacto Pneumática",
+    status: "EM USO",
     responsavel: "Carlos Silva",
-    bancada: "Bancada A - Motores",
-    retirada: "09:00",
-    tempoDecorrido: "5h 23min",
+    perfil: "MECANICO",
+    retirada: "Hoje, 08:00",
+    tempoDecorrido: "2h 15min",
   },
   {
-    id: "FT-007",
-    nome: "Alicate Amperímetro",
-    status: "Em uso",
-    responsavel: "Maria Oliveira",
-    bancada: "Bancada B - Elétrica",
-    retirada: "11:30",
-    tempoDecorrido: "3h 15min",
+    tag_rfid: "RFID-FER-006",
+    nome: "Kit Chaves Torx (Jogo 9 peças)",
+    status: "EM USO",
+    responsavel: "Juliana Oliveira",
+    perfil: "SUPERVISOR",
+    retirada: "Hoje, 09:45",
+    tempoDecorrido: "30min",
   },
   {
-    id: "FT-003",
-    nome: 'Chave Inglesa 12"',
-    status: "Em uso",
-    responsavel: "João Silva",
-    bancada: "Bancada A - Motores",
-    retirada: "13:00",
-    tempoDecorrido: "1h 45min",
-  },
-  {
-    id: "FT-009",
-    nome: "Multímetro Digital",
-    status: "Atrasada",
-    responsavel: "Pedro Lima",
-    bancada: "Bancada B - Elétrica",
-    retirada: "08:30",
-    tempoDecorrido: "6h 15min",
-  },
-  {
-    id: "FT-005",
-    nome: "Jogo de Chaves Allen",
-    status: "Em uso",
+    tag_rfid: "RFID-FER-007",
+    nome: "Macaco Hidráulico Garrafa 2T",
+    status: "ATRASADA",
     responsavel: "Lucas Mendes",
-    bancada: "Bancada C - Montagem",
-    retirada: "14:00",
-    tempoDecorrido: "45min",
-  },
+    perfil: "MECANICO",
+    retirada: "Ontem, 16:30",
+    tempoDecorrido: "17h 45min",
+  }
 ];
 
 export default function FerramentasFora() {
   const totalFora = ferramentas.length;
-  const emUso = ferramentas.filter((f) => f.status === "Em uso").length;
-  const atrasadas = ferramentas.filter((f) => f.status === "Atrasada").length;
+  const emUso = ferramentas.filter((f) => f.status === "EM USO").length;
+  const atrasadas = ferramentas.filter((f) => f.status === "ATRASADA").length;
 
   return (
     <div className="flex min-h-screen bg-[#121212] text-white">
       <SidebarNav />
 
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-8 font-sans">
 
-        {/* Cabeçalho */}
         <header className="mb-8">
           <div className="flex items-center gap-3 mb-1">
             <Wrench size={34} color="#7033ff" strokeWidth={1.5} />
-            <h1 className="text-3xl font-bold">Ferramentas Fora</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-white">Ferramentas Fora</h1>
           </div>
 
           <p className="text-sm text-gray-400">
-            Ferramentas atualmente fora das bancadas
+            Monitoramento em tempo real do maquinário retirado da bancada.
           </p>
         </header>
 
-        {/* Cards de resumo */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 
-          <div className="bg-[#1e1e1e] border border-gray-800 rounded-xl p-6 flex flex-col gap-2">
-            <span className="text-sm text-gray-400">Total Fora</span>
-            <span className="text-4xl font-bold text-[#7033ff]">
+          <div className="bg-[#1e1e1e] border border-gray-800 rounded-xl p-6 flex flex-col gap-2 shadow-lg">
+            <span className="text-sm font-medium text-gray-400">Total Fora</span>
+            <span className="text-4xl font-bold text-white">
               {totalFora}
             </span>
           </div>
 
-          <div className="bg-[#1e1e1e] border border-gray-800 rounded-xl p-6 flex flex-col gap-2">
-            <span className="text-sm text-gray-400">Em Uso</span>
+          <div className="bg-[#1e1e1e] border border-gray-800 rounded-xl p-6 flex flex-col gap-2 shadow-lg">
+            <span className="text-sm font-medium text-gray-400">Status: Em Uso Regular</span>
             <span className="text-4xl font-bold text-[#7033ff]">
               {emUso}
             </span>
           </div>
 
-          <div className="bg-[#1e1e1e] border border-gray-800 rounded-xl p-6 flex flex-col gap-2">
-            <span className="text-sm text-gray-400">Atrasadas</span>
+          <div className="bg-[#1e1e1e] border border-gray-800 rounded-xl p-6 flex flex-col gap-2 shadow-lg">
+            <span className="text-sm font-medium text-gray-400">Status: Atrasadas</span>
             <span className="text-4xl font-bold text-red-500">
               {atrasadas}
             </span>
@@ -99,95 +90,76 @@ export default function FerramentasFora() {
 
         </div>
 
-        {/* Grid das ferramentas */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
 
           {ferramentas.map((ferramenta) => {
-
-            const isAtrasada = ferramenta.status === "Atrasada";
+            const isAtrasada = ferramenta.status === "ATRASADA";
 
             return (
               <div
-                key={ferramenta.id}
-                className="bg-[#1e1e1e] border border-gray-800 rounded-xl p-6 shadow transition hover:shadow-lg"
+                key={ferramenta.tag_rfid}
+                className={`bg-[#1e1e1e] border rounded-xl p-6 shadow-md transition-all duration-300 hover:shadow-xl ${isAtrasada ? 'border-red-900/30' : 'border-gray-800'}`}
               >
 
-                {/* Header */}
                 <div className="flex justify-between items-start mb-5">
-
-                  <div>
-                    <h3 className="text-lg font-bold">
+                  <div className="pr-4">
+                    <h3 className="text-lg font-bold text-white leading-tight mb-1">
                       {ferramenta.nome}
                     </h3>
-
-                    <span className="text-xs text-gray-400 font-mono">
-                      {ferramenta.id}
+                    <span className="text-xs text-gray-500 font-mono tracking-wider">
+                      {ferramenta.tag_rfid}
                     </span>
                   </div>
 
                   <span
-                    className={`text-xs px-3 py-1 rounded-full font-medium border ${
-                      isAtrasada
-                        ? "bg-red-500/20 text-red-400 border-red-500/40"
-                        : "bg-[#7033ff]/20 text-[#7033ff] border-[#7033ff]/40"
-                    }`}
+                    className={`text-xs px-3 py-1 rounded-full font-bold border whitespace-nowrap ${isAtrasada
+                        ? "bg-red-500/10 text-red-500 border-red-500/20"
+                        : "bg-[#7033ff]/10 text-[#7033ff] border-[#7033ff]/20"
+                      }`}
                   >
                     {ferramenta.status}
                   </span>
-
                 </div>
 
-                {/* Informações */}
                 <div className="space-y-3 text-sm">
 
-                  <div className="flex items-center gap-2 text-gray-400">
-                    <User size={18} color="#7033ff" />
-                    <span>
-                      Responsável:{" "}
-                      <strong className="text-white">
-                        {ferramenta.responsavel}
-                      </strong>
+                  <div className="flex items-center gap-3 text-gray-400">
+                    <User size={16} className={isAtrasada ? "text-red-400" : "text-[#7033ff]"} />
+                    <span className="flex items-center gap-2">
+                      <strong className="text-gray-200">{ferramenta.responsavel}</strong>
+                      <span className="text-[10px] uppercase bg-[#121212] px-2 py-0.5 rounded text-gray-500 border border-gray-800">
+                        {ferramenta.perfil}
+                      </span>
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2 text-gray-400">
-                    <Wrench size={18} color="#7033ff" />
+                  <div className="flex items-center gap-3 text-gray-400">
+                    <ShieldAlert size={16} className={isAtrasada ? "text-red-400" : "text-[#7033ff]"} />
                     <span>
-                      Bancada:{" "}
-                      <strong className="text-white">
-                        {ferramenta.bancada}
-                      </strong>
+                      Retirada registrada às <strong className="text-gray-300">{ferramenta.retirada}</strong>
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between pt-3 border-t border-gray-800">
-                    <div className="flex items-center gap-2 text-gray-400 text-xs">
-                      <Clock size={16} color="#7033ff" />
-                      Retirada:{" "}
-                      <strong className="text-white">
-                        {ferramenta.retirada}
-                      </strong>
+                  <div className="flex items-center justify-between pt-4 mt-2 border-t border-gray-800">
+                    <div className="flex items-center gap-2 text-gray-400 text-xs font-medium uppercase tracking-wider">
+                      <Clock size={14} className={isAtrasada ? "text-red-500" : "text-[#7033ff]"} />
+                      Tempo Fora
                     </div>
 
                     <span
-                      className={`text-lg font-bold ${
-                        isAtrasada
-                          ? "text-red-500"
-                          : "text-[#7033ff]"
-                      }`}
+                      className={`text-xl font-black ${isAtrasada ? "text-red-500" : "text-[#7033ff]"
+                        }`}
                     >
                       {ferramenta.tempoDecorrido}
                     </span>
                   </div>
 
                 </div>
-
               </div>
             );
           })}
 
         </div>
-
       </main>
     </div>
   );
