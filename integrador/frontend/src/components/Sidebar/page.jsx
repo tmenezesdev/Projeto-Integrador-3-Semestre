@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import {  ShelvingUnit } from "lucide-react";
 import {
   LayoutGrid,
   Wrench,
@@ -20,6 +21,7 @@ export default function SidebarNav() {
     { id: "dashboard", label: "Dashboard", href: "/dashboard", icon: LayoutGrid },
     { id: "ferramentas", label: "Ferramentas Fora", href: "/FerramentasDeFora", icon: Wrench },
     { id: "historico", label: "Histórico", href: "/historico", icon: History },
+    { id: "estoque", label: "Estoque", href: "/estoque", icon: ShelvingUnit },
     { id: "alertas", label: "Alertas", href: "/alertas", icon: AlertTriangle },
     { id: "configuracoes", label: "Configurações", href: "/configuracoes", icon: Settings },
   ];
