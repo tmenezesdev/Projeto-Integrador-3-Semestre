@@ -1,14 +1,12 @@
--- =========================================================================
--- PARTE 1: CONSTRUÇÃO DA ESTRUTURA (A CASA)
--- =========================================================================
-
-CREATE DATABASE IF NOT EXISTS smartbench;
+-- Cria o banco novo
+CREATE DATABASE smartbench;
 USE smartbench;
 
--- Tabela de Usuários
+-- Tabela de Usuários (AGORA COM EMAIL)
 CREATE TABLE IF NOT EXISTS usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
+    email VARCHAR(150) UNIQUE NOT NULL, 
     tag_cracha VARCHAR(50) UNIQUE NOT NULL, 
     tipo_perfil ENUM('ADMIN', 'SUPERVISOR', 'MECANICO') NOT NULL,
     senha VARCHAR(255) NOT NULL, 
@@ -49,6 +47,19 @@ CREATE TABLE IF NOT EXISTS reservas (
     FOREIGN KEY (ferramenta_id) REFERENCES ferramentas(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    rota VARCHAR(255) NOT NULL,
+    metodo VARCHAR(10) NOT NULL,
+    ip_address VARCHAR(50),
+    user_agent VARCHAR(255),
+    dados_requisicao TEXT,
+    status_code INT,
+    tempo_resposta_ms INT,
+    dados_resposta TEXT,
+    data_hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Tabela de Alertas
 CREATE TABLE IF NOT EXISTS alertas (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -59,6 +70,7 @@ CREATE TABLE IF NOT EXISTS alertas (
     FOREIGN KEY (ferramenta_id) REFERENCES ferramentas(id) ON DELETE CASCADE
 );
 
+-- Tabela de Configurações
 CREATE TABLE IF NOT EXISTS configuracoes_sistema (
     id INT AUTO_INCREMENT PRIMARY KEY,
     tempo_limite_horas INT DEFAULT 4,
@@ -67,6 +79,7 @@ CREATE TABLE IF NOT EXISTS configuracoes_sistema (
     ultima_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+-- Inserindo a configuração inicial
 INSERT INTO configuracoes_sistema (tempo_limite_horas, tempo_aviso_minutos) VALUES (4, 30);
 
 -- Trigger para atualizar o status da ferramenta automaticamente
@@ -88,13 +101,13 @@ DELIMITER ;
 -- PARTE 2: INSERÇÃO DOS DADOS (OS MÓVEIS)
 -- =========================================================================
 
--- Inserindo Usuários (Senha de todos: 123456)
-INSERT INTO usuarios (nome, tag_cracha, tipo_perfil, senha) VALUES
-('Thiago Menezes Teixeira', 'TAG-ADMIN-001', 'ADMIN', '$2a$12$R9h/cIPz0gi.URNNX3cx2e7jSM0c3FEVyLC5yO62hGUu/O9O9v1iW'),
-('Juliana Oliveira', 'TAG-SUP-002', 'SUPERVISOR', '$2a$12$R9h/cIPz0gi.URNNX3cx2e7jSM0c3FEVyLC5yO62hGUu/O9O9v1iW'),
-('Carlos Silva', 'TAG-MEC-003', 'MECANICO', '$2a$12$R9h/cIPz0gi.URNNX3cx2e7jSM0c3FEVyLC5yO62hGUu/O9O9v1iW'),
-('Bávaro', 'TAG-MEC-004', 'MECANICO', '$2a$12$R9h/cIPz0gi.URNNX3cx2e7jSM0c3FEVyLC5yO62hGUu/O9O9v1iW'),
-('Lucas Mendes', 'TAG-MEC-005', 'MECANICO', '$2a$12$R9h/cIPz0gi.URNNX3cx2e7jSM0c3FEVyLC5yO62hGUu/O9O9v1iW');
+-- Inserindo Usuários (AGORA COM EMAIL | Senha de todos: 123456)
+INSERT INTO usuarios (nome, email, tag_cracha, tipo_perfil, senha) VALUES
+('Thiago Menezes Teixeira', 'thiago.menezes@gm.com', 'TAG-ADMIN-001', 'ADMIN', '$2a$10$4J57bTadHf6xQfJ9sBxh6.P6HvbFtJ03qtBooMkPfgrCIPbWnAnKO'),
+('Juliana Oliveira', 'juliana.oliveira@gm.com', 'TAG-SUP-002', 'SUPERVISOR', '$2a$10$4J57bTadHf6xQfJ9sBxh6.P6HvbFtJ03qtBooMkPfgrCIPbWnAnKO'),
+('Carlos Silva', 'carlos.silva@gm.com', 'TAG-MEC-003', 'MECANICO', '$2a$10$4J57bTadHf6xQfJ9sBxh6.P6HvbFtJ03qtBooMkPfgrCIPbWnAnKO'),
+('Bávaro', 'bavaro@gm.com', 'TAG-MEC-004', 'MECANICO', '$2a$10$4J57bTadHf6xQfJ9sBxh6.P6HvbFtJ03qtBooMkPfgrCIPbWnAnKO'),
+('Lucas Mendes', 'lucas.mendes@gm.com', 'TAG-MEC-005', 'MECANICO', '$2a$10$4J57bTadHf6xQfJ9sBxh6.P6HvbFtJ03qtBooMkPfgrCIPbWnAnKO');
 
 -- Inserindo Ferramentas
 INSERT INTO ferramentas (nome, tag_rfid, peso_referencia, status) VALUES

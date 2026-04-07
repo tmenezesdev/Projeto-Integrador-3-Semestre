@@ -8,7 +8,7 @@ export default function HistoricoPage() {
   const [busca, setBusca] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
-  const API_URL = 'http://localhost:3001/api/supervisor/historico';
+  const API_URL = 'http://localhost:3000/api/supervisor/historico';
 
   useEffect(() => {
     const carregarHistorico = async () => {

@@ -8,7 +8,7 @@ export default function FerramentasForaPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   // URL base do seu backend conforme o print do terminal (Porta 3001)
-  const API_BASE_URL = 'http://localhost:3001/api';
+  const API_BASE_URL = 'http://localhost:3000/api';
   
   // ID da Juliana Oliveira (Supervisor) para registrar a devolução manual
   const SUPERVISOR_ID = 2;

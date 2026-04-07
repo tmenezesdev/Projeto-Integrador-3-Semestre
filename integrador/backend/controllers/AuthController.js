@@ -48,12 +48,15 @@ class AuthController {
                 });
             }
 
+            // Pegamos o tipo_perfil ou cargo, o que o seu banco retornar
+            const perfil = usuario.tipo_perfil || usuario.tipo || usuario.cargo || 'COMUM';
+
             // Gerar token JWT
             const token = jwt.sign(
                 { 
                     id: usuario.id, 
                     email: usuario.email,
-                    tipo: usuario.tipo 
+                    tipo_perfil: perfil // <-- CORRIGIDO AQUI
                 },
                 JWT_CONFIG.secret,
                 { expiresIn: JWT_CONFIG.expiresIn }
@@ -68,7 +71,7 @@ class AuthController {
                         id: usuario.id,
                         nome: usuario.nome,
                         email: usuario.email,
-                        tipo: usuario.tipo
+                        tipo_perfil: perfil // <-- CORRIGIDO AQUI TAMBÉM! Agora vai pro frontend
                     }
                 }
             });
@@ -85,7 +88,7 @@ class AuthController {
     // POST /auth/registrar - Registrar novo usuário
     static async registrar(req, res) {
         try {
-            const { nome, email, senha, tipo } = req.body;
+            const { nome, email, senha, tipo_perfil, tipo } = req.body;
             
             // Validações básicas
             if (!nome || nome.trim() === '') {
@@ -156,12 +159,12 @@ class AuthController {
                 });
             }
 
-            // Preparar dados do usuário
+            // Preparar dados do usuário (aceita tanto tipo_perfil quanto tipo)
             const dadosUsuario = {
                 nome: nome.trim(),
                 email: email.trim().toLowerCase(),
                 senha: senha,
-                tipo: tipo || 'comum'
+                tipo_perfil: tipo_perfil || tipo || 'COMUM'
             };
 
             // Criar usuário
@@ -174,7 +177,7 @@ class AuthController {
                     id: usuarioId,
                     nome: dadosUsuario.nome,
                     email: dadosUsuario.email,
-                    tipo: dadosUsuario.tipo
+                    tipo_perfil: dadosUsuario.tipo_perfil
                 }
             });
         } catch (error) {
@@ -270,7 +273,7 @@ class AuthController {
     // POST /usuarios - Criar novo usuário (apenas admin)
     static async criarUsuario(req, res) {
         try {
-            const { nome, email, senha, tipo } = req.body;
+            const { nome, email, senha, tipo_perfil, tipo } = req.body;
             
             // Validações básicas
             if (!nome || nome.trim() === '') {
@@ -346,7 +349,7 @@ class AuthController {
                 nome: nome.trim(),
                 email: email.trim().toLowerCase(),
                 senha: senha,
-                tipo: tipo || 'comum'
+                tipo_perfil: tipo_perfil || tipo || 'COMUM'
             };
 
             // Criar usuário
@@ -359,7 +362,7 @@ class AuthController {
                     id: usuarioId,
                     nome: dadosUsuario.nome,
                     email: dadosUsuario.email,
-                    tipo: dadosUsuario.tipo
+                    tipo_perfil: dadosUsuario.tipo_perfil
                 }
             });
         } catch (error) {
@@ -376,7 +379,7 @@ class AuthController {
     static async atualizarUsuario(req, res) {
         try {
             const { id } = req.params;
-            const { nome, email, senha, tipo } = req.body;
+            const { nome, email, senha, tipo_perfil, tipo } = req.body;
             
             // Validação do ID
             if (!id || isNaN(id)) {
@@ -452,8 +455,9 @@ class AuthController {
                 dadosAtualizacao.senha = senha;
             }
 
-            if (tipo !== undefined) {
-                dadosAtualizacao.tipo = tipo;
+            const perfil = tipo_perfil || tipo;
+            if (perfil !== undefined) {
+                dadosAtualizacao.tipo_perfil = perfil;
             }
 
             // Verificar se há dados para atualizar
@@ -531,4 +535,3 @@ class AuthController {
 }
 
 export default AuthController;
-
