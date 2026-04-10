@@ -1,12 +1,11 @@
--- Cria o banco novo
-CREATE DATABASE smartbench;
-USE smartbench;
+CREATE DATABASE SmartBench_DB;
+USE SmartBench_DB;
 
--- Tabela de Usuários (AGORA COM EMAIL)
+-- Tabela de Usuários (CORRIGIDO: Coluna 'email' adicionada)
 CREATE TABLE IF NOT EXISTS usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
-    email VARCHAR(150) UNIQUE NOT NULL, 
+    email VARCHAR(100) UNIQUE NOT NULL, 
     tag_cracha VARCHAR(50) UNIQUE NOT NULL, 
     tipo_perfil ENUM('ADMIN', 'SUPERVISOR', 'MECANICO') NOT NULL,
     senha VARCHAR(255) NOT NULL, 
@@ -23,7 +22,7 @@ CREATE TABLE IF NOT EXISTS ferramentas (
     data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Tabela de Transações (Log de Eventos)
+-- Tabela de Transações
 CREATE TABLE IF NOT EXISTS transacoes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL,
@@ -31,6 +30,8 @@ CREATE TABLE IF NOT EXISTS transacoes (
     tipo ENUM('RETIRADA', 'DEVOLUCAO') NOT NULL,
     metodo ENUM('RFID_AUTOMATICO', 'MANUAL') DEFAULT 'RFID_AUTOMATICO',
     data_hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX (usuario_id),
+    INDEX (ferramenta_id),
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE RESTRICT,
     FOREIGN KEY (ferramenta_id) REFERENCES ferramentas(id) ON DELETE RESTRICT
 );
@@ -41,23 +42,10 @@ CREATE TABLE IF NOT EXISTS reservas (
     usuario_id INT NOT NULL,
     ferramenta_id INT NOT NULL,
     data_prevista DATETIME NOT NULL,
-    status_reserva ENUM('PENDENTE', 'CONCLUIDA', 'ATRASADA') DEFAULT 'PENDENTE',
+    status_reserva ENUM('PENDENTE', 'CONCLUIDA', 'ATRASADA', 'CANCELADA') DEFAULT 'PENDENTE',
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (ferramenta_id) REFERENCES ferramentas(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS logs (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    rota VARCHAR(255) NOT NULL,
-    metodo VARCHAR(10) NOT NULL,
-    ip_address VARCHAR(50),
-    user_agent VARCHAR(255),
-    dados_requisicao TEXT,
-    status_code INT,
-    tempo_resposta_ms INT,
-    dados_resposta TEXT,
-    data_hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Tabela de Alertas
@@ -70,7 +58,7 @@ CREATE TABLE IF NOT EXISTS alertas (
     FOREIGN KEY (ferramenta_id) REFERENCES ferramentas(id) ON DELETE CASCADE
 );
 
--- Tabela de Configurações
+-- Configurações do Sistema
 CREATE TABLE IF NOT EXISTS configuracoes_sistema (
     id INT AUTO_INCREMENT PRIMARY KEY,
     tempo_limite_horas INT DEFAULT 4,
@@ -79,10 +67,17 @@ CREATE TABLE IF NOT EXISTS configuracoes_sistema (
     ultima_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Inserindo a configuração inicial
-INSERT INTO configuracoes_sistema (tempo_limite_horas, tempo_aviso_minutos) VALUES (4, 30);
+-- Tabela de Logs (CORRIGIDO: Tabela criada para evitar o erro de background)
+CREATE TABLE IF NOT EXISTS logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nivel VARCHAR(50) DEFAULT 'INFO',
+    mensagem TEXT NOT NULL,
+    data_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
--- Trigger para atualizar o status da ferramenta automaticamente
+INSERT IGNORE INTO configuracoes_sistema (id, tempo_limite_horas, tempo_aviso_minutos) VALUES (1, 4, 30);
+
+-- Trigger para atualizar status da ferramenta automaticamente
 DELIMITER //
 CREATE TRIGGER trg_atualiza_status_ferramenta
 AFTER INSERT ON transacoes
@@ -98,16 +93,17 @@ END;
 DELIMITER ;
 
 -- =========================================================================
--- PARTE 2: INSERÇÃO DOS DADOS (OS MÓVEIS)
+-- PARTE 2: INSERÇÃO DOS DADOS (CORRIGIDO)
 -- =========================================================================
 
--- Inserindo Usuários (AGORA COM EMAIL | Senha de todos: 123456)
+-- Inserindo Usuários (CORRIGIDO: Incluídos os e-mails para o login funcionar)
 INSERT INTO usuarios (nome, email, tag_cracha, tipo_perfil, senha) VALUES
-('Thiago Menezes Teixeira', 'thiago.menezes@gm.com', 'TAG-ADMIN-001', 'ADMIN', '$2a$10$4J57bTadHf6xQfJ9sBxh6.P6HvbFtJ03qtBooMkPfgrCIPbWnAnKO'),
-('Juliana Oliveira', 'juliana.oliveira@gm.com', 'TAG-SUP-002', 'SUPERVISOR', '$2a$10$4J57bTadHf6xQfJ9sBxh6.P6HvbFtJ03qtBooMkPfgrCIPbWnAnKO'),
-('Carlos Silva', 'carlos.silva@gm.com', 'TAG-MEC-003', 'MECANICO', '$2a$10$4J57bTadHf6xQfJ9sBxh6.P6HvbFtJ03qtBooMkPfgrCIPbWnAnKO'),
-('Bávaro', 'bavaro@gm.com', 'TAG-MEC-004', 'MECANICO', '$2a$10$4J57bTadHf6xQfJ9sBxh6.P6HvbFtJ03qtBooMkPfgrCIPbWnAnKO'),
-('Lucas Mendes', 'lucas.mendes@gm.com', 'TAG-MEC-005', 'MECANICO', '$2a$10$4J57bTadHf6xQfJ9sBxh6.P6HvbFtJ03qtBooMkPfgrCIPbWnAnKO');
+('Thiago Menezes Teixeira', 'thiago.menezes@gm.com', 'TAG-ADMIN-001', 'ADMIN', '$2a$12$R9h/cIPz0gi.URNNX3cx2e7jSM0c3FEVyLC5yO62hGUu/O9O9v1iW'),
+('Juliana Oliveira', 'juliana.oliveira@gm.com', 'TAG-SUP-002', 'SUPERVISOR', '$2a$12$R9h/cIPz0gi.URNNX3cx2e7jSM0c3FEVyLC5yO62hGUu/O9O9v1iW'),
+('Carlos Silva', 'carlos.silva@gm.com', 'TAG-MEC-003', 'MECANICO', '$2a$12$R9h/cIPz0gi.URNNX3cx2e7jSM0c3FEVyLC5yO62hGUu/O9O9v1iW'),
+('Bávaro', 'bavaro@gm.com', 'TAG-MEC-004', 'MECANICO', '$2a$12$R9h/cIPz0gi.URNNX3cx2e7jSM0c3FEVyLC5yO62hGUu/O9O9v1iW'),
+('Lucas Mendes', 'lucas.mendes@gm.com', 'TAG-MEC-005', 'MECANICO', '$2a$12$R9h/cIPz0gi.URNNX3cx2e7jSM0c3FEVyLC5yO62hGUu/O9O9v1iW'),
+('Marina Montagnini', 'marina.montagnini@gm.com', 'TAG-SUP-006', 'SUPERVISOR', 'senha123'); 
 
 -- Inserindo Ferramentas
 INSERT INTO ferramentas (nome, tag_rfid, peso_referencia, status) VALUES
