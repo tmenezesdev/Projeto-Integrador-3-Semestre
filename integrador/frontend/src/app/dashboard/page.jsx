@@ -93,41 +93,43 @@ export default function Dashboard() {
     <div className="flex min-h-screen bg-[#121212] text-white font-sans">
       <SidebarNav />
 
-      <main className="flex-1 p-8">
-        <div className="flex flex-col gap-1 mb-8">
-          <h2 className="text-3xl font-bold tracking-tight text-white">
+      {/* Ajuste de padding: p-4 no mobile, p-8 no desktop */}
+      <main className="flex-1 p-4 md:p-8 w-full overflow-hidden">
+        <div className="flex flex-col gap-1 mb-6 md:mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-white">
             Visão Geral da Bancada
           </h2>
-          <p className="text-sm text-gray-400">
+          <p className="text-xs md:text-sm text-gray-400">
             Acompanhe o status físico das ferramentas em tempo real.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {/* Grid de Cards: Gap menor no mobile */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-8">
           <Card className="bg-[#1e1e1e] border-gray-800 text-white shadow-lg">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-400">Total de Ferramentas</CardTitle>
+              <CardTitle className="text-xs md:text-sm font-medium text-gray-400 uppercase tracking-wider">Total de Ferramentas</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-[#7033ff]">{resumoEstoque.totalFerramentas}</div>
+              <div className="text-2xl md:text-3xl font-bold text-[#7033ff]">{resumoEstoque.totalFerramentas}</div>
             </CardContent>
           </Card>
 
           <Card className="bg-[#1e1e1e] border-gray-800 text-white shadow-lg">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-400">Ferramentas Em Uso</CardTitle>
+              <CardTitle className="text-xs md:text-sm font-medium text-gray-400 uppercase tracking-wider">Ferramentas Em Uso</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-yellow-500">{resumoEstoque.emUso}</div>
+              <div className="text-2xl md:text-3xl font-bold text-yellow-500">{resumoEstoque.emUso}</div>
             </CardContent>
           </Card>
 
-          <Card className="bg-[#1e1e1e] border-gray-800 text-white shadow-lg">
+          <Card className="bg-[#1e1e1e] border-gray-800 text-white shadow-lg sm:col-span-2 md:col-span-1">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-400">Alertas Ativos</CardTitle>
+              <CardTitle className="text-xs md:text-sm font-medium text-gray-400 uppercase tracking-wider">Alertas Ativos</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-red-500">{resumoEstoque.alertas}</div>
+              <div className="text-2xl md:text-3xl font-bold text-red-500">{resumoEstoque.alertas}</div>
             </CardContent>
           </Card>
         </div>
@@ -136,20 +138,20 @@ export default function Dashboard() {
           <Card className="bg-[#170f0f] border-[#4a1c1c] text-white shadow-lg mb-8">
             <CardHeader className="pb-4 border-b border-[#4a1c1c]/50">
               <div className="flex items-center gap-2">
-                <AlertTriangle className="text-red-500 h-5 w-5" />
-                <CardTitle className="text-md font-bold text-white flex items-center gap-2">
+                <AlertTriangle className="text-red-500 h-5 w-5 shrink-0" />
+                <CardTitle className="text-sm md:text-md font-bold text-white">
                   Alertas do Sistema ({alertasAtivos.length})
                 </CardTitle>
               </div>
             </CardHeader>
             <CardContent className="pt-4 flex flex-col gap-3">
               {alertasAtivos.map((alerta) => (
-                <div key={alerta.id} className="flex justify-between items-center p-4 bg-[#1e1e1e] border border-gray-800 rounded-lg">
+                <div key={alerta.id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 md:p-4 bg-[#1e1e1e] border border-gray-800 rounded-lg gap-3">
                   <div className="flex flex-col gap-1">
-                    <span className="font-bold text-white text-base">{alerta.ferramenta}</span>
-                    <span className="text-sm text-gray-400">{alerta.mensagem}</span>
+                    <span className="font-bold text-white text-sm md:text-base">{alerta.ferramenta}</span>
+                    <span className="text-xs md:text-sm text-gray-400">{alerta.mensagem}</span>
                   </div>
-                  <Badge className="bg-red-500/10 text-red-500 border border-red-900/50 px-3 py-1">
+                  <Badge className="bg-red-500/10 text-red-500 border border-red-900/50 px-3 py-1 shrink-0">
                     {alerta.status}
                   </Badge>
                 </div>
@@ -158,65 +160,70 @@ export default function Dashboard() {
           </Card>
         )}
 
-        <EstoqueChart />
+        <div className="mb-8 overflow-hidden">
+          <EstoqueChart />
+        </div>
 
         <Card className="bg-[#1e1e1e] border-gray-800 text-white shadow-xl">
           <CardHeader>
-            <CardTitle>Últimas Transações</CardTitle>
+            <CardTitle className="text-lg md:text-xl">Últimas Transações</CardTitle>
           </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow className="border-gray-800 hover:bg-transparent">
-                  <TableHead className="text-gray-400">TAG RFID</TableHead>
-                  <TableHead className="text-gray-400">Ferramenta</TableHead>
-                  <TableHead className="text-gray-400">Mecânico/Usuário</TableHead>
-                  <TableHead className="text-gray-400">Operação</TableHead>
-                  <TableHead className="text-right text-gray-400">Data/Hora</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {ultimasMovimentacoes.map((item) => (
-                  <TableRow
-                    key={item.id}
-                    className="border-gray-800 cursor-pointer hover:bg-[#252525] transition-colors"
-                    onClick={() => handleOpenDetails(item)}
-                  >
-                    <TableCell className="font-mono text-xs text-gray-400">{item.tag_rfid}</TableCell>
-                    <TableCell className="font-medium text-white">{item.ferramenta}</TableCell>
-                    <TableCell>
-                      <div className="text-gray-300">{item.usuario}</div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={item.tipo === "DEVOLUCAO" ? "bg-green-500/10 text-green-400 border-none" : "bg-orange-500/10 text-orange-400 border-none"}>
-                        {item.tipo}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right text-sm text-gray-400">{item.dataHora}</TableCell>
+          <CardContent className="px-2 md:px-6"> {/* Menos padding lateral no mobile */}
+            {/* Wrapper de Scroll Horizontal para a Tabela */}
+            <div className="overflow-x-auto w-full">
+              <Table className="min-w-[600px]">
+                <TableHeader>
+                  <TableRow className="border-gray-800 hover:bg-transparent">
+                    <TableHead className="text-gray-400">TAG RFID</TableHead>
+                    <TableHead className="text-gray-400">Ferramenta</TableHead>
+                    <TableHead className="text-gray-400">Mecânico/Usuário</TableHead>
+                    <TableHead className="text-gray-400">Operação</TableHead>
+                    <TableHead className="text-right text-gray-400">Data/Hora</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {ultimasMovimentacoes.map((item) => (
+                    <TableRow
+                      key={item.id}
+                      className="border-gray-800 cursor-pointer hover:bg-[#252525] transition-colors"
+                      onClick={() => handleOpenDetails(item)}
+                    >
+                      <TableCell className="font-mono text-[10px] md:text-xs text-gray-400 whitespace-nowrap">{item.tag_rfid}</TableCell>
+                      <TableCell className="font-medium text-white whitespace-nowrap">{item.ferramenta}</TableCell>
+                      <TableCell className="whitespace-nowrap">
+                        <div className="text-gray-300">{item.usuario}</div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={item.tipo === "DEVOLUCAO" ? "bg-green-500/10 text-green-400 border-none text-[10px] px-2" : "bg-orange-500/10 text-orange-400 border-none text-[10px] px-2"}>
+                          {item.tipo}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right text-[10px] md:text-sm text-gray-400 whitespace-nowrap">{item.dataHora}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
       </main>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="bg-[#1e1e1e] border-gray-800 text-white sm:max-w-[425px]">
+        <DialogContent className="bg-[#1e1e1e] border-gray-800 text-white w-[95%] sm:max-w-[425px] rounded-lg">
           <DialogHeader>
-            <DialogTitle className="text-[#7033ff] text-2xl font-bold">Detalhes da Transação</DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogTitle className="text-[#7033ff] text-xl md:text-2xl font-bold">Detalhes da Transação</DialogTitle>
+            <DialogDescription className="text-gray-400 text-xs md:text-sm">
               ID da Transação: #{movimentacaoSelecionada?.id}
             </DialogDescription>
           </DialogHeader>
 
           {movimentacaoSelecionada && (
-            <div className="grid gap-6 py-4 border-t border-gray-800">
+            <div className="grid gap-4 md:gap-6 py-4 border-t border-gray-800">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-[10px] text-gray-500 uppercase font-black tracking-widest">Ferramenta</p>
-                  <p className="text-sm font-semibold">{movimentacaoSelecionada.ferramenta}</p>
-                  <p className="text-[11px] font-mono text-gray-400">{movimentacaoSelecionada.tag_rfid}</p>
+                  <p className="text-xs md:text-sm font-semibold">{movimentacaoSelecionada.ferramenta}</p>
+                  <p className="text-[10px] md:text-[11px] font-mono text-gray-400">{movimentacaoSelecionada.tag_rfid}</p>
                 </div>
                 <div>
                   <p className="text-[10px] text-gray-500 uppercase font-black tracking-widest">Operação</p>
@@ -229,12 +236,12 @@ export default function Dashboard() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-[10px] text-gray-500 uppercase font-black tracking-widest">Responsável</p>
-                  <p className="text-sm">{movimentacaoSelecionada.usuario}</p>
+                  <p className="text-xs md:text-sm">{movimentacaoSelecionada.usuario}</p>
                   <p className="text-[10px] text-[#7033ff] font-bold">Perfil: {movimentacaoSelecionada.perfil}</p>
                 </div>
                 <div>
                   <p className="text-[10px] text-gray-500 uppercase font-black tracking-widest">Data/Hora</p>
-                  <p className="text-sm">{movimentacaoSelecionada.dataHora}</p>
+                  <p className="text-xs md:text-sm">{movimentacaoSelecionada.dataHora}</p>
                 </div>
               </div>
 
@@ -242,7 +249,7 @@ export default function Dashboard() {
                 <p className="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-2">Método de Captura</p>
                 <div className="flex items-center gap-2 bg-[#121212] p-2 rounded border border-gray-800">
                   <div className={`w-2 h-2 rounded-full animate-pulse ${movimentacaoSelecionada.metodo === 'RFID_AUTOMATICO' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' : 'bg-yellow-500'}`} />
-                  <p className="text-xs font-mono">{movimentacaoSelecionada.metodo}</p>
+                  <p className="text-[10px] md:text-xs font-mono">{movimentacaoSelecionada.metodo}</p>
                 </div>
               </div>
             </div>
