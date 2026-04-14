@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import SidebarNav from "@/components/Sidebar/page";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { AlertOctagon, Clock, AlertTriangle, Search } from "lucide-react";
 
 export default function AtrasosPage() {
-
   const ferramentasAtrasadas = [
     {
       id: 1,
@@ -46,25 +45,28 @@ export default function AtrasosPage() {
 
   return (
     <div className="flex min-h-screen bg-[#121212] text-white font-sans">
+      {/* Dependendo de como o SidebarNav for construído, você pode precisar ajustar a responsividade lá também */}
       <SidebarNav />
 
-      <main className="flex-1 p-8">
-
-        <div className="flex flex-col gap-1 mb-8">
+      {/* Reduzi o padding no mobile (p-4) e mantive p-8 no desktop (md:p-8) */}
+      <main className="flex-1 p-4 md:p-8 w-full max-w-full overflow-hidden">
+        
+        <div className="flex flex-col gap-1 mb-6 md:mb-8">
           <div className="flex items-center gap-3">
-            <AlertOctagon className="text-red-500 h-8 w-8" />
-            <h2 className="text-3xl font-bold tracking-tight text-white">
+            <AlertOctagon className="text-red-500 h-6 w-6 md:h-8 md:w-8 shrink-0" />
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-white">
               Monitoramento de Atrasos
             </h2>
           </div>
-          <p className="text-sm text-gray-400 ml-11">
+          <p className="text-xs md:text-sm text-gray-400 ml-9 md:ml-11">
             Gestão de ferramentas que excederam o tempo limite fora da bancada.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {/* O grid já estava responsivo (grid-cols-1 para mobile e md:grid-cols-3) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
           <Card className="bg-[#1e1e1e] border-gray-800 text-white shadow-lg">
-            <CardHeader className="pb-2 flex flex-row items-center justify-between">
+            <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
               <CardTitle className="text-sm font-medium text-gray-400">Total em Atraso</CardTitle>
               <Clock className="h-4 w-4 text-red-500" />
             </CardHeader>
@@ -75,7 +77,7 @@ export default function AtrasosPage() {
           </Card>
 
           <Card className="bg-[#1e1e1e] border-gray-800 text-white shadow-lg">
-            <CardHeader className="pb-2 flex flex-row items-center justify-between">
+            <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
               <CardTitle className="text-sm font-medium text-gray-400">Alertas Críticos</CardTitle>
               <AlertOctagon className="h-4 w-4 text-red-600" />
             </CardHeader>
@@ -86,7 +88,7 @@ export default function AtrasosPage() {
           </Card>
 
           <Card className="bg-[#1e1e1e] border-gray-800 text-white shadow-lg">
-            <CardHeader className="pb-2 flex flex-row items-center justify-between">
+            <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
               <CardTitle className="text-sm font-medium text-gray-400">Próximos do Limite</CardTitle>
               <AlertTriangle className="h-4 w-4 text-yellow-500" />
             </CardHeader>
@@ -98,13 +100,15 @@ export default function AtrasosPage() {
         </div>
 
         <Card className="bg-[#1e1e1e] border-gray-800 text-white shadow-xl">
-          <CardHeader className="flex flex-row items-center justify-between">
+          {/* Ajuste para quebrar linha no mobile (flex-col) e ficar lado a lado no tablet/desktop (sm:flex-row) */}
+          <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <CardTitle>Relação de Pendências</CardTitle>
+              <CardTitle className="text-lg md:text-xl">Relação de Pendências</CardTitle>
               <CardDescription className="text-gray-400">Lista detalhada de equipamentos não devolvidos.</CardDescription>
             </div>
 
-            <div className="relative w-64">
+            {/* w-full no mobile, w-64 no desktop */}
+            <div className="relative w-full sm:w-64">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
               <input
                 type="text"
@@ -115,58 +119,60 @@ export default function AtrasosPage() {
           </CardHeader>
 
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow className="border-gray-800 hover:bg-transparent">
-                  <TableHead className="text-gray-400">Equipamento</TableHead>
-                  <TableHead className="text-gray-400">Responsável</TableHead>
-                  <TableHead className="text-gray-400">Retirada</TableHead>
-                  <TableHead className="text-gray-400">Tempo Fora</TableHead>
-                  <TableHead className="text-right text-gray-400">Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {ferramentasAtrasadas.map((item) => (
-                  <TableRow key={item.id} className="border-gray-800 hover:bg-[#252525] transition-colors">
-                    <TableCell>
-                      <div className="font-medium text-white">{item.nome}</div>
-                      <div className="text-xs font-mono text-gray-500">{item.tag_rfid}</div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-gray-300">{item.responsavel}</div>
-                      <div className="text-[10px] text-gray-500 font-bold tracking-wider">{item.perfil}</div>
-                    </TableCell>
-                    <TableCell className="text-sm text-gray-400">{item.dataRetirada}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-3 w-3 text-gray-400" />
-                        <span className="text-sm font-medium">{item.tempoFora}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {item.status === "CRÍTICO" && (
-                        <Badge className="bg-red-600/20 text-red-500 border border-red-900/50 hover:bg-red-600/30">
-                          {item.status}
-                        </Badge>
-                      )}
-                      {item.status === "ATRASADO" && (
-                        <Badge className="bg-orange-500/20 text-orange-400 border border-orange-900/50 hover:bg-orange-500/30">
-                          {item.status}
-                        </Badge>
-                      )}
-                      {item.status === "ATENÇÃO" && (
-                        <Badge className="bg-yellow-500/20 text-yellow-500 border border-yellow-900/50 hover:bg-yellow-500/30">
-                          {item.status}
-                        </Badge>
-                      )}
-                    </TableCell>
+            {/* Wrapper de overflow horizontal para a tabela não quebrar a tela no mobile */}
+            <div className="overflow-x-auto">
+              <Table className="min-w-[600px] w-full">
+                <TableHeader>
+                  <TableRow className="border-gray-800 hover:bg-transparent">
+                    <TableHead className="text-gray-400">Equipamento</TableHead>
+                    <TableHead className="text-gray-400">Responsável</TableHead>
+                    <TableHead className="text-gray-400">Retirada</TableHead>
+                    <TableHead className="text-gray-400">Tempo Fora</TableHead>
+                    <TableHead className="text-right text-gray-400">Status</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {ferramentasAtrasadas.map((item) => (
+                    <TableRow key={item.id} className="border-gray-800 hover:bg-[#252525] transition-colors">
+                      <TableCell>
+                        <div className="font-medium text-white">{item.nome}</div>
+                        <div className="text-xs font-mono text-gray-500">{item.tag_rfid}</div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-gray-300">{item.responsavel}</div>
+                        <div className="text-[10px] text-gray-500 font-bold tracking-wider">{item.perfil}</div>
+                      </TableCell>
+                      <TableCell className="text-sm text-gray-400 whitespace-nowrap">{item.dataRetirada}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2 whitespace-nowrap">
+                          <Clock className="h-3 w-3 text-gray-400" />
+                          <span className="text-sm font-medium">{item.tempoFora}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {item.status === "CRÍTICO" && (
+                          <Badge className="bg-red-600/20 text-red-500 border border-red-900/50 hover:bg-red-600/30">
+                            {item.status}
+                          </Badge>
+                        )}
+                        {item.status === "ATRASADO" && (
+                          <Badge className="bg-orange-500/20 text-orange-400 border border-orange-900/50 hover:bg-orange-500/30">
+                            {item.status}
+                          </Badge>
+                        )}
+                        {item.status === "ATENÇÃO" && (
+                          <Badge className="bg-yellow-500/20 text-yellow-500 border border-yellow-900/50 hover:bg-yellow-500/30">
+                            {item.status}
+                          </Badge>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
-
       </main>
     </div>
   );
