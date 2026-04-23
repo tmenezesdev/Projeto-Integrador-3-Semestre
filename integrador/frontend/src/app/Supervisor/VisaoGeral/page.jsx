@@ -23,7 +23,7 @@ function KpiCard({ label, value, color = 'teal', sub }) {
   );
 }
 
-export default function SupervisorDashboard() {
+export default function SupervisorVisaoGeral() {
   const [ferramentas, setFerramentas] = useState([]);
   const [alertas, setAlertas] = useState([]);
   const [totalFerramentas, setTotalFerramentas] = useState(null);
@@ -38,7 +38,7 @@ export default function SupervisorDashboard() {
         const [ferrRes, alertRes, dashRes] = await Promise.all([
           fetch(`${API}/ferramentas-fora`),
           fetch(`${API}/alertas`),
-          fetch(`${API}/dashboard`),
+          fetch(`${API}/visãogeral`),
         ]);
         if (ferrRes.ok) setFerramentas(await ferrRes.json());
         if (alertRes.ok) setAlertas(await alertRes.json());

@@ -10,11 +10,11 @@ import {
 } from 'lucide-react';
 
 const navItems = [
-  { href: '/Supervisor/Dashboard',        label: 'Dashboard',        icon: LayoutDashboard, exact: true },
+  { href: '/Supervisor/VisaoGeral',        label: 'Visão Geral',        icon: LayoutDashboard, exact: true },
   { href: '/Supervisor/Ferramentas-Fora', label: 'Ferramentas Fora', icon: Wrench },
   { href: '/Supervisor/Historico',        label: 'Histórico',        icon: History },
   { href: '/Supervisor/Atrasos',          label: 'Atrasos',          icon: AlertOctagon },
-  { href: '/Supervisor/configuracoes',    label: 'Configurações',    icon: Settings },
+  { href: '/Supervisor/Cadastro',    label: 'Cadastro',    icon: Settings },
 ];
 
 export default function SidebarSupervisor() {
