@@ -293,10 +293,10 @@ export default function SupervisorVisaoGeral() {
               <button
                 key={val}
                 onClick={() => setPeriodo(Number(val))}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                className={`cursor-pointer px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                   periodo === Number(val)
                     ? 'bg-teal-500 text-white shadow-lg shadow-teal-500/20'
-                    : 'text-slate-500 hover:text-slate-300 bg-teal-500/5 border border-teal-500/10'
+                    : 'text-slate-300 hover:text-white bg-teal-500/5 border border-teal-500/10 hover:border-teal-500/30 hover:bg-teal-500/10'
                 }`}
               >
                 {lbl}
