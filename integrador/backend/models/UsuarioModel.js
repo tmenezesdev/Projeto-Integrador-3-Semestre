@@ -35,23 +35,29 @@ class UsuarioModel {
 
     // Buscar usuário por ID
     static async buscarPorId(id) {
+        const connection = await getConnection();
         try {
-            const rows = await read('usuarios', `id = ${id}`);
+            const [rows] = await connection.execute('SELECT * FROM usuarios WHERE id = ?', [id]);
             return rows[0] || null;
         } catch (error) {
             console.error('Erro ao buscar usuário por ID:', error);
             throw error;
+        } finally {
+            connection.release();
         }
     }
 
     // Buscar usuário por email
     static async buscarPorEmail(email) {
+        const connection = await getConnection();
         try {
-            const rows = await read('usuarios', `email = '${email}'`);
+            const [rows] = await connection.execute('SELECT * FROM usuarios WHERE email = ?', [email]);
             return rows[0] || null;
         } catch (error) {
             console.error('Erro ao buscar usuário por email:', error);
             throw error;
+        } finally {
+            connection.release();
         }
     }
 

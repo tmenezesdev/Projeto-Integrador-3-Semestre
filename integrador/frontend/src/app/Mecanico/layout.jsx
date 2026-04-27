@@ -1,14 +1,14 @@
 'use client';
 
 import React from 'react';
-import SidebarSupervisor from '@/components/SidebarSupervisor/sidebarsupervisor';
+import SidebarMecanico from '@/components/SidebarMecanico/sidebarmecanico';
 import AuthGuard from '@/components/AuthGuard/authguard';
 
-export default function SupervisorLayout({ children }) {
+export default function MecanicoLayout({ children }) {
   return (
-    <AuthGuard perfisPermitidos={['SUPERVISOR', 'ADMIN']}>
+    <AuthGuard perfisPermitidos={['MECANICO', 'SUPERVISOR', 'ADMIN']}>
       <div className="flex h-screen bg-[#09090A] text-gray-100 overflow-hidden font-sans">
-        <SidebarSupervisor />
+        <SidebarMecanico />
         <main className="flex-1 overflow-y-auto bg-[#09090A]">
           {children}
         </main>

@@ -11,10 +11,17 @@ import {
   RefreshCw,
   AlertCircle
 } from "lucide-react";
+import { Sk } from '@/components/ui/skeleton';
 import ModalDevolucao from "@/components/ModalDevolucao/page";
 
 const API = 'http://localhost:3000/api/supervisor';
-const SUPERVISOR_ID = 2;
+
+function getSupervisorId() {
+  try {
+    const user = JSON.parse(localStorage.getItem('smartbench_user') || '{}');
+    return user.id || null;
+  } catch { return null; }
+}
 
 export default function FerramentasForaPage() {
   const [ferramentas, setFerramentas] = useState([]);
@@ -59,15 +66,21 @@ export default function FerramentasForaPage() {
     setIsModalOpen(true);
   };
 
-  const handleConfirmarDevolucao = async (ferramentaId) => {
+  const handleConfirmarDevolucao = async (ferramentaId, observacao) => {
+    const supervisorId = getSupervisorId();
+    if (!supervisorId) {
+      alert('Sessão inválida. Faça login novamente.');
+      return;
+    }
     try {
+      const token = localStorage.getItem('smartbench_token');
       const res = await fetch(`${API}/ferramentas-fora/devolucao`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ferramentaId,
-          supervisorId: SUPERVISOR_ID
-        }),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ ferramentaId, supervisorId, observacao }),
       });
 
       if (!res.ok) throw new Error();
@@ -97,15 +110,63 @@ export default function FerramentasForaPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#060d1f]">
-        <Loader2 className="animate-spin text-teal-400 w-10 h-10" />
+      <div className="flex-1 p-8 bg-[#09090A] min-h-screen text-white font-sans">
+        <div className="flex items-start justify-between mb-10">
+          <div>
+            <Sk className="h-3 w-32 mb-2" />
+            <div className="flex items-center gap-3">
+              <Wrench size={28} className="text-teal-400 opacity-30" strokeWidth={1.5} />
+              <h1 className="text-3xl font-bold text-white tracking-tight">Ferramentas Fora</h1>
+            </div>
+            <Sk className="h-3 w-64 mt-2 ml-10" />
+          </div>
+          <Sk className="h-9 w-28 rounded-lg" />
+        </div>
+        <div className="grid grid-cols-3 gap-4 mb-10">
+          {Array(3).fill(0).map((_, i) => (
+            <div key={i} className="bg-white/[0.03] border border-slate-700/30 rounded-xl p-5 flex flex-col gap-3">
+              <Sk className="h-3 w-24" />
+              <Sk className="h-10 w-14" />
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5">
+          {Array(6).fill(0).map((_, i) => (
+            <div key={i} className="bg-[#0a1628] rounded-xl p-6 border border-slate-700/30">
+              <div className="flex justify-between items-start mb-5">
+                <div className="flex flex-col gap-1.5 flex-1 pr-4">
+                  <Sk className="h-5 w-40" />
+                  <Sk className="h-3 w-24" />
+                </div>
+                <Sk className="h-6 w-16 rounded flex-shrink-0" />
+              </div>
+              <div className="space-y-2.5 mb-5">
+                <div className="flex items-center gap-3">
+                  <Sk className="w-4 h-4 rounded flex-shrink-0" />
+                  <Sk className="h-4 w-36" />
+                </div>
+                <div className="flex items-center gap-3">
+                  <Sk className="w-4 h-4 rounded flex-shrink-0" />
+                  <Sk className="h-4 w-44" />
+                </div>
+              </div>
+              <div className="flex items-center justify-between pt-4 border-t border-slate-700/30">
+                <div className="flex flex-col gap-1">
+                  <Sk className="h-3 w-20" />
+                  <Sk className="h-7 w-20" />
+                </div>
+                <Sk className="h-9 w-24 rounded-lg" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
 
   if (erro) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#060d1f]">
+      <div className="flex items-center justify-center min-h-screen bg-[#09090A]">
         <div className="text-center">
           <AlertCircle className="text-red-400 w-10 h-10 mx-auto mb-3" />
           <p className="text-white font-semibold">Erro ao conectar ao servidor</p>
@@ -121,7 +182,7 @@ export default function FerramentasForaPage() {
   }
 
   return (
-    <div className="flex-1 p-8 bg-[#060d1f] min-h-screen text-white font-sans">
+    <div className="flex-1 p-8 bg-[#09090A] min-h-screen text-white font-sans">
       <div className="flex items-start justify-between mb-10">
         <div>
           <p className="text-xs font-bold text-teal-500 uppercase tracking-widest mb-1">

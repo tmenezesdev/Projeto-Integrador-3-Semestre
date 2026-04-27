@@ -129,7 +129,82 @@
 }
 
 @theme {
-  --color-primaria: #121212; 
+  --color-primaria: #121212;
   --color-segundaria: #7033ff;
   --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
 }
+
+/* ═══════════════════════════════════════════════
+   LIGHT MODE — aplicado quando html.light-mode
+   ═══════════════════════════════════════════════ */
+
+/* Transição suave — só ativa durante a troca de tema, não afeta hovers */
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+  transition:
+    background-color 0.55s ease-in-out,
+    border-color     0.55s ease-in-out,
+    color            0.4s  ease-in-out,
+    box-shadow       0.55s ease-in-out !important;
+}
+
+/* Página / layout principal */
+html.light-mode .bg-\[\#09090A\] { background-color: #f0eef8 !important; }
+
+/* Painéis e cards */
+html.light-mode .bg-\[\#13102a\] { background-color: #ffffff !important; }
+html.light-mode .bg-\[\#1a1000\] { background-color: #ffffff !important; }
+html.light-mode .bg-\[\#0f1a35\] { background-color: #ffffff !important; }
+
+/* Inputs e fundos internos */
+html.light-mode .bg-\[\#0a0a12\] { background-color: #f5f3ff !important; }
+html.light-mode .bg-\[\#0f0900\] { background-color: #fffcf5 !important; }
+html.light-mode .bg-\[\#060d1f\] { background-color: #f0faf9 !important; }
+
+/* Textos */
+html.light-mode .text-white      { color: #1e1b3a !important; }
+html.light-mode .text-gray-100   { color: #1e1b3a !important; }
+html.light-mode .text-slate-300  { color: #4a4870 !important; }
+html.light-mode .text-slate-400  { color: #6b6890 !important; }
+html.light-mode .text-slate-500  { color: #8b88a8 !important; }
+html.light-mode .text-slate-600  { color: #9e9cc0 !important; }
+html.light-mode .text-slate-700  { color: #b0aed0 !important; }
+
+/* Active nav items — muito claros no fundo branco */
+html.light-mode .text-\[\#a87fff\] { color: #5a1fc0 !important; }
+html.light-mode .text-amber-300    { color: #92400e !important; }
+html.light-mode .text-teal-300     { color: #0f766e !important; }
+html.light-mode .text-amber-400    { color: #b45309 !important; }
+html.light-mode .text-teal-400     { color: #0d9488 !important; }
+
+/* Bordas — levemente mais visíveis no fundo claro */
+html.light-mode .border-\[\#7033ff\]\/10  { border-color: rgba(112,51,255,0.18) !important; }
+html.light-mode .border-\[\#7033ff\]\/20  { border-color: rgba(112,51,255,0.28) !important; }
+html.light-mode .border-\[\#7033ff\]\/5   { border-color: rgba(112,51,255,0.10) !important; }
+html.light-mode .border-amber-500\/10     { border-color: rgba(245,158,11,0.22) !important; }
+html.light-mode .border-amber-500\/5      { border-color: rgba(245,158,11,0.12) !important; }
+html.light-mode .border-amber-500\/20     { border-color: rgba(245,158,11,0.30) !important; }
+html.light-mode .border-teal-500\/10      { border-color: rgba(45,212,191,0.22) !important; }
+html.light-mode .border-teal-500\/20      { border-color: rgba(45,212,191,0.30) !important; }
+
+/* Cards e inputs das páginas Supervisor (Histórico, Cadastro, Ferramentas-Fora) */
+html.light-mode .bg-\[\#0a1628\]    { background-color: #f4f8ff !important; }
+html.light-mode .bg-\[\#0c1b31\]\/50 { background-color: rgba(236,244,255,0.8) !important; }
+html.light-mode .bg-\[\#0c1b31\]    { background-color: #ecf4ff !important; }
+
+/* Texto de inputs e conteúdo de tabela */
+html.light-mode .text-slate-200  { color: #2d2b4a !important; }
+
+/* Bordas slate usadas em cards de Supervisor */
+html.light-mode .border-slate-700\/50 { border-color: rgba(99,102,121,0.28) !important; }
+html.light-mode .border-slate-700\/40 { border-color: rgba(99,102,121,0.22) !important; }
+html.light-mode .border-slate-700\/30 { border-color: rgba(99,102,121,0.16) !important; }
+html.light-mode .border-slate-700\/20 { border-color: rgba(99,102,121,0.12) !important; }
+
+/* Hover em linhas de tabela */
+html.light-mode .hover\:bg-\[\#7033ff\]\/5:hover  { background-color: rgba(112,51,255,0.05) !important; }
+html.light-mode .hover\:bg-amber-500\/5:hover      { background-color: rgba(245,158,11,0.05) !important; }
+html.light-mode .hover\:bg-teal-500\/5:hover       { background-color: rgba(20,184,166,0.06) !important; }
+html.light-mode .hover\:bg-white\/5:hover          { background-color: rgba(0,0,0,0.04) !important; }
+html.light-mode .hover\:text-slate-200:hover       { color: #1e1b3a !important; }

@@ -4,21 +4,20 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  LayoutDashboard, Wrench, History,
-  AlertOctagon, Settings, ChevronLeft,
-  ChevronRight, LogOut, ShieldCheck,
+  PackageOpen, Wrench, History,
+  AlertOctagon, ChevronLeft,
+  ChevronRight, LogOut, HardHat,
 } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle/themetoggle';
 
 const navItems = [
-  { href: '/Supervisor/VisaoGeral',       label: 'Visão Geral',      icon: LayoutDashboard, exact: true },
-  { href: '/Supervisor/Ferramentas-Fora', label: 'Ferramentas Fora', icon: Wrench },
-  { href: '/Supervisor/Historico',        label: 'Histórico',        icon: History },
-  { href: '/Supervisor/Atrasos',          label: 'Atrasos',          icon: AlertOctagon },
-  { href: '/Supervisor/Cadastro',         label: 'Cadastro',         icon: Settings },
+  { href: '/Mecanico/Dashboard',   label: 'Minhas Retiradas', icon: PackageOpen, exact: true },
+  { href: '/Mecanico/Ferramentas', label: 'Ferramentas',      icon: Wrench },
+  { href: '/Mecanico/Historico',   label: 'Histórico',        icon: History },
+  { href: '/Mecanico/Alertas',     label: 'Alertas',          icon: AlertOctagon },
 ];
 
-export default function SidebarSupervisor() {
+export default function SidebarMecanico() {
   const pathname = usePathname();
   const router   = useRouter();
   const [collapsed, setCollapsed] = useState(false);
@@ -42,18 +41,18 @@ export default function SidebarSupervisor() {
   const btnBase = `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all w-full border border-transparent ${collapsed ? 'justify-center px-0' : ''}`;
 
   return (
-    <aside className={`relative flex flex-col h-full bg-[#060d1f] border-r border-teal-500/10 transition-all duration-300 ${collapsed ? 'w-[80px]' : 'w-[260px]'}`}>
+    <aside className={`relative flex flex-col h-full bg-[#0f0900] border-r border-amber-500/10 transition-all duration-300 ${collapsed ? 'w-[80px]' : 'w-[260px]'}`}>
 
       {/* Logo */}
-      <div className={`flex items-center gap-3 px-5 py-6 border-b border-teal-500/10 ${collapsed ? 'justify-center px-0' : ''}`}>
-        <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-teal-500/20 border border-teal-500/30 flex items-center justify-center">
-          <ShieldCheck size={20} className="text-teal-400" />
+      <div className={`flex items-center gap-3 px-5 py-6 border-b border-amber-500/10 ${collapsed ? 'justify-center px-0' : ''}`}>
+        <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center">
+          <HardHat size={20} className="text-amber-400" />
         </div>
         {!collapsed && (
           <div className="flex flex-col leading-tight">
             <span className="text-white font-bold text-base tracking-tight">SmartBench</span>
-            <span className="text-teal-400 text-[11px] font-semibold uppercase tracking-widest">
-              {nomeUsuario ? `${nomeUsuario} · Supervisor` : 'Supervisor'}
+            <span className="text-amber-400 text-[11px] font-semibold uppercase tracking-widest">
+              {nomeUsuario ? `${nomeUsuario} · Mecânico` : 'Mecânico'}
             </span>
           </div>
         )}
@@ -70,14 +69,14 @@ export default function SidebarSupervisor() {
               href={item.href}
               title={collapsed ? item.label : undefined}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all group relative
-                ${active ? 'bg-teal-500/10 text-teal-300 border border-teal-500/20' : 'text-slate-500 hover:text-slate-200 hover:bg-white/5 border border-transparent'}
+                ${active ? 'bg-amber-500/10 text-amber-300 border border-amber-500/20' : 'text-slate-500 hover:text-slate-200 hover:bg-white/5 border border-transparent'}
                 ${collapsed ? 'justify-center px-0' : ''}`}
             >
-              {active && <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-teal-400 rounded-r-full" />}
-              <Icon size={20} className={`flex-shrink-0 ${active ? 'text-teal-400' : 'text-slate-600 group-hover:text-slate-300'}`} />
+              {active && <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-amber-400 rounded-r-full" />}
+              <Icon size={20} className={`flex-shrink-0 ${active ? 'text-amber-400' : 'text-slate-600 group-hover:text-slate-300'}`} />
               {!collapsed && <span>{item.label}</span>}
               {collapsed && (
-                <div className="absolute left-full ml-3 px-2.5 py-1.5 bg-[#0f1a35] text-slate-100 text-xs rounded-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 border border-teal-500/20">
+                <div className="absolute left-full ml-3 px-2.5 py-1.5 bg-[#1a1000] text-slate-100 text-xs rounded-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 border border-amber-500/20">
                   {item.label}
                 </div>
               )}
@@ -87,8 +86,8 @@ export default function SidebarSupervisor() {
       </nav>
 
       {/* Footer */}
-      <div className={`px-3 pb-5 border-t border-teal-500/10 pt-3 flex flex-col gap-1.5 ${collapsed ? 'items-center' : ''}`}>
-        <ThemeToggle collapsed={collapsed} trackOn="#2dd4bf" />
+      <div className={`px-3 pb-5 border-t border-amber-500/10 pt-3 flex flex-col gap-1.5 ${collapsed ? 'items-center' : ''}`}>
+        <ThemeToggle collapsed={collapsed} trackOn="#f59e0b" />
         <button
           onClick={handleLogout}
           className={`${btnBase} text-slate-600 hover:text-red-400 hover:bg-red-500/5`}
@@ -101,7 +100,7 @@ export default function SidebarSupervisor() {
       {/* Toggle collapse */}
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3.5 top-[76px] w-7 h-7 bg-[#0f1a35] border border-teal-500/20 rounded-full flex items-center justify-center text-slate-500 hover:text-teal-300 transition-all z-10"
+        className="absolute -right-3.5 top-[76px] w-7 h-7 bg-[#1a1000] border border-amber-500/20 rounded-full flex items-center justify-center text-slate-500 hover:text-amber-300 transition-all z-10"
       >
         {collapsed ? <ChevronRight size={13} /> : <ChevronLeft size={13} />}
       </button>

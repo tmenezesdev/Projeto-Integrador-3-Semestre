@@ -22,7 +22,7 @@ export default function SidebarNav() {
   
   // === CORREÇÃO AQUI ===
   // Se a rota começar com "/Supervisor", a barra normal "desaparece" para dar espaço à nova.
-  if (pathname.startsWith("/Supervisor")) return null;
+  if (pathname.startsWith("/Supervisor") || pathname.startsWith("/Admin") || pathname.startsWith("/Mecanico")) return null;
   // =====================
 
   const [isOpen, setIsOpen] = useState(false);

@@ -1,14 +1,14 @@
 'use client';
 
 import React from 'react';
-import SidebarSupervisor from '@/components/SidebarSupervisor/sidebarsupervisor';
+import SidebarAdmin from '@/components/SidebarAdmin/sidebaradmin';
 import AuthGuard from '@/components/AuthGuard/authguard';
 
-export default function SupervisorLayout({ children }) {
+export default function AdminLayout({ children }) {
   return (
-    <AuthGuard perfisPermitidos={['SUPERVISOR', 'ADMIN']}>
+    <AuthGuard perfisPermitidos={['ADMIN']}>
       <div className="flex h-screen bg-[#09090A] text-gray-100 overflow-hidden font-sans">
-        <SidebarSupervisor />
+        <SidebarAdmin />
         <main className="flex-1 overflow-y-auto bg-[#09090A]">
           {children}
         </main>
