@@ -172,7 +172,7 @@ export default function FerramentasForaPage() {
           <p className="text-white font-semibold">Erro ao conectar ao servidor</p>
           <button
             onClick={() => fetchFerramentas()}
-            className="mt-3 text-xs text-teal-400 border border-teal-500/30 px-4 py-2 rounded-lg hover:bg-teal-500/10 transition-colors"
+            className="mt-3 text-xs text-teal-400 border border-teal-500/30 px-4 py-2 rounded-lg hover:bg-teal-500/10 transition-colors cursor-pointer"
           >
             Tentar novamente
           </button>
@@ -202,7 +202,7 @@ export default function FerramentasForaPage() {
         <button
           onClick={() => fetchFerramentas(true)}
           disabled={isRefreshing}
-          className="flex items-center gap-2 text-xs text-slate-400 hover:text-white border border-slate-700/50 px-3 py-2 rounded-lg hover:border-teal-500/30 transition-all"
+          className="flex items-center gap-2 text-xs text-slate-400 hover:text-white border border-slate-700/50 px-3 py-2 rounded-lg hover:border-teal-500/30 transition-all cursor-pointer disabled:cursor-not-allowed"
         >
           <RefreshCw
             size={13}
@@ -312,8 +312,7 @@ export default function FerramentasForaPage() {
                       <Clock size={11} /> Tempo fora
                     </div>
                     <span
-                      className={`text-2xl font-bold ${atrasada ? 'text-red-400' : 'text-teal-400'
-                        }`}
+                      className={`text-2xl font-bold ${atrasada ? 'text-red-400' : 'text-teal-400'}`}
                     >
                       {f.tempoForaLabel || f.tempoFora}
                     </span>
@@ -321,7 +320,7 @@ export default function FerramentasForaPage() {
 
                   <button
                     onClick={() => abrirModal(f)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold border transition-all duration-200 bg-white/5 text-slate-400 border-slate-700/50 hover:bg-emerald-500/10 hover:text-emerald-400 hover:border-emerald-500/20"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold border transition-all duration-200 bg-white/5 text-slate-400 border-slate-700/50 hover:bg-emerald-500/10 hover:text-emerald-400 hover:border-emerald-500/20 cursor-pointer"
                   >
                     <CheckCircle2 size={15} />
                     Devolver

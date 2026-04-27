@@ -1,25 +1,110 @@
 'use client';
 
 import { useState, useEffect } from "react";
-import { History, Search, Download, Loader2, AlertCircle, ArrowUpRight, ArrowDownLeft } from "lucide-react";
+import { History, Search, Download, AlertCircle, ArrowUpRight, ArrowDownLeft } from "lucide-react";
 import { Sk } from '@/components/ui/skeleton';
+import ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
 
 const API_URL = 'http://localhost:3000/api/supervisor/historico';
 
+function gerarGraficoBase64(labels, retiradas, devolucoes) {
+  const canvas = document.createElement('canvas');
+  canvas.width  = 900;
+  canvas.height = 420;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const pad = { top: 60, right: 40, bottom: 80, left: 55 };
+  const cW = W - pad.left - pad.right;
+  const cH = H - pad.top - pad.bottom;
+
+  // fundo
+  ctx.fillStyle = '#0d1f3c';
+  ctx.fillRect(0, 0, W, H);
+
+  // título
+  ctx.fillStyle = '#e2e8f0';
+  ctx.font = 'bold 16px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('Movimentações por Data', W / 2, 38);
+
+  const maxVal = Math.max(...retiradas, ...devolucoes, 1);
+  const gridLines = 5;
+
+  // grid + eixo Y
+  for (let i = 0; i <= gridLines; i++) {
+    const y = pad.top + cH - (i / gridLines) * cH;
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + cW, y); ctx.stroke();
+    ctx.fillStyle = '#64748b';
+    ctx.font = '11px sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(String(Math.round((i / gridLines) * maxVal)), pad.left - 8, y + 4);
+  }
+
+  // barras
+  const groupW = cW / Math.max(labels.length, 1);
+  const barW   = Math.min(groupW * 0.32, 28);
+  const barGap = 4;
+
+  labels.forEach((label, i) => {
+    const cx = pad.left + i * groupW + groupW / 2;
+
+    // retirada
+    const rH = (retiradas[i] / maxVal) * cH || 0;
+    ctx.fillStyle = '#f97316';
+    ctx.fillRect(cx - barW - barGap / 2, pad.top + cH - rH, barW, rH);
+
+    // devolução
+    const dH = (devolucoes[i] / maxVal) * cH || 0;
+    ctx.fillStyle = '#10b981';
+    ctx.fillRect(cx + barGap / 2, pad.top + cH - dH, barW, dH);
+
+    // label X
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '10px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(label, cx, pad.top + cH + 18);
+  });
+
+  // eixo X linha
+  ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(pad.left, pad.top + cH);
+  ctx.lineTo(pad.left + cW, pad.top + cH);
+  ctx.stroke();
+
+  // legenda
+  const legY = H - 16;
+  ctx.fillStyle = '#f97316';
+  ctx.fillRect(W / 2 - 130, legY - 11, 13, 13);
+  ctx.fillStyle = '#cbd5e1';
+  ctx.font = '12px sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('Retiradas', W / 2 - 113, legY);
+
+  ctx.fillStyle = '#10b981';
+  ctx.fillRect(W / 2 + 20, legY - 11, 13, 13);
+  ctx.fillStyle = '#cbd5e1';
+  ctx.fillText('Devoluções', W / 2 + 37, legY);
+
+  return canvas.toDataURL('image/png').split(',')[1];
+}
+
 export default function HistoricoPage() {
   const [historico, setHistorico] = useState([]);
-  const [busca, setBusca] = useState('');
-  const [filtroOp, setFiltroOp] = useState('TODOS');
+  const [busca, setBusca]         = useState('');
+  const [filtroOp, setFiltroOp]   = useState('TODOS');
   const [isLoading, setIsLoading] = useState(true);
-  const [erro, setErro] = useState(false);
+  const [erro, setErro]           = useState(false);
 
   useEffect(() => {
     const load = async () => {
       try {
         const token = localStorage.getItem('smartbench_token');
-        const res = await fetch(API_URL, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await fetch(API_URL, { headers: { Authorization: `Bearer ${token}` } });
         if (!res.ok) throw new Error();
         setHistorico(await res.json());
       } catch { setErro(true); }
@@ -36,6 +121,96 @@ export default function HistoricoPage() {
     const matchOp = filtroOp === 'TODOS' || item.operacao === filtroOp;
     return matchBusca && matchOp;
   });
+
+  const handleExportar = async () => {
+    // agrupamento para o gráfico
+    const porData = {};
+    dadosFiltrados.forEach(log => {
+      const data = log.dataHora?.split(' ')[0] ?? 'N/A';
+      if (!porData[data]) porData[data] = { retiradas: 0, devolucoes: 0 };
+      if (log.operacao === 'RETIRADA') porData[data].retiradas++;
+      else porData[data].devolucoes++;
+    });
+    const labels    = Object.keys(porData).sort();
+    const retArr    = labels.map(d => porData[d].retiradas);
+    const devArr    = labels.map(d => porData[d].devolucoes);
+    const imgBase64 = gerarGraficoBase64(labels, retArr, devArr);
+
+    // workbook
+    const wb = new ExcelJS.Workbook();
+    wb.creator = 'SmartBench';
+
+    // sheet 1 — dados
+    const ws = wb.addWorksheet('Histórico');
+    ws.columns = [
+      { header: 'ID',          key: 'id',          width: 8  },
+      { header: 'Data e Hora', key: 'dataHora',     width: 20 },
+      { header: 'Ferramenta',  key: 'ferramenta',   width: 32 },
+      { header: 'TAG RFID',    key: 'tagRfid',      width: 16 },
+      { header: 'Responsável', key: 'responsavel',  width: 24 },
+      { header: 'Cargo',       key: 'cargo',        width: 14 },
+      { header: 'Operação',    key: 'operacao',     width: 14 },
+      { header: 'Método',      key: 'metodo',       width: 14 },
+      { header: 'Observação',  key: 'observacao',   width: 38 },
+    ];
+
+    // estilo do cabeçalho
+    ws.getRow(1).eachCell(cell => {
+      cell.fill      = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0D1F3C' } };
+      cell.font      = { bold: true, color: { argb: 'FF2DD4BF' }, size: 10 };
+      cell.border    = { bottom: { style: 'thin', color: { argb: 'FF2DD4BF' } } };
+      cell.alignment = { vertical: 'middle' };
+    });
+    ws.getRow(1).height = 22;
+
+    dadosFiltrados.forEach(log => {
+      const row = ws.addRow({
+        id:          log.id,
+        dataHora:    log.dataHora,
+        ferramenta:  log.ferramenta,
+        tagRfid:     log.tagRfid,
+        responsavel: log.responsavel,
+        cargo:       log.cargo,
+        operacao:    log.operacao,
+        metodo:      log.metodo === 'RFID_AUTOMATICO' ? 'RFID AUTO' : 'MANUAL',
+        observacao:  log.observacao || '',
+      });
+
+      // colorir célula operação
+      const opCell = row.getCell('operacao');
+      opCell.font = {
+        bold: true,
+        color: { argb: log.operacao === 'RETIRADA' ? 'FFF97316' : 'FF10B981' },
+      };
+
+      row.eachCell(cell => {
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0A1628' } };
+        if (!cell.font) cell.font = {};
+        if (!cell.font.color) cell.font.color = { argb: 'FFE2E8F0' };
+        cell.font.size = 10;
+        cell.alignment = { vertical: 'middle' };
+      });
+      row.height = 18;
+    });
+
+    // rodapé contagem
+    const totalRow = ws.addRow([`${dadosFiltrados.length} registro(s) exportado(s)`]);
+    totalRow.getCell(1).font = { italic: true, color: { argb: 'FF64748B' }, size: 9 };
+
+    // sheet 2 — gráfico
+    const wsChart = wb.addWorksheet('Gráfico');
+    const imgId = wb.addImage({ base64: imgBase64, extension: 'png' });
+    wsChart.addImage(imgId, {
+      tl: { col: 0.5, row: 0.5 },
+      ext: { width: 900, height: 420 },
+    });
+    wsChart.getCell('A1').value = '';
+
+    // salvar
+    const buffer    = await wb.xlsx.writeBuffer();
+    const dataAtual = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
+    saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `historico-smartbench-${dataAtual}.xlsx`);
+  };
 
   if (isLoading) return (
     <div className="flex-1 p-8 bg-[#09090A] min-h-screen text-white font-sans">
@@ -120,12 +295,12 @@ export default function HistoricoPage() {
               <button
                 key={op}
                 onClick={() => setFiltroOp(op)}
-                className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${
+                className={`cursor-pointer px-3 py-1.5 rounded-md text-xs font-bold transition-all ${
                   filtroOp === op
-                    ? op === 'RETIRADA' ? 'bg-orange-500/20 text-orange-400'
+                    ? op === 'RETIRADA'  ? 'bg-orange-500/20 text-orange-400'
                     : op === 'DEVOLUCAO' ? 'bg-emerald-500/20 text-emerald-400'
                     : 'bg-teal-500/20 text-teal-400'
-                    : 'text-slate-500 hover:text-slate-300'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
                 }`}
               >
                 {op === 'TODOS' ? 'Todos' : op === 'RETIRADA' ? 'Retiradas' : 'Devoluções'}
@@ -133,7 +308,10 @@ export default function HistoricoPage() {
             ))}
           </div>
         </div>
-        <button className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-lg text-xs font-bold transition-all">
+        <button
+          onClick={handleExportar}
+          className="cursor-pointer flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white px-5 py-2.5 rounded-lg text-xs font-bold transition-all shadow-lg shadow-teal-900/30"
+        >
           <Download size={14} /> Exportar
         </button>
       </div>

@@ -28,7 +28,7 @@ export default function ModalDevolucao({ isOpen, onClose, onConfirm, ferramenta 
           </div>
           <button
             onClick={handleClose}
-            className="text-slate-500 hover:text-slate-300 transition-colors p-1 rounded-md hover:bg-slate-800"
+            className="cursor-pointer text-slate-500 hover:text-slate-300 transition-colors p-1 rounded-md hover:bg-slate-800"
           >
             <X size={18} />
           </button>
@@ -68,13 +68,13 @@ export default function ModalDevolucao({ isOpen, onClose, onConfirm, ferramenta 
         <div className="px-6 py-4 bg-black/20 border-t border-slate-700/30 flex justify-end gap-3">
           <button
             onClick={handleClose}
-            className="px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+            className="cursor-pointer px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
           >
             Cancelar
           </button>
           <button
             onClick={handleConfirm}
-            className="px-5 py-2 rounded-lg text-sm font-bold text-teal-400 bg-teal-500/10 border border-teal-500/20 hover:bg-teal-500/20 transition-colors shadow-[0_0_15px_rgba(45,212,191,0.1)] hover:shadow-[0_0_20px_rgba(45,212,191,0.2)]"
+            className="cursor-pointer px-5 py-2 rounded-lg text-sm font-bold text-teal-400 bg-teal-500/10 border border-teal-500/20 hover:bg-teal-500/20 transition-colors shadow-[0_0_15px_rgba(45,212,191,0.1)] hover:shadow-[0_0_20px_rgba(45,212,191,0.2)]"
           >
             Confirmar Devolução
           </button>

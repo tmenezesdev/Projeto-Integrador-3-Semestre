@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, Wrench, History,
-  AlertOctagon, Settings, ChevronLeft,
+  AlertOctagon, UserPlus, ChevronLeft,
   ChevronRight, LogOut, ShieldCheck,
 } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle/themetoggle';
@@ -15,7 +15,7 @@ const navItems = [
   { href: '/Supervisor/Ferramentas-Fora', label: 'Ferramentas Fora', icon: Wrench },
   { href: '/Supervisor/Historico',        label: 'Histórico',        icon: History },
   { href: '/Supervisor/Atrasos',          label: 'Atrasos',          icon: AlertOctagon },
-  { href: '/Supervisor/Cadastro',         label: 'Cadastro',         icon: Settings },
+  { href: '/Supervisor/Cadastro',         label: 'Cadastro',         icon: UserPlus },
 ];
 
 export default function SidebarSupervisor() {
@@ -101,7 +101,7 @@ export default function SidebarSupervisor() {
       {/* Toggle collapse */}
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3.5 top-[76px] w-7 h-7 bg-[#0f1a35] border border-teal-500/20 rounded-full flex items-center justify-center text-slate-500 hover:text-teal-300 transition-all z-10"
+        className="absolute -right-3.5 top-[76px] w-7 h-7 bg-[#0f1a35] border border-teal-500/20 rounded-full flex items-center justify-center text-slate-500 hover:text-teal-300 transition-all z-10 cursor-pointer"
       >
         {collapsed ? <ChevronRight size={13} /> : <ChevronLeft size={13} />}
       </button>

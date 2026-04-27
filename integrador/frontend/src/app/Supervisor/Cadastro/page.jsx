@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import {
-  Settings,
   User,
   Save,
   UserPlus,
@@ -76,7 +75,7 @@ export default function CadastroPage() {
       <div className="flex flex-col gap-1 mb-10 w-full">
         <p className="text-[10px] font-bold text-teal-500 uppercase tracking-[0.2em]">Painel de Controle</p>
         <div className="flex items-center gap-3">
-          <Settings className="text-teal-400 h-7 w-7" />
+          <UserPlus className="text-teal-400 h-7 w-7" />
           <h1 className="text-3xl font-bold text-white tracking-tight">Cadastro do Sistema</h1>
         </div>
       </div>
@@ -172,7 +171,7 @@ export default function CadastroPage() {
               <button
                 type="submit"
                 disabled={salvando}
-                className="flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white px-8 py-3 rounded-lg text-xs font-bold transition-all disabled:opacity-50 active:scale-95 shadow-lg shadow-teal-500/10 uppercase tracking-widest"
+                className="cursor-pointer flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white px-8 py-3 rounded-lg text-xs font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 shadow-lg shadow-teal-500/10 uppercase tracking-widest"
               >
                 {salvando ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Save size={14} />}
                 {salvando ? 'Salvando...' : 'Finalizar Cadastro'}

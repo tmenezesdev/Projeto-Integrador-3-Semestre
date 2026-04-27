@@ -100,7 +100,7 @@ export default function SidebarMecanico() {
       {/* Toggle collapse */}
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3.5 top-[76px] w-7 h-7 bg-[#1a1000] border border-amber-500/20 rounded-full flex items-center justify-center text-slate-500 hover:text-amber-300 transition-all z-10"
+        className="absolute -right-3.5 top-[76px] w-7 h-7 bg-[#1a1000] border border-amber-500/20 rounded-full flex items-center justify-center text-slate-500 hover:text-amber-300 transition-all z-10 cursor-pointer"
       >
         {collapsed ? <ChevronRight size={13} /> : <ChevronLeft size={13} />}
       </button>
