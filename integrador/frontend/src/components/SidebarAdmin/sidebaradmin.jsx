@@ -11,17 +11,17 @@ import {
 import ThemeToggle from '@/components/ThemeToggle/themetoggle';
 
 const navItems = [
-  { href: '/Admin/Dashboard',     label: 'Dashboard',     icon: LayoutDashboard, exact: true },
-  { href: '/Admin/Usuarios',      label: 'Usuários',      icon: Users },
-  { href: '/Admin/Ferramentas',   label: 'Ferramentas',   icon: Wrench },
-  { href: '/Admin/Historico',     label: 'Histórico',     icon: History },
-  { href: '/Admin/Alertas',       label: 'Alertas',       icon: AlertOctagon },
+  { href: '/Admin/Dashboard', label: 'Dashboard', icon: LayoutDashboard, exact: true },
+  { href: '/Admin/Usuarios', label: 'Usuários', icon: Users },
+  { href: '/Admin/Ferramentas', label: 'Ferramentas', icon: Wrench },
+  { href: '/Admin/Historico', label: 'Histórico', icon: History },
+  { href: '/Admin/Alertas', label: 'Alertas', icon: AlertOctagon },
   { href: '/Admin/Configuracoes', label: 'Configurações', icon: Settings },
 ];
 
 export default function SidebarAdmin() {
   const pathname = usePathname();
-  const router   = useRouter();
+  const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const [nomeUsuario, setNomeUsuario] = useState('');
 
@@ -29,7 +29,7 @@ export default function SidebarAdmin() {
     try {
       const u = JSON.parse(localStorage.getItem('smartbench_user') || '{}');
       setNomeUsuario(u.nome?.split(' ')[0] || '');
-    } catch {}
+    } catch { }
   }, []);
 
   const isActive = (item) => item.exact ? pathname === item.href : pathname.startsWith(item.href);
@@ -64,7 +64,7 @@ export default function SidebarAdmin() {
       <nav className="flex-1 py-5 px-3 flex flex-col gap-1.5">
         {navItems.map((item) => {
           const active = isActive(item);
-          const Icon   = item.icon;
+          const Icon = item.icon;
           return (
             <Link
               key={item.href}
@@ -88,11 +88,11 @@ export default function SidebarAdmin() {
       </nav>
 
       {/* Footer */}
-      <div className={`px-3 pb-5 border-t border-[#7033ff]/10 pt-3 flex flex-col gap-1.5 ${collapsed ? 'items-center' : ''}`}>
-        <ThemeToggle collapsed={collapsed} trackOn="#7033ff" />
+      <div className={`px-3 pb-5 border-t border-teal-500/10 pt-3 flex flex-col gap-1.5 ${collapsed ? 'items-center' : ''}`}>
+        <ThemeToggle collapsed={collapsed} trackOn="#2dd4bf" />
         <button
           onClick={handleLogout}
-          className={`${btnBase} text-slate-600 hover:text-red-400 hover:bg-red-500/5`}
+          className={`${btnBase} cursor-pointer text-slate-400 hover:text-red-400 hover:bg-red-500/5`}
         >
           <LogOut size={19} className="flex-shrink-0" />
           {!collapsed && <span>Sair</span>}
