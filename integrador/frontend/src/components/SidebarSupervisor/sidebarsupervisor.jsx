@@ -91,7 +91,7 @@ export default function SidebarSupervisor() {
         <ThemeToggle collapsed={collapsed} trackOn="#2dd4bf" />
         <button
           onClick={handleLogout}
-          className={`${btnBase} text-slate-600 hover:text-red-400 hover:bg-red-500/5`}
+          className={`${btnBase} cursor-pointer text-slate-400 hover:text-red-400 hover:bg-red-500/5`}
         >
           <LogOut size={19} className="flex-shrink-0" />
           {!collapsed && <span>Sair</span>}
