@@ -286,7 +286,7 @@ export default function AdminDashboard() {
               <button
                 key={val}
                 onClick={() => setPeriodo(Number(val))}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                className={`cursor-pointer px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                   periodo === Number(val)
                     ? 'bg-[#7033ff] text-white shadow-lg shadow-[#7033ff]/20'
                     : 'text-slate-500 hover:text-slate-300 bg-[#7033ff]/5 border border-[#7033ff]/10'
