@@ -11,13 +11,23 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer,
 } from 'recharts';
+import ModalInventario  from '@/components/ModaisVisaoGeral/ModalInventario';
+import ModalEmUso       from '@/components/ModaisVisaoGeral/ModalEmUso';
+import ModalAtrasadas   from '@/components/ModaisVisaoGeral/ModalAtrasadas';
+import ModalAlertas     from '@/components/ModaisVisaoGeral/ModalAlertas';
+import ModalTransacoes  from '@/components/ModaisVisaoGeral/ModalTransacoes';
+import ModalMecanicos   from '@/components/ModaisVisaoGeral/ModalMecanicos';
+import ModalTaxaPrazo   from '@/components/ModaisVisaoGeral/ModalTaxaPrazo';
 
 const API   = 'http://localhost:3000/api/supervisor';
 const token = () => localStorage.getItem('smartbench_token');
 
-function KpiCard({ label, value, accent, sub, icon: Icon }) {
+function KpiCard({ label, value, accent, sub, icon: Icon, onClick }) {
   return (
-    <div className="bg-[#0f1a35] border border-teal-500/10 rounded-xl p-5 flex flex-col gap-3 shadow-lg">
+    <div
+      onClick={onClick}
+      className="bg-[#0f1a35] border border-teal-500/10 rounded-xl p-5 flex flex-col gap-3 shadow-lg cursor-pointer hover:border-teal-500/30 hover:bg-[#112040] transition-all group"
+    >
       <div className="flex items-center justify-between">
         <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest">{label}</span>
         <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${accent ?? 'bg-teal-500/10 border border-teal-500/20'}`}>
@@ -25,7 +35,12 @@ function KpiCard({ label, value, accent, sub, icon: Icon }) {
         </div>
       </div>
       <span className="text-4xl font-black text-white">{value ?? '—'}</span>
-      {sub && <span className="text-xs text-slate-600">{sub}</span>}
+      {sub && (
+        <span className="text-xs text-slate-600 flex items-center gap-1">
+          {sub}
+          <ArrowUpRight size={10} className="opacity-0 group-hover:opacity-60 transition-opacity" />
+        </span>
+      )}
     </div>
   );
 }
@@ -48,15 +63,20 @@ function StatBar({ label, value, max, color }) {
 }
 
 export default function SupervisorVisaoGeral() {
-  const [kpis,        setKpis]        = useState(null);
-  const [ferramentas, setFerramentas] = useState([]);
-  const [alertas,     setAlertas]     = useState([]);
-  const [nomeUsuario, setNomeUsuario] = useState('');
-  const [isLoading,   setIsLoading]   = useState(true);
-  const [erro,        setErro]        = useState(false);
+  const [kpis,         setKpis]         = useState(null);
+  const [ferramentas,  setFerramentas]  = useState([]);
+  const [alertas,      setAlertas]      = useState([]);
+  const [historico,    setHistorico]    = useState([]);
+  const [nomeUsuario,  setNomeUsuario]  = useState('');
+  const [isLoading,    setIsLoading]    = useState(true);
+  const [erro,         setErro]         = useState(false);
   const [periodo,      setPeriodo]      = useState(15);
   const [fluxo,        setFluxo]        = useState([]);
   const [fluxoLoading, setFluxoLoading] = useState(false);
+
+  const [modalAberto,  setModalAberto]  = useState(null);
+  const [todasFerr,    setTodasFerr]    = useState([]);
+  const [loadingModal, setLoadingModal] = useState(false);
 
   useEffect(() => {
     try {
@@ -67,18 +87,26 @@ export default function SupervisorVisaoGeral() {
     const load = async () => {
       try {
         const h = { Authorization: `Bearer ${token()}` };
-        const [ferrRes, alertRes, dashRes] = await Promise.all([
+        const [ferrRes, alertRes, dashRes, histRes] = await Promise.all([
           fetch(`${API}/ferramentas-fora`, { headers: h }),
           fetch(`${API}/alertas`,          { headers: h }),
           fetch(`${API}/visaogeral`,       { headers: h }),
+          fetch(`${API}/historico`,        { headers: h }),
         ]);
         if (!dashRes.ok) throw new Error();
         const ferr  = await ferrRes.json();
         const alert = await alertRes.json();
         const dash  = await dashRes.json();
+        const hist  = await histRes.json();
+
         setFerramentas(Array.isArray(ferr)  ? ferr  : ferr.dados  ?? []);
         setAlertas(Array.isArray(alert) ? alert : alert.dados ?? []);
         setKpis(dash.dados ?? dash);
+
+        const hoje_str = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        const transacoesHoje = (Array.isArray(hist) ? hist : hist.dados ?? [])
+          .filter(t => t.dataHora?.startsWith(hoje_str));
+        setHistorico(transacoesHoje);
       } catch { setErro(true); }
       finally  { setIsLoading(false); }
     };
@@ -100,7 +128,32 @@ export default function SupervisorVisaoGeral() {
     fetchFluxo();
   }, [periodo]);
 
+  const abrirModal = async (tipo) => {
+    setModalAberto(tipo);
+    if (tipo === 'total' && todasFerr.length === 0) {
+      setLoadingModal(true);
+      try {
+        const r = await fetch(`${API}/ferramentas`, {
+          headers: { Authorization: `Bearer ${token()}` },
+        });
+        const json = await r.json();
+        setTodasFerr(json.dados ?? []);
+      } catch {}
+      finally { setLoadingModal(false); }
+    }
+  };
+
+  const fecharModal = () => setModalAberto(null);
+
   const hoje = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
+
+  const emUso         = ferramentas.filter(f => f.statusAlerta === 'EM_USO');
+  const atrasadas     = ferramentas.filter(f => f.statusAlerta === 'ATRASADA');
+  const alertAtivos   = alertas.filter(a => a.status_alerta === 'ATIVO');
+  const totalFerr     = kpis?.totalFerramentas ?? 0;
+  const mecanicosAtivos = [...new Set(
+    historico.filter(t => t.cargo === 'MECANICO').map(t => t.responsavel)
+  )].length;
 
   if (isLoading) return (
     <div className="p-8 font-sans min-h-full">
@@ -124,87 +177,6 @@ export default function SupervisorVisaoGeral() {
           </div>
         ))}
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
-        {Array(3).fill(0).map((_, i) => (
-          <div key={i} className="bg-[#0f1a35] border border-teal-500/10 rounded-xl p-5 flex items-center gap-4">
-            <Sk className="w-11 h-11 rounded-xl flex-shrink-0" />
-            <div className="flex flex-col gap-2 flex-1">
-              <Sk className="h-3 w-32" />
-              <Sk className="h-8 w-16" />
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="bg-[#0f1a35] border border-teal-500/10 rounded-xl shadow-xl overflow-hidden mb-6">
-        <div className="px-6 py-4 border-b border-teal-500/10 flex items-center justify-between">
-          <div className="flex flex-col gap-1.5">
-            <Sk className="h-4 w-40" />
-            <Sk className="h-3 w-56" />
-          </div>
-          <div className="flex gap-2">
-            {Array(3).fill(0).map((_, i) => <Sk key={i} className="h-7 w-16 rounded-lg" />)}
-          </div>
-        </div>
-        <Sk className="mx-4 my-4 h-[230px] rounded-xl" />
-      </div>
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <div className="xl:col-span-2 bg-[#0f1a35] border border-teal-500/10 rounded-xl shadow-xl overflow-hidden">
-          <div className="px-6 py-4 border-b border-teal-500/10">
-            <Sk className="h-4 w-44" />
-          </div>
-          <div className="divide-y divide-teal-500/5">
-            {Array(7).fill(0).map((_, i) => (
-              <div key={i} className="px-6 py-3.5 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Sk className="w-2 h-2 rounded-full flex-shrink-0" />
-                  <div className="flex flex-col gap-1.5">
-                    <Sk className="h-4 w-32" />
-                    <Sk className="h-3 w-44" />
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Sk className="h-4 w-16" />
-                  <Sk className="h-5 w-16 rounded" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="flex flex-col gap-6">
-          <div className="bg-[#0f1a35] border border-teal-500/10 rounded-xl p-6">
-            <Sk className="h-4 w-44 mb-5" />
-            <div className="flex flex-col gap-4">
-              {Array(3).fill(0).map((_, i) => (
-                <div key={i} className="flex flex-col gap-1.5">
-                  <div className="flex justify-between">
-                    <Sk className="h-3 w-20" />
-                    <Sk className="h-3 w-12" />
-                  </div>
-                  <Sk className="h-1.5 w-full rounded-full" />
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="bg-[#0f1a35] border border-teal-500/10 rounded-xl overflow-hidden flex-1">
-            <div className="px-5 py-4 border-b border-teal-500/10">
-              <Sk className="h-4 w-28" />
-            </div>
-            <div className="divide-y divide-teal-500/5">
-              {Array(5).fill(0).map((_, i) => (
-                <div key={i} className="px-5 py-3.5">
-                  <div className="flex items-start gap-2.5">
-                    <Sk className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" />
-                    <div className="flex flex-col gap-1.5 flex-1">
-                      <Sk className="h-3 w-28" />
-                      <Sk className="h-3 w-full" />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 
@@ -217,13 +189,48 @@ export default function SupervisorVisaoGeral() {
     </div>
   );
 
-  const emUso      = ferramentas.filter(f => f.statusAlerta === 'EM_USO').length;
-  const atrasadas  = ferramentas.filter(f => f.statusAlerta === 'ATRASADA').length;
-  const alertAtivos = alertas.filter(a => a.status_alerta === 'ATIVO');
-  const totalFerr  = kpis?.totalFerramentas ?? 0;
-
   return (
     <div className="p-8 font-sans min-h-full">
+
+      {/* Modais */}
+      <ModalInventario
+        open={modalAberto === 'total'}
+        onClose={fecharModal}
+        ferramentas={todasFerr}
+        loading={loadingModal}
+      />
+      <ModalEmUso
+        open={modalAberto === 'emUso'}
+        onClose={fecharModal}
+        ferramentas={emUso}
+      />
+      <ModalAtrasadas
+        open={modalAberto === 'atrasadas'}
+        onClose={fecharModal}
+        ferramentas={atrasadas}
+      />
+      <ModalAlertas
+        open={modalAberto === 'alertas'}
+        onClose={fecharModal}
+        alertas={alertAtivos}
+      />
+      <ModalTransacoes
+        open={modalAberto === 'transacoes'}
+        onClose={fecharModal}
+        transacoes={historico}
+      />
+      <ModalMecanicos
+        open={modalAberto === 'mecanicos'}
+        onClose={fecharModal}
+        transacoes={historico}
+      />
+      <ModalTaxaPrazo
+        open={modalAberto === 'taxaPrazo'}
+        onClose={fecharModal}
+        total={totalFerr}
+        emUso={emUso.length}
+        atrasadas={atrasadas.length}
+      />
 
       {/* Header */}
       <div className="flex items-start justify-between mb-10">
@@ -247,28 +254,34 @@ export default function SupervisorVisaoGeral() {
 
       {/* KPIs principais */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-5 mb-6">
-        <KpiCard label="Total Ferramentas" value={totalFerr}           icon={Wrench}      sub="no inventário" />
-        <KpiCard label="Em Uso Agora"       value={emUso}               icon={TrendingUp}  sub="retiradas" />
-        <KpiCard label="Atrasadas"           value={atrasadas}           icon={Clock}
+        <KpiCard label="Total Ferramentas" value={totalFerr}          icon={Wrench}       sub="ver inventário" onClick={() => abrirModal('total')}     />
+        <KpiCard label="Em Uso Agora"      value={emUso.length}       icon={TrendingUp}   sub="ver detalhes"   onClick={() => abrirModal('emUso')}     />
+        <KpiCard label="Atrasadas"         value={atrasadas.length}   icon={Clock}
           accent="bg-red-500/10 border border-red-500/20"
-          sub={atrasadas > 0 ? 'fora do prazo' : 'dentro do prazo'}
+          sub={atrasadas.length > 0 ? 'ver atrasadas' : 'dentro do prazo'}
+          onClick={() => abrirModal('atrasadas')}
         />
-        <KpiCard label="Alertas Ativos"     value={alertAtivos.length}  icon={AlertOctagon}
+        <KpiCard label="Alertas Ativos"    value={alertAtivos.length} icon={AlertOctagon}
           accent="bg-red-500/10 border border-red-500/20"
-          sub={alertAtivos.length > 0 ? 'requer atenção' : 'tudo em ordem'}
+          sub={alertAtivos.length > 0 ? 'ver alertas' : 'tudo em ordem'}
+          onClick={() => abrirModal('alertas')}
         />
       </div>
 
       {/* KPIs secundários */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
         {[
-          { label: 'Transações Hoje',   value: kpis?.transacoesHoje,  icon: BarChart3, color: 'text-teal-400',    bg: 'bg-teal-500/10',    border: 'border-teal-500/20'    },
-          { label: 'Mecânicos Ativos',  value: kpis?.mecanicosAtivos, icon: Users,     color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
-          { label: 'Taxa no Prazo',      value: (emUso + atrasadas) > 0 ? `${Math.round((emUso / (emUso + atrasadas)) * 100)}%` : '100%',
-            icon: Activity, color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20' },
-        ].map(({ label, value, icon: Icon, color, bg, border }) => (
-          <div key={label} className={`${bg} border ${border} rounded-xl p-5 flex items-center gap-4`}>
-            <div className={`w-11 h-11 rounded-xl ${bg} border ${border} flex items-center justify-center flex-shrink-0`}>
+          { label: 'Transações Hoje',  value: kpis?.transacoesHoje, icon: BarChart3, color: 'text-teal-400',    bg: 'bg-teal-500/10',    border: 'border-teal-500/20',    modal: 'transacoes' },
+          { label: 'Mecânicos Ativos', value: mecanicosAtivos,      icon: Users,     color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', modal: 'mecanicos'  },
+          { label: 'Taxa no Prazo',    value: (emUso.length + atrasadas.length) > 0 ? `${Math.round((emUso.length / (emUso.length + atrasadas.length)) * 100)}%` : '100%',
+            icon: Activity, color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20', modal: 'taxaPrazo' },
+        ].map(({ label, value, icon: Icon, color, bg, border, modal }) => (
+          <div
+            key={label}
+            onClick={() => abrirModal(modal)}
+            className={`${bg} border ${border} rounded-xl p-5 flex items-center gap-4 cursor-pointer hover:brightness-125 transition-all`}
+          >
+            <div className={`w-11 h-11 rounded-xl ${bg} border ${border} flex items-center justify-center shrink-0`}>
               <Icon size={20} className={color} />
             </div>
             <div>
@@ -304,7 +317,7 @@ export default function SupervisorVisaoGeral() {
             ))}
           </div>
         </div>
-        <div className="px-2 py-4 h-[230px]">
+        <div className="px-2 py-4 h-57.5">
           {fluxoLoading ? (
             <div className="h-full flex items-center justify-center">
               <Loader2 className="animate-spin text-teal-400 w-6 h-6" />
@@ -323,13 +336,7 @@ export default function SupervisorVisaoGeral() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(20,184,166,0.07)" vertical={false} />
-                <XAxis
-                  dataKey="data"
-                  tick={{ fill: '#64748b', fontSize: 11 }}
-                  axisLine={false}
-                  tickLine={false}
-                  interval={Math.max(0, Math.floor(fluxo.length / 6) - 1)}
-                />
+                <XAxis dataKey="data" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} interval={Math.max(0, Math.floor(fluxo.length / 6) - 1)} />
                 <YAxis hide allowDecimals={false} />
                 <Tooltip
                   contentStyle={{ background: '#0a1628', border: '1px solid rgba(20,184,166,0.3)', borderRadius: '8px', fontSize: 12, padding: '8px 14px' }}
@@ -369,7 +376,7 @@ export default function SupervisorVisaoGeral() {
               return (
                 <div key={f.id} className="px-6 py-3.5 flex items-center justify-between hover:bg-teal-500/5 transition-colors">
                   <div className="flex items-center gap-3">
-                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${atrasada ? 'bg-red-400 animate-pulse' : 'bg-teal-400'}`} />
+                    <div className={`w-2 h-2 rounded-full shrink-0 ${atrasada ? 'bg-red-400 animate-pulse' : 'bg-teal-400'}`} />
                     <div>
                       <p className="text-sm font-medium text-white">{f.ferramenta ?? f.nome}</p>
                       <p className="text-[11px] text-slate-500 font-mono">{f.tagRfid} · {f.responsavel}</p>
@@ -389,18 +396,15 @@ export default function SupervisorVisaoGeral() {
 
         {/* Coluna lateral */}
         <div className="flex flex-col gap-6">
-
-          {/* Distribuição */}
           <div className="bg-[#0f1a35] border border-teal-500/10 rounded-xl p-6">
             <h2 className="text-sm font-semibold text-white mb-5">Distribuição do Inventário</h2>
             <div className="flex flex-col gap-4">
-              <StatBar label="Disponíveis" value={totalFerr - emUso - atrasadas} max={totalFerr} color="bg-green-500"  />
-              <StatBar label="Em Uso"       value={emUso}                          max={totalFerr} color="bg-teal-500"  />
-              <StatBar label="Atrasadas"    value={atrasadas}                      max={totalFerr} color="bg-red-500"   />
+              <StatBar label="Disponíveis" value={totalFerr - emUso.length - atrasadas.length} max={totalFerr} color="bg-green-500" />
+              <StatBar label="Em Uso"      value={emUso.length}                                max={totalFerr} color="bg-teal-500" />
+              <StatBar label="Atrasadas"   value={atrasadas.length}                            max={totalFerr} color="bg-red-500"  />
             </div>
           </div>
 
-          {/* Alertas */}
           <div className="bg-[#0f1a35] border border-teal-500/10 rounded-xl overflow-hidden flex-1">
             <div className="px-5 py-4 border-b border-teal-500/10 flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -422,7 +426,7 @@ export default function SupervisorVisaoGeral() {
               ) : alertAtivos.slice(0, 5).map((a) => (
                 <div key={a.id} className="px-5 py-3.5 hover:bg-teal-500/5 transition-colors">
                   <div className="flex items-start gap-2.5">
-                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0 animate-pulse" />
+                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-red-400 shrink-0 animate-pulse" />
                     <div>
                       <p className="text-xs font-semibold text-slate-200">{a.ferramenta}</p>
                       <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed line-clamp-2">{a.mensagem}</p>
