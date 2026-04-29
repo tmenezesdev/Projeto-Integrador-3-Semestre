@@ -14,7 +14,7 @@ function Modal({ title, onClose, children }) {
       <div className="bg-[#13102a] border border-[#7033ff]/20 rounded-2xl w-full max-w-md shadow-2xl">
         <div className="flex items-center justify-between p-5 border-b border-[#7033ff]/10">
           <h3 className="text-base font-semibold text-white">{title}</h3>
-          <button onClick={onClose} className="text-slate-500 hover:text-white transition-colors"><X size={18} /></button>
+          <button onClick={onClose} className="cursor-pointer text-slate-500 hover:text-white transition-colors"><X size={18} /></button>
         </div>
         <div className="p-5">{children}</div>
       </div>
@@ -189,7 +189,7 @@ export default function AdminFerramentas() {
         </div>
         <button
           onClick={() => { resetForm(); setModalCriar(true); }}
-          className="flex items-center gap-2 bg-[#7033ff] hover:bg-[#5a28cc] text-black text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors"
+          className="cursor-pointer flex items-center gap-2 bg-[#7033ff] hover:bg-[#5a28cc] text-black text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors"
         >
           <Plus size={16} /> Nova Ferramenta
         </button>
@@ -229,8 +229,8 @@ export default function AdminFerramentas() {
                   </td>
                   <td className="px-5 py-3">
                     <div className="flex gap-2">
-                      <button onClick={() => openEditar(f)} className="p-1.5 rounded-lg text-slate-500 hover:text-[#7033ff] hover:bg-[#7033ff]/10 transition-colors"><Pencil size={15} /></button>
-                      <button onClick={() => { setFormErro(''); setModalDeletar(f); }} className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"><Trash2 size={15} /></button>
+                      <button onClick={() => openEditar(f)} className="cursor-pointer p-1.5 rounded-lg text-slate-500 hover:text-[#7033ff] hover:bg-[#7033ff]/10 transition-colors"><Pencil size={15} /></button>
+                      <button onClick={() => { setFormErro(''); setModalDeletar(f); }} className="cursor-pointer p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"><Trash2 size={15} /></button>
                     </div>
                   </td>
                 </tr>
@@ -257,8 +257,8 @@ export default function AdminFerramentas() {
             </Field>
             {formErro && <p className="text-xs text-red-400">{formErro}</p>}
             <div className="flex gap-3 mt-2">
-              <button onClick={() => { setModalCriar(false); resetForm(); }} className="flex-1 h-10 rounded-lg border border-[#7033ff]/20 text-slate-400 hover:text-white text-sm transition-colors">Cancelar</button>
-              <button onClick={handleCriar} disabled={saving} className="flex-1 h-10 rounded-lg bg-[#7033ff] hover:bg-[#5a28cc] text-black font-semibold text-sm transition-colors disabled:opacity-50">
+              <button onClick={() => { setModalCriar(false); resetForm(); }} className="cursor-pointer flex-1 h-10 rounded-lg border border-[#7033ff]/20 text-slate-400 hover:text-white text-sm transition-colors">Cancelar</button>
+              <button onClick={handleCriar} disabled={saving} className="cursor-pointer flex-1 h-10 rounded-lg bg-[#7033ff] hover:bg-[#5a28cc] text-black font-semibold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 {saving ? <Loader2 size={16} className="animate-spin mx-auto" /> : 'Criar'}
               </button>
             </div>
@@ -280,8 +280,8 @@ export default function AdminFerramentas() {
             </Field>
             {formErro && <p className="text-xs text-red-400">{formErro}</p>}
             <div className="flex gap-3 mt-2">
-              <button onClick={() => { setModalEditar(null); resetForm(); }} className="flex-1 h-10 rounded-lg border border-[#7033ff]/20 text-slate-400 hover:text-white text-sm transition-colors">Cancelar</button>
-              <button onClick={handleEditar} disabled={saving} className="flex-1 h-10 rounded-lg bg-[#7033ff] hover:bg-[#5a28cc] text-black font-semibold text-sm transition-colors disabled:opacity-50">
+              <button onClick={() => { setModalEditar(null); resetForm(); }} className="cursor-pointer flex-1 h-10 rounded-lg border border-[#7033ff]/20 text-slate-400 hover:text-white text-sm transition-colors">Cancelar</button>
+              <button onClick={handleEditar} disabled={saving} className="cursor-pointer flex-1 h-10 rounded-lg bg-[#7033ff] hover:bg-[#5a28cc] text-black font-semibold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 {saving ? <Loader2 size={16} className="animate-spin mx-auto" /> : 'Salvar'}
               </button>
             </div>
@@ -298,8 +298,8 @@ export default function AdminFerramentas() {
             </p>
             {formErro && <p className="text-xs text-red-400">{formErro}</p>}
             <div className="flex gap-3 mt-2">
-              <button onClick={() => setModalDeletar(null)} className="flex-1 h-10 rounded-lg border border-[#7033ff]/20 text-slate-400 hover:text-white text-sm transition-colors">Cancelar</button>
-              <button onClick={handleDeletar} disabled={saving} className="flex-1 h-10 rounded-lg bg-red-600 hover:bg-red-500 text-white font-semibold text-sm transition-colors disabled:opacity-50">
+              <button onClick={() => setModalDeletar(null)} className="cursor-pointer flex-1 h-10 rounded-lg border border-[#7033ff]/20 text-slate-400 hover:text-white text-sm transition-colors">Cancelar</button>
+              <button onClick={handleDeletar} disabled={saving} className="cursor-pointer flex-1 h-10 rounded-lg bg-red-600 hover:bg-red-500 text-white font-semibold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 {saving ? <Loader2 size={16} className="animate-spin mx-auto" /> : 'Excluir'}
               </button>
             </div>

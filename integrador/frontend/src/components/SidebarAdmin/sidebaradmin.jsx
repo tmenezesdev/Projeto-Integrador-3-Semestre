@@ -85,19 +85,23 @@ export default function SidebarAdmin() {
             </Link>
           );
         })}
-      </nav>
 
-      {/* Footer */}
-      <div className={`px-3 pb-5 border-t border-teal-500/10 pt-3 flex flex-col gap-1.5 ${collapsed ? 'items-center' : ''}`}>
-        <ThemeToggle collapsed={collapsed} trackOn="#2dd4bf" />
-        <button
-          onClick={handleLogout}
-          className={`${btnBase} cursor-pointer text-slate-400 hover:text-red-400 hover:bg-red-500/5`}
-        >
-          <LogOut size={19} className="flex-shrink-0" />
-          {!collapsed && <span>Sair</span>}
-        </button>
-      </div>
+        {/* Espaço flexível empurra o bloco inferior para o fundo */}
+        <div className="flex-1" />
+
+        {/*divisor + footer*/}
+        <div className="flex flex-col gap-1.5">
+          <ThemeToggle collapsed={collapsed} trackOn="#2dd4bf" />
+          <div className="border-t border-[#7033ff]/10 my-1" />
+          <button
+            onClick={handleLogout}
+            className={`${btnBase} cursor-pointer text-slate-400 hover:text-red-400 hover:bg-red-500/5`}
+          >
+            <LogOut size={19} className="flex-shrink-0" />
+            {!collapsed && <span>Sair</span>}
+          </button>
+        </div>
+      </nav>
 
       {/* Toggle collapse */}
       <button
