@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   PackageOpen, Wrench, History,
   AlertOctagon, ChevronLeft,
-  ChevronRight, LogOut, HardHat,
+  ChevronRight, LogOut, HardHat, UserCircle,
 } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle/themetoggle';
 
@@ -31,6 +31,7 @@ export default function SidebarMecanico() {
   }, []);
 
   const isActive = (item) => item.exact ? pathname === item.href : pathname.startsWith(item.href);
+  const perfilAtivo = pathname.startsWith('/Mecanico/Perfil');
 
   const handleLogout = () => {
     localStorage.removeItem('smartbench_token');
@@ -83,19 +84,45 @@ export default function SidebarMecanico() {
             </Link>
           );
         })}
-      </nav>
 
-      {/* Footer */}
-      <div className={`px-3 pb-5 border-t border-teal-500/10 pt-3 flex flex-col gap-1.5 ${collapsed ? 'items-center' : ''}`}>
-        <ThemeToggle collapsed={collapsed} trackOn="#2dd4bf" />
-        <button
-          onClick={handleLogout}
-          className={`${btnBase} cursor-pointer text-slate-400 hover:text-red-400 hover:bg-red-500/5`}
-        >
-          <LogOut size={19} className="flex-shrink-0" />
-          {!collapsed && <span>Sair</span>}
-        </button>
-      </div>
+        {/* Espaço flexível empurra o bloco inferior para o fundo */}
+        <div className="flex-1" />
+
+        {/* Divisor + Footer */}
+        <div className="flex flex-col gap-1.5">
+          <div style={{ cursor: 'pointer' }}>
+            <ThemeToggle collapsed={collapsed} trackOn="#f59e0b" />
+          </div>
+          <div className="border-t border-amber-500/10 my-1" />
+
+          {/* Perfil */}
+          <Link
+            href="/Mecanico/Perfil"
+            title={collapsed ? 'Perfil' : undefined}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all group relative
+              ${perfilAtivo ? 'bg-amber-500/10 text-amber-300 border border-amber-500/20' : 'text-slate-500 hover:text-slate-200 hover:bg-white/5 border border-transparent'}
+              ${collapsed ? 'justify-center px-0' : ''}`}
+          >
+            {perfilAtivo && <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-amber-400 rounded-r-full" />}
+            <UserCircle size={20} className={`flex-shrink-0 ${perfilAtivo ? 'text-amber-400' : 'text-slate-600 group-hover:text-slate-300'}`} />
+            {!collapsed && <span>Perfil</span>}
+            {collapsed && (
+              <div className="absolute left-full ml-3 px-2.5 py-1.5 bg-[#1a1000] text-slate-100 text-xs rounded-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 border border-amber-500/20">
+                Perfil
+              </div>
+            )}
+          </Link>
+
+          {/* Sair */}
+          <button
+            onClick={handleLogout}
+            className={`${btnBase} cursor-pointer text-slate-400 hover:text-red-400 hover:bg-red-500/5`}
+          >
+            <LogOut size={19} className="flex-shrink-0" />
+            {!collapsed && <span>Sair</span>}
+          </button>
+        </div>
+      </nav>
 
       {/* Toggle collapse */}
       <button
