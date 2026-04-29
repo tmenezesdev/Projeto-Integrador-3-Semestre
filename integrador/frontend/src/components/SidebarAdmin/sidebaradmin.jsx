@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard, Users, Wrench, History,
   AlertOctagon, Settings, ChevronLeft,
-  ChevronRight, LogOut, ShieldCheck,
+  ChevronRight, LogOut, ShieldCheck, UserCircle,
 } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle/themetoggle';
 
@@ -41,6 +41,8 @@ export default function SidebarAdmin() {
   };
 
   const btnBase = `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all w-full border border-transparent ${collapsed ? 'justify-center px-0' : ''}`;
+
+  const perfilAtivo = pathname.startsWith('/Admin/Perfil');
 
   return (
     <aside className={`relative flex flex-col h-full bg-[#0a0a12] border-r border-[#7033ff]/10 transition-all duration-300 ${collapsed ? 'w-[80px]' : 'w-[260px]'}`}>
@@ -89,10 +91,32 @@ export default function SidebarAdmin() {
         {/* Espaço flexível empurra o bloco inferior para o fundo */}
         <div className="flex-1" />
 
-        {/*divisor + footer*/}
+        {/* Divisor + Footer */}
         <div className="flex flex-col gap-1.5">
-          <ThemeToggle collapsed={collapsed} trackOn="#2dd4bf" />
+          <div style={{ cursor: 'pointer' }}>
+            <ThemeToggle collapsed={collapsed} trackOn="#7033ff" />
+          </div>
           <div className="border-t border-[#7033ff]/10 my-1" />
+
+          {/* Perfil */}
+          <Link
+            href="/Admin/Perfil"
+            title={collapsed ? 'Perfil' : undefined}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all group relative
+              ${perfilAtivo ? 'bg-[#7033ff]/10 text-[#a87fff] border border-[#7033ff]/20' : 'text-slate-500 hover:text-slate-200 hover:bg-white/5 border border-transparent'}
+              ${collapsed ? 'justify-center px-0' : ''}`}
+          >
+            {perfilAtivo && <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-[#7033ff] rounded-r-full" />}
+            <UserCircle size={20} className={`flex-shrink-0 ${perfilAtivo ? 'text-[#7033ff]' : 'text-slate-600 group-hover:text-slate-300'}`} />
+            {!collapsed && <span>Perfil</span>}
+            {collapsed && (
+              <div className="absolute left-full ml-3 px-2.5 py-1.5 bg-[#13102a] text-slate-100 text-xs rounded-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 border border-[#7033ff]/20">
+                Perfil
+              </div>
+            )}
+          </Link>
+
+          {/* Sair */}
           <button
             onClick={handleLogout}
             className={`${btnBase} cursor-pointer text-slate-400 hover:text-red-400 hover:bg-red-500/5`}
