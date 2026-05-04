@@ -1,136 +1,38 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import {
-  PackageOpen, Wrench, History,
-  AlertOctagon, ChevronLeft,
-  ChevronRight, LogOut, HardHat, UserCircle,
-} from 'lucide-react';
-import ThemeToggle from '@/components/ThemeToggle/themetoggle';
+import { PackageOpen, Wrench, History, AlertOctagon, HardHat } from 'lucide-react';
+import SidebarBase from '@/components/SidebarBase/sidebarbase';
 
 const navItems = [
-  { href: '/Mecanico/Dashboard', label: 'Minhas Retiradas', icon: PackageOpen, exact: true },
-  { href: '/Mecanico/Ferramentas', label: 'Ferramentas', icon: Wrench },
-  { href: '/Mecanico/Historico', label: 'Histórico', icon: History },
-  { href: '/Mecanico/Alertas', label: 'Alertas', icon: AlertOctagon },
+  { href: '/Mecanico/Dashboard',   label: 'Minhas Retiradas', icon: PackageOpen, exact: true },
+  { href: '/Mecanico/Ferramentas', label: 'Ferramentas',      icon: Wrench },
+  { href: '/Mecanico/Historico',   label: 'Histórico',        icon: History },
+  { href: '/Mecanico/Alertas',     label: 'Alertas',          icon: AlertOctagon },
 ];
 
+const theme = {
+  aside:         'bg-[#0f0900] border-r border-amber-500/10',
+  headerBorder:  'border-b border-amber-500/10',
+  logoBg:        'bg-amber-500/20 border border-amber-500/30',
+  logoIconCls:   'text-amber-400',
+  roleColor:     'text-amber-400',
+  navActive:     'bg-amber-500/10 text-amber-300 border border-amber-500/20',
+  navDot:        'bg-amber-400',
+  navIconActive: 'text-amber-400',
+  tooltip:       'bg-[#1a1000] border border-amber-500/20',
+  trackOn:       '#f59e0b',
+  divider:       'border-t border-amber-500/10',
+  collapseBtn:   'bg-[#1a1000] border border-amber-500/20 hover:text-amber-300',
+};
+
 export default function SidebarMecanico() {
-  const pathname = usePathname();
-  const router = useRouter();
-  const [collapsed, setCollapsed] = useState(false);
-  const [nomeUsuario, setNomeUsuario] = useState('');
-
-  useEffect(() => {
-    try {
-      const u = JSON.parse(localStorage.getItem('smartbench_user') || '{}');
-      setNomeUsuario(u.nome?.split(' ')[0] || '');
-    } catch { }
-  }, []);
-
-  const isActive = (item) => item.exact ? pathname === item.href : pathname.startsWith(item.href);
-  const perfilAtivo = pathname.startsWith('/Mecanico/Perfil');
-
-  const handleLogout = () => {
-    localStorage.removeItem('smartbench_token');
-    localStorage.removeItem('smartbench_user');
-    router.push('/login');
-  };
-
-  const btnBase = `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all w-full border border-transparent ${collapsed ? 'justify-center px-0' : ''}`;
-
   return (
-    <aside className={`relative flex flex-col h-full bg-[#0f0900] border-r border-amber-500/10 transition-all duration-300 ${collapsed ? 'w-[80px]' : 'w-[260px]'}`}>
-
-      {/* Logo */}
-      <div className={`flex items-center gap-3 px-5 py-6 border-b border-amber-500/10 ${collapsed ? 'justify-center px-0' : ''}`}>
-        <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center">
-          <HardHat size={20} className="text-amber-400" />
-        </div>
-        {!collapsed && (
-          <div className="flex flex-col leading-tight">
-            <span className="text-white font-bold text-base tracking-tight">SmartBench</span>
-            <span className="text-amber-400 text-[11px] font-semibold uppercase tracking-widest">
-              {nomeUsuario ? `${nomeUsuario} · Mecânico` : 'Mecânico'}
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Nav */}
-      <nav className="flex-1 py-5 px-3 flex flex-col gap-1.5">
-        {navItems.map((item) => {
-          const active = isActive(item);
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              title={collapsed ? item.label : undefined}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all group relative
-                ${active ? 'bg-amber-500/10 text-amber-300 border border-amber-500/20' : 'text-slate-500 hover:text-slate-200 hover:bg-white/5 border border-transparent'}
-                ${collapsed ? 'justify-center px-0' : ''}`}
-            >
-              {active && <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-amber-400 rounded-r-full" />}
-              <Icon size={20} className={`flex-shrink-0 ${active ? 'text-amber-400' : 'text-slate-600 group-hover:text-slate-300'}`} />
-              {!collapsed && <span>{item.label}</span>}
-              {collapsed && (
-                <div className="absolute left-full ml-3 px-2.5 py-1.5 bg-[#1a1000] text-slate-100 text-xs rounded-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 border border-amber-500/20">
-                  {item.label}
-                </div>
-              )}
-            </Link>
-          );
-        })}
-
-        {/* Espaço flexível empurra o bloco inferior para o fundo */}
-        <div className="flex-1" />
-
-        {/* Divisor + Footer */}
-        <div className="flex flex-col gap-1.5">
-          <div style={{ cursor: 'pointer' }}>
-            <ThemeToggle collapsed={collapsed} trackOn="#f59e0b" />
-          </div>
-          <div className="border-t border-amber-500/10 my-1" />
-
-          {/* Perfil */}
-          <Link
-            href="/Mecanico/Perfil"
-            title={collapsed ? 'Perfil' : undefined}
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all group relative
-              ${perfilAtivo ? 'bg-amber-500/10 text-amber-300 border border-amber-500/20' : 'text-slate-500 hover:text-slate-200 hover:bg-white/5 border border-transparent'}
-              ${collapsed ? 'justify-center px-0' : ''}`}
-          >
-            {perfilAtivo && <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-amber-400 rounded-r-full" />}
-            <UserCircle size={20} className={`flex-shrink-0 ${perfilAtivo ? 'text-amber-400' : 'text-slate-600 group-hover:text-slate-300'}`} />
-            {!collapsed && <span>Perfil</span>}
-            {collapsed && (
-              <div className="absolute left-full ml-3 px-2.5 py-1.5 bg-[#1a1000] text-slate-100 text-xs rounded-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 border border-amber-500/20">
-                Perfil
-              </div>
-            )}
-          </Link>
-
-          {/* Sair */}
-          <button
-            onClick={handleLogout}
-            className={`${btnBase} cursor-pointer text-slate-400 hover:text-red-400 hover:bg-red-500/5`}
-          >
-            <LogOut size={19} className="flex-shrink-0" />
-            {!collapsed && <span>Sair</span>}
-          </button>
-        </div>
-      </nav>
-
-      {/* Toggle collapse */}
-      <button
-        onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3.5 top-[76px] w-7 h-7 bg-[#1a1000] border border-amber-500/20 rounded-full flex items-center justify-center text-slate-500 hover:text-amber-300 transition-all z-10 cursor-pointer"
-      >
-        {collapsed ? <ChevronRight size={13} /> : <ChevronLeft size={13} />}
-      </button>
-    </aside>
+    <SidebarBase
+      navItems={navItems}
+      theme={theme}
+      role="Mecânico"
+      LogoIcon={HardHat}
+      profileHref="/Mecanico/Perfil"
+    />
   );
 }

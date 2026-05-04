@@ -11,9 +11,9 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer,
 } from 'recharts';
+import { useAuth } from '@/hooks/useAuth';
 
-const API   = 'http://localhost:3000/api/admin';
-const token = () => localStorage.getItem('smartbench_token');
+const API = 'http://localhost:3000/api/admin';
 
 function KpiCard({ label, value, icon: Icon, accent, sub }) {
   return (
@@ -30,79 +30,8 @@ function KpiCard({ label, value, icon: Icon, accent, sub }) {
   );
 }
 
-function StatBar({ label, value, max, color }) {
-  const pct = max > 0 ? Math.round((value / max) * 100) : 0;
+function AdminDashboardSkeleton() {
   return (
-    <div className="flex flex-col gap-1.5">
-      <div className="flex justify-between items-center">
-        <span className="text-xs text-slate-400">{label}</span>
-        <span className="text-xs font-bold text-white">
-          {value} <span className="text-slate-600 font-normal">/ {max}</span>
-        </span>
-      </div>
-      <div className="h-1.5 bg-[#7033ff]/10 rounded-full overflow-hidden">
-        <div className={`h-full rounded-full ${color}`} style={{ width: `${pct}%` }} />
-      </div>
-    </div>
-  );
-}
-
-export default function AdminDashboard() {
-  const [kpis,        setKpis]        = useState(null);
-  const [historico,   setHistorico]   = useState([]);
-  const [alertas,     setAlertas]     = useState([]);
-  const [nomeUsuario, setNomeUsuario] = useState('');
-  const [isLoading,   setIsLoading]   = useState(true);
-  const [erro,        setErro]        = useState(false);
-  const [periodo,      setPeriodo]      = useState(15);
-  const [fluxo,        setFluxo]        = useState([]);
-  const [fluxoLoading, setFluxoLoading] = useState(false);
-
-  useEffect(() => {
-    try {
-      const u = JSON.parse(localStorage.getItem('smartbench_user') || '{}');
-      setNomeUsuario(u.nome?.split(' ')[0] || '');
-    } catch {}
-
-    const load = async () => {
-      try {
-        const h = { Authorization: `Bearer ${token()}` };
-        const [dashRes, histRes, alertRes] = await Promise.all([
-          fetch(`${API}/dashboard`, { headers: h }),
-          fetch(`${API}/historico`, { headers: h }),
-          fetch(`${API}/alertas`,   { headers: h }),
-        ]);
-        if (!dashRes.ok) throw new Error();
-        const d = await dashRes.json();
-        const hist  = await histRes.json();
-        const alert = await alertRes.json();
-        setKpis(d.dados ?? d);
-        setHistorico((hist.dados  ?? hist).slice(0, 8));
-        setAlertas((alert.dados ?? alert).filter(a => a.status_alerta === 'ATIVO').slice(0, 6));
-      } catch { setErro(true); }
-      finally  { setIsLoading(false); }
-    };
-    load();
-  }, []);
-
-  useEffect(() => {
-    const fetchFluxo = async () => {
-      setFluxoLoading(true);
-      try {
-        const r = await fetch(`${API}/fluxo-movimentacoes?periodo=${periodo}`, {
-          headers: { Authorization: `Bearer ${token()}` },
-        });
-        const json = await r.json();
-        setFluxo(json.dados ?? []);
-      } catch {}
-      finally { setFluxoLoading(false); }
-    };
-    fetchFluxo();
-  }, [periodo]);
-
-  const hoje = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
-
-  if (isLoading) return (
     <div className="p-8 font-sans min-h-full">
       <div className="flex items-start justify-between mb-10">
         <div className="flex flex-col gap-2">
@@ -204,6 +133,79 @@ export default function AdminDashboard() {
       </div>
     </div>
   );
+}
+
+function StatBar({ label, value, max, color }) {
+  const pct = max > 0 ? Math.round((value / max) * 100) : 0;
+  return (
+    <div className="flex flex-col gap-1.5">
+      <div className="flex justify-between items-center">
+        <span className="text-xs text-slate-400">{label}</span>
+        <span className="text-xs font-bold text-white">
+          {value} <span className="text-slate-600 font-normal">/ {max}</span>
+        </span>
+      </div>
+      <div className="h-1.5 bg-[#7033ff]/10 rounded-full overflow-hidden">
+        <div className={`h-full rounded-full ${color}`} style={{ width: `${pct}%` }} />
+      </div>
+    </div>
+  );
+}
+
+export default function AdminDashboard() {
+  const { getToken, getUser } = useAuth();
+  const [kpis,        setKpis]        = useState(null);
+  const [historico,   setHistorico]   = useState([]);
+  const [alertas,     setAlertas]     = useState([]);
+  const [nomeUsuario, setNomeUsuario] = useState('');
+  const [isLoading,   setIsLoading]   = useState(true);
+  const [erro,        setErro]        = useState(false);
+  const [periodo,      setPeriodo]      = useState(15);
+  const [fluxo,        setFluxo]        = useState([]);
+  const [fluxoLoading, setFluxoLoading] = useState(false);
+
+  useEffect(() => {
+    setNomeUsuario(getUser().nome?.split(' ')[0] || '');
+
+    const load = async () => {
+      try {
+        const h = { Authorization: `Bearer ${getToken()}` };
+        const [dashRes, histRes, alertRes] = await Promise.all([
+          fetch(`${API}/dashboard`, { headers: h }),
+          fetch(`${API}/historico`, { headers: h }),
+          fetch(`${API}/alertas`,   { headers: h }),
+        ]);
+        if (!dashRes.ok) throw new Error();
+        const d = await dashRes.json();
+        const hist  = await histRes.json();
+        const alert = await alertRes.json();
+        setKpis(d.dados ?? d);
+        setHistorico((hist.dados  ?? hist).slice(0, 8));
+        setAlertas((alert.dados ?? alert).filter(a => a.status_alerta === 'ATIVO').slice(0, 6));
+      } catch { setErro(true); }
+      finally  { setIsLoading(false); }
+    };
+    load();
+  }, []);
+
+  useEffect(() => {
+    const fetchFluxo = async () => {
+      setFluxoLoading(true);
+      try {
+        const r = await fetch(`${API}/fluxo-movimentacoes?periodo=${periodo}`, {
+          headers: { Authorization: `Bearer ${getToken()}` },
+        });
+        const json = await r.json();
+        setFluxo(json.dados ?? []);
+      } catch {}
+      finally { setFluxoLoading(false); }
+    };
+    fetchFluxo();
+  }, [periodo]);
+
+  const hoje = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
+
+  if (isLoading) return <AdminDashboardSkeleton />;
 
   if (erro) return (
     <div className="flex-1 flex items-center justify-center h-full">

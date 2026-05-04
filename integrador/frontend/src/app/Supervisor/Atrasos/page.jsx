@@ -7,7 +7,6 @@ import {
   User,
   Wrench,
   CheckCircle2,
-  Loader2,
   RefreshCw,
   AlertCircle,
   TrendingUp,
@@ -15,15 +14,9 @@ import {
 } from "lucide-react";
 import { Sk } from '@/components/ui/skeleton';
 import ModalDevolucao from "@/components/ModalDevolucao/page";
+import { useAuth } from '@/hooks/useAuth';
 
 const API = 'http://localhost:3000/api/supervisor';
-
-function getSupervisorId() {
-  try {
-    const user = JSON.parse(localStorage.getItem('smartbench_user') || '{}');
-    return user.id || null;
-  } catch { return null; }
-}
 
 function NivelAtraso({ horas }) {
   if (horas >= 24) return { label: 'Crítico',  cor: 'text-red-400',    bg: 'bg-red-500/10',    border: 'border-red-500/20',    dot: 'bg-red-400'    };
@@ -32,10 +25,12 @@ function NivelAtraso({ horas }) {
 }
 
 export default function AtrasosPage() {
+  const { getToken, getUser } = useAuth();
   const [atrasadas,    setAtrasadas]    = useState([]);
   const [isLoading,    setIsLoading]    = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [erro,         setErro]         = useState(false);
+  const [erroAcao,     setErroAcao]     = useState('');
   const [isModalOpen,  setIsModalOpen]  = useState(false);
   const [ferramentaSelecionada, setFerramentaSelecionada] = useState(null);
   const [filtroNivel,  setFiltroNivel]  = useState('TODOS');
@@ -46,9 +41,8 @@ export default function AtrasosPage() {
     setErro(false);
 
     try {
-      const token = localStorage.getItem('smartbench_token');
       const res = await fetch(`${API}/ferramentas-fora`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${getToken()}` }
       });
       if (!res.ok) throw new Error();
       const data = await res.json();
@@ -74,13 +68,16 @@ export default function AtrasosPage() {
   };
 
   const handleConfirmarDevolucao = async (ferramentaId, observacao) => {
-    const supervisorId = getSupervisorId();
-    if (!supervisorId) { alert('Sessão inválida. Faça login novamente.'); return; }
+    const supervisorId = getUser()?.id || null;
+    if (!supervisorId) {
+      setErroAcao('Sessão inválida. Faça login novamente.');
+      return;
+    }
     try {
-      const token = localStorage.getItem('smartbench_token');
+      setErroAcao('');
       const res = await fetch(`${API}/ferramentas-fora/devolucao`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
         body: JSON.stringify({ ferramentaId, supervisorId, observacao }),
       });
       if (!res.ok) throw new Error();
@@ -88,7 +85,7 @@ export default function AtrasosPage() {
       setIsModalOpen(false);
       setFerramentaSelecionada(null);
     } catch {
-      alert("Erro ao processar devolução.");
+      setErroAcao('Erro ao processar devolução. Tente novamente.');
     }
   };
 
@@ -191,6 +188,20 @@ export default function AtrasosPage() {
           Atualizar
         </button>
       </div>
+
+      {/* Banner de erro de ação */}
+      {erroAcao && (
+        <div className="mb-6 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-lg text-sm text-red-400 flex items-center gap-2">
+          <AlertCircle size={15} className="flex-shrink-0" />
+          {erroAcao}
+          <button
+            onClick={() => setErroAcao('')}
+            className="ml-auto text-red-400/60 hover:text-red-400 transition-colors cursor-pointer"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* KPIs */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-8">

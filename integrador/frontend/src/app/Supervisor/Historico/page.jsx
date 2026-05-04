@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect } from "react";
-import { History, Search, Download, AlertCircle, ArrowUpRight, ArrowDownLeft } from "lucide-react";
+import { History, Search, Download, AlertCircle, ArrowUpRight, ArrowDownLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { Sk } from '@/components/ui/skeleton';
 import ExcelJS from 'exceljs';
-import { saveAs } from 'file-saver';
+import { useAuth } from '@/hooks/useAuth';
 
 const API_URL = 'http://localhost:3000/api/supervisor/historico';
+const PAGE_SIZE = 20;
 
 function gerarGraficoBase64(labels, retiradas, devolucoes) {
   const canvas = document.createElement('canvas');
@@ -94,17 +95,18 @@ function gerarGraficoBase64(labels, retiradas, devolucoes) {
 }
 
 export default function HistoricoPage() {
+  const { getToken } = useAuth();
   const [historico, setHistorico] = useState([]);
   const [busca, setBusca]         = useState('');
   const [filtroOp, setFiltroOp]   = useState('TODOS');
+  const [pagina, setPagina]       = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [erro, setErro]           = useState(false);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const token = localStorage.getItem('smartbench_token');
-        const res = await fetch(API_URL, { headers: { Authorization: `Bearer ${token}` } });
+        const res = await fetch(API_URL, { headers: { Authorization: `Bearer ${getToken()}` } });
         if (!res.ok) throw new Error();
         setHistorico(await res.json());
       } catch { setErro(true); }
@@ -112,6 +114,8 @@ export default function HistoricoPage() {
     };
     load();
   }, []);
+
+  useEffect(() => { setPagina(1); }, [busca, filtroOp]);
 
   const dadosFiltrados = historico.filter(item => {
     const matchBusca =
@@ -207,10 +211,14 @@ export default function HistoricoPage() {
     wsChart.getCell('A1').value = '';
 
     // salvar
+    const { saveAs } = await import('file-saver');
     const buffer    = await wb.xlsx.writeBuffer();
     const dataAtual = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
     saveAs(new Blob([buffer], { type: 'application/octet-stream' }), `historico-smartbench-${dataAtual}.xlsx`);
   };
+
+  const totalPaginas = Math.max(1, Math.ceil(dadosFiltrados.length / PAGE_SIZE));
+  const paginados = dadosFiltrados.slice((pagina - 1) * PAGE_SIZE, pagina * PAGE_SIZE);
 
   if (isLoading) return (
     <div className="flex-1 p-8 bg-[#09090A] min-h-screen text-white font-sans">
@@ -331,7 +339,7 @@ export default function HistoricoPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-700/20">
-            {dadosFiltrados.map((log) => (
+            {paginados.map((log) => (
               <tr key={log.id} className="hover:bg-white/[0.02] transition-colors group">
                 <td className="px-6 py-4 text-[11px] font-mono text-slate-600 group-hover:text-teal-400 transition-colors">{log.id}</td>
                 <td className="px-6 py-4 text-sm text-slate-400 whitespace-nowrap">{log.dataHora}</td>
@@ -365,9 +373,27 @@ export default function HistoricoPage() {
         {dadosFiltrados.length === 0 && (
           <div className="p-16 text-center text-slate-600 text-sm">Nenhum registro encontrado.</div>
         )}
+        {/* Paginação */}
         <div className="px-6 py-3 border-t border-slate-700/30 flex items-center justify-between">
-          <span className="text-xs text-slate-700">{dadosFiltrados.length} registro{dadosFiltrados.length !== 1 ? 's' : ''}</span>
-          <span className="text-xs text-slate-700">SmartBench Audit Log</span>
+          <span className="text-xs text-slate-700">
+            {dadosFiltrados.length} registro{dadosFiltrados.length !== 1 ? 's' : ''} · página {pagina} de {totalPaginas}
+          </span>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setPagina(p => Math.max(1, p - 1))}
+              disabled={pagina === 1}
+              className="cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1 text-xs text-slate-400 border border-slate-700/40 px-3 py-1.5 rounded-lg hover:border-teal-500/30 transition-colors"
+            >
+              <ChevronLeft size={13} /> Anterior
+            </button>
+            <button
+              onClick={() => setPagina(p => Math.min(totalPaginas, p + 1))}
+              disabled={pagina >= totalPaginas}
+              className="cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1 text-xs text-slate-400 border border-slate-700/40 px-3 py-1.5 rounded-lg hover:border-teal-500/30 transition-colors"
+            >
+              Próximo <ChevronRight size={13} />
+            </button>
+          </div>
         </div>
       </div>
     </div>

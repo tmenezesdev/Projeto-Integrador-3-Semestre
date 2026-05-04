@@ -1,139 +1,40 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import {
-  LayoutDashboard, Users, Wrench, History,
-  AlertOctagon, Settings, ChevronLeft,
-  ChevronRight, LogOut, ShieldCheck, UserCircle,
-} from 'lucide-react';
-import ThemeToggle from '@/components/ThemeToggle/themetoggle';
+import { LayoutDashboard, Users, Wrench, History, AlertOctagon, Settings, ShieldCheck } from 'lucide-react';
+import SidebarBase from '@/components/SidebarBase/sidebarbase';
 
 const navItems = [
-  { href: '/Admin/Dashboard', label: 'Dashboard', icon: LayoutDashboard, exact: true },
-  { href: '/Admin/Usuarios', label: 'Usuários', icon: Users },
-  { href: '/Admin/Ferramentas', label: 'Ferramentas', icon: Wrench },
-  { href: '/Admin/Historico', label: 'Histórico', icon: History },
-  { href: '/Admin/Alertas', label: 'Alertas', icon: AlertOctagon },
+  { href: '/Admin/Dashboard',     label: 'Dashboard',     icon: LayoutDashboard, exact: true },
+  { href: '/Admin/Usuarios',      label: 'Usuários',      icon: Users },
+  { href: '/Admin/Ferramentas',   label: 'Ferramentas',   icon: Wrench },
+  { href: '/Admin/Historico',     label: 'Histórico',     icon: History },
+  { href: '/Admin/Alertas',       label: 'Alertas',       icon: AlertOctagon },
   { href: '/Admin/Configuracoes', label: 'Configurações', icon: Settings },
 ];
 
+const theme = {
+  aside:         'bg-[#0a0a12] border-r border-[#7033ff]/10',
+  headerBorder:  'border-b border-[#7033ff]/10',
+  logoBg:        'bg-[#7033ff]/20 border border-[#7033ff]/30',
+  logoIconCls:   'text-[#7033ff]',
+  roleColor:     'text-[#7033ff]',
+  navActive:     'bg-[#7033ff]/10 text-[#a87fff] border border-[#7033ff]/20',
+  navDot:        'bg-[#7033ff]',
+  navIconActive: 'text-[#7033ff]',
+  tooltip:       'bg-[#13102a] border border-[#7033ff]/20',
+  trackOn:       '#7033ff',
+  divider:       'border-t border-[#7033ff]/10',
+  collapseBtn:   'bg-[#13102a] border border-[#7033ff]/20 hover:text-[#a87fff]',
+};
+
 export default function SidebarAdmin() {
-  const pathname = usePathname();
-  const router = useRouter();
-  const [collapsed, setCollapsed] = useState(false);
-  const [nomeUsuario, setNomeUsuario] = useState('');
-
-  useEffect(() => {
-    try {
-      const u = JSON.parse(localStorage.getItem('smartbench_user') || '{}');
-      setNomeUsuario(u.nome?.split(' ')[0] || '');
-    } catch { }
-  }, []);
-
-  const isActive = (item) => item.exact ? pathname === item.href : pathname.startsWith(item.href);
-
-  const handleLogout = () => {
-    localStorage.removeItem('smartbench_token');
-    localStorage.removeItem('smartbench_user');
-    router.push('/login');
-  };
-
-  const btnBase = `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all w-full border border-transparent ${collapsed ? 'justify-center px-0' : ''}`;
-
-  const perfilAtivo = pathname.startsWith('/Admin/Perfil');
-
   return (
-    <aside className={`relative flex flex-col h-full bg-[#0a0a12] border-r border-[#7033ff]/10 transition-all duration-300 ${collapsed ? 'w-[80px]' : 'w-[260px]'}`}>
-
-      {/* Logo */}
-      <div className={`flex items-center gap-3 px-5 py-6 border-b border-[#7033ff]/10 ${collapsed ? 'justify-center px-0' : ''}`}>
-        <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-[#7033ff]/20 border border-[#7033ff]/30 flex items-center justify-center">
-          <ShieldCheck size={20} className="text-[#7033ff]" />
-        </div>
-        {!collapsed && (
-          <div className="flex flex-col leading-tight">
-            <span className="text-white font-bold text-base tracking-tight">SmartBench</span>
-            <span className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#7033ff' }}>
-              {nomeUsuario ? `${nomeUsuario} · Admin` : 'Admin'}
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Nav */}
-      <nav className="flex-1 py-5 px-3 flex flex-col gap-1.5">
-        {navItems.map((item) => {
-          const active = isActive(item);
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              title={collapsed ? item.label : undefined}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all group relative
-                ${active ? 'bg-[#7033ff]/10 text-[#a87fff] border border-[#7033ff]/20' : 'text-slate-500 hover:text-slate-200 hover:bg-white/5 border border-transparent'}
-                ${collapsed ? 'justify-center px-0' : ''}`}
-            >
-              {active && <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-[#7033ff] rounded-r-full" />}
-              <Icon size={20} className={`flex-shrink-0 ${active ? 'text-[#7033ff]' : 'text-slate-600 group-hover:text-slate-300'}`} />
-              {!collapsed && <span>{item.label}</span>}
-              {collapsed && (
-                <div className="absolute left-full ml-3 px-2.5 py-1.5 bg-[#13102a] text-slate-100 text-xs rounded-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 border border-[#7033ff]/20">
-                  {item.label}
-                </div>
-              )}
-            </Link>
-          );
-        })}
-
-        {/* Espaço flexível empurra o bloco inferior para o fundo */}
-        <div className="flex-1" />
-
-        {/* Divisor + Footer */}
-        <div className="flex flex-col gap-1.5">
-          <div style={{ cursor: 'pointer' }}>
-            <ThemeToggle collapsed={collapsed} trackOn="#7033ff" />
-          </div>
-          <div className="border-t border-[#7033ff]/10 my-1" />
-
-          {/* Perfil */}
-          <Link
-            href="/Admin/Perfil"
-            title={collapsed ? 'Perfil' : undefined}
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all group relative
-              ${perfilAtivo ? 'bg-[#7033ff]/10 text-[#a87fff] border border-[#7033ff]/20' : 'text-slate-500 hover:text-slate-200 hover:bg-white/5 border border-transparent'}
-              ${collapsed ? 'justify-center px-0' : ''}`}
-          >
-            {perfilAtivo && <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-[#7033ff] rounded-r-full" />}
-            <UserCircle size={20} className={`flex-shrink-0 ${perfilAtivo ? 'text-[#7033ff]' : 'text-slate-600 group-hover:text-slate-300'}`} />
-            {!collapsed && <span>Perfil</span>}
-            {collapsed && (
-              <div className="absolute left-full ml-3 px-2.5 py-1.5 bg-[#13102a] text-slate-100 text-xs rounded-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 border border-[#7033ff]/20">
-                Perfil
-              </div>
-            )}
-          </Link>
-
-          {/* Sair */}
-          <button
-            onClick={handleLogout}
-            className={`${btnBase} cursor-pointer text-slate-400 hover:text-red-400 hover:bg-red-500/5`}
-          >
-            <LogOut size={19} className="flex-shrink-0" />
-            {!collapsed && <span>Sair</span>}
-          </button>
-        </div>
-      </nav>
-
-      {/* Toggle collapse */}
-      <button
-        onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3.5 top-[76px] w-7 h-7 bg-[#13102a] border border-[#7033ff]/20 rounded-full flex items-center justify-center text-slate-500 hover:text-[#a87fff] transition-all z-10 cursor-pointer"
-      >
-        {collapsed ? <ChevronRight size={13} /> : <ChevronLeft size={13} />}
-      </button>
-    </aside>
+    <SidebarBase
+      navItems={navItems}
+      theme={theme}
+      role="Admin"
+      LogoIcon={ShieldCheck}
+      profileHref="/Admin/Perfil"
+    />
   );
 }

@@ -138,7 +138,7 @@
    LIGHT MODE — aplicado quando html.light-mode
    ═══════════════════════════════════════════════ */
 
-/* Transição suave — só ativa durante a troca de tema, não afeta hovers */
+/* Transição suave — só ativa durante a troca de tema */
 html.theme-transitioning *,
 html.theme-transitioning *::before,
 html.theme-transitioning *::after {
@@ -149,62 +149,88 @@ html.theme-transitioning *::after {
     box-shadow       0.55s ease-in-out !important;
 }
 
-/* Página / layout principal */
-html.light-mode .bg-\[\#09090A\] { background-color: #f0eef8 !important; }
+/* ── BACKGROUNDS PRINCIPAIS ── */
+html.light-mode .bg-\[\#09090A\]  { background-color: #f4f2fc !important; }
+html.light-mode .bg-\[\#0a0a12\]  { background-color: #ede8ff !important; }
+html.light-mode .bg-\[\#060d1f\]  { background-color: #edfcfa !important; }
+html.light-mode .bg-\[\#0f0900\]  { background-color: #fffcf5 !important; }
 
-/* Painéis e cards */
-html.light-mode .bg-\[\#13102a\] { background-color: #ffffff !important; }
-html.light-mode .bg-\[\#1a1000\] { background-color: #ffffff !important; }
-html.light-mode .bg-\[\#0f1a35\] { background-color: #ffffff !important; }
+/* ── CARDS E PAINÉIS ── */
+html.light-mode .bg-\[\#13102a\]  { background-color: #ffffff !important; }
+html.light-mode .bg-\[\#1a1000\]  { background-color: #ffffff !important; }
+html.light-mode .bg-\[\#0f1a35\]  { background-color: #ffffff !important; }
+html.light-mode .bg-\[\#0a1628\]  { background-color: #f4f8ff !important; }
+html.light-mode .bg-\[\#0c1b31\]  { background-color: #ecf4ff !important; }
+html.light-mode .bg-\[\#1a1030\]  { background-color: #f3f0ff !important; }
+html.light-mode .bg-\[\#13102a\]\/80 { background-color: rgba(255,255,255,0.9) !important; }
+html.light-mode .bg-\[\#1a1000\]\/80 { background-color: rgba(255,255,255,0.9) !important; }
 
-/* Inputs e fundos internos */
-html.light-mode .bg-\[\#0a0a12\] { background-color: #f5f3ff !important; }
-html.light-mode .bg-\[\#0f0900\] { background-color: #fffcf5 !important; }
-html.light-mode .bg-\[\#060d1f\] { background-color: #f0faf9 !important; }
+/* ── BG-WHITE/X — ficam invisíveis em fundo claro, trocar por cinza leve ── */
+html.light-mode .bg-white\/5          { background-color: rgba(0,0,0,0.04) !important; }
+html.light-mode .bg-white\/\[0\.02\]  { background-color: rgba(0,0,0,0.015) !important; }
+html.light-mode .bg-white\/\[0\.03\]  { background-color: rgba(0,0,0,0.025) !important; }
 
-/* Textos */
-html.light-mode .text-white      { color: #1e1b3a !important; }
-html.light-mode .text-gray-100   { color: #1e1b3a !important; }
-html.light-mode .text-slate-300  { color: #4a4870 !important; }
-html.light-mode .text-slate-400  { color: #6b6890 !important; }
-html.light-mode .text-slate-500  { color: #8b88a8 !important; }
-html.light-mode .text-slate-600  { color: #9e9cc0 !important; }
-html.light-mode .text-slate-700  { color: #b0aed0 !important; }
+/* ── TEXTOS — valores suficientemente escuros para ler em fundo claro ── */
+html.light-mode .text-white     { color: #1e1b3a !important; }
+html.light-mode .text-gray-100  { color: #1e1b3a !important; }
+html.light-mode .text-slate-100 { color: #2a2848 !important; }
+html.light-mode .text-slate-200 { color: #2d2b50 !important; }
+html.light-mode .text-slate-300 { color: #3d3b60 !important; }
+html.light-mode .text-slate-400 { color: #545275 !important; }
+html.light-mode .text-slate-500 { color: #706e8e !important; }
+html.light-mode .text-slate-600 { color: #5f5c7a !important; }
+html.light-mode .text-slate-700 { color: #4a4868 !important; }
 
-/* Active nav items — muito claros no fundo branco */
+/* ── TEXTOS COLORIDOS POR PERFIL ── */
 html.light-mode .text-\[\#a87fff\] { color: #5a1fc0 !important; }
+html.light-mode .text-\[\#7033ff\] { color: #5a1fc0 !important; }
 html.light-mode .text-amber-300    { color: #92400e !important; }
-html.light-mode .text-teal-300     { color: #0f766e !important; }
 html.light-mode .text-amber-400    { color: #b45309 !important; }
+html.light-mode .text-teal-300     { color: #0f766e !important; }
 html.light-mode .text-teal-400     { color: #0d9488 !important; }
 
-/* Bordas — levemente mais visíveis no fundo claro */
-html.light-mode .border-\[\#7033ff\]\/10  { border-color: rgba(112,51,255,0.18) !important; }
-html.light-mode .border-\[\#7033ff\]\/20  { border-color: rgba(112,51,255,0.28) !important; }
-html.light-mode .border-\[\#7033ff\]\/5   { border-color: rgba(112,51,255,0.10) !important; }
-html.light-mode .border-amber-500\/10     { border-color: rgba(245,158,11,0.22) !important; }
-html.light-mode .border-amber-500\/5      { border-color: rgba(245,158,11,0.12) !important; }
-html.light-mode .border-amber-500\/20     { border-color: rgba(245,158,11,0.30) !important; }
-html.light-mode .border-teal-500\/10      { border-color: rgba(45,212,191,0.22) !important; }
-html.light-mode .border-teal-500\/20      { border-color: rgba(45,212,191,0.30) !important; }
+/* ── BORDAS — mais visíveis em fundo claro ── */
+html.light-mode .border-\[\#7033ff\]\/10 { border-color: rgba(112,51,255,0.20) !important; }
+html.light-mode .border-\[\#7033ff\]\/20 { border-color: rgba(112,51,255,0.30) !important; }
+html.light-mode .border-\[\#7033ff\]\/5  { border-color: rgba(112,51,255,0.12) !important; }
+html.light-mode .border-amber-500\/5     { border-color: rgba(245,158,11,0.14) !important; }
+html.light-mode .border-amber-500\/10    { border-color: rgba(245,158,11,0.24) !important; }
+html.light-mode .border-amber-500\/15    { border-color: rgba(245,158,11,0.30) !important; }
+html.light-mode .border-amber-500\/20    { border-color: rgba(245,158,11,0.35) !important; }
+html.light-mode .border-teal-500\/10     { border-color: rgba(20,184,166,0.24) !important; }
+html.light-mode .border-teal-500\/20     { border-color: rgba(20,184,166,0.34) !important; }
+html.light-mode .border-slate-700\/20    { border-color: rgba(51,65,85,0.16) !important; }
+html.light-mode .border-slate-700\/30    { border-color: rgba(51,65,85,0.22) !important; }
+html.light-mode .border-slate-700\/40    { border-color: rgba(51,65,85,0.28) !important; }
+html.light-mode .border-slate-700\/50    { border-color: rgba(51,65,85,0.34) !important; }
 
-/* Cards e inputs das páginas Supervisor (Histórico, Cadastro, Ferramentas-Fora) */
-html.light-mode .bg-\[\#0a1628\]    { background-color: #f4f8ff !important; }
-html.light-mode .bg-\[\#0c1b31\]\/50 { background-color: rgba(236,244,255,0.8) !important; }
-html.light-mode .bg-\[\#0c1b31\]    { background-color: #ecf4ff !important; }
+/* ── FUNDOS DE HOVER ── */
+html.light-mode .hover\:bg-\[\#7033ff\]\/5:hover    { background-color: rgba(112,51,255,0.06) !important; }
+html.light-mode .hover\:bg-amber-500\/5:hover        { background-color: rgba(245,158,11,0.06) !important; }
+html.light-mode .hover\:bg-teal-500\/5:hover         { background-color: rgba(20,184,166,0.06) !important; }
+html.light-mode .hover\:bg-white\/5:hover            { background-color: rgba(0,0,0,0.04) !important; }
+html.light-mode .hover\:text-slate-200:hover         { color: #1e1b3a !important; }
 
-/* Texto de inputs e conteúdo de tabela */
-html.light-mode .text-slate-200  { color: #2d2b4a !important; }
+/* ── DIVIDE (linhas separadoras) ── */
+html.light-mode .divide-\[\#7033ff\]\/5  > * + * { border-color: rgba(112,51,255,0.12) !important; }
+html.light-mode .divide-teal-500\/5      > * + * { border-color: rgba(20,184,166,0.12) !important; }
+html.light-mode .divide-amber-500\/5     > * + * { border-color: rgba(245,158,11,0.12) !important; }
+html.light-mode .divide-slate-700\/20    > * + * { border-color: rgba(51,65,85,0.14) !important; }
 
-/* Bordas slate usadas em cards de Supervisor */
-html.light-mode .border-slate-700\/50 { border-color: rgba(99,102,121,0.28) !important; }
-html.light-mode .border-slate-700\/40 { border-color: rgba(99,102,121,0.22) !important; }
-html.light-mode .border-slate-700\/30 { border-color: rgba(99,102,121,0.16) !important; }
-html.light-mode .border-slate-700\/20 { border-color: rgba(99,102,121,0.12) !important; }
+/* ── INPUTS ESPECÍFICOS (fundos internos) ── */
+html.light-mode input:not([type="range"]),
+html.light-mode textarea,
+html.light-mode select {
+  color-scheme: light;
+}
 
-/* Hover em linhas de tabela */
-html.light-mode .hover\:bg-\[\#7033ff\]\/5:hover  { background-color: rgba(112,51,255,0.05) !important; }
-html.light-mode .hover\:bg-amber-500\/5:hover      { background-color: rgba(245,158,11,0.05) !important; }
-html.light-mode .hover\:bg-teal-500\/5:hover       { background-color: rgba(20,184,166,0.06) !important; }
-html.light-mode .hover\:bg-white\/5:hover          { background-color: rgba(0,0,0,0.04) !important; }
-html.light-mode .hover\:text-slate-200:hover       { color: #1e1b3a !important; }
+/* ── SENHA: remove ícone nativo do browser (Chrome/Edge/IE) ── */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+input::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  pointer-events: none;
+  position: absolute;
+}

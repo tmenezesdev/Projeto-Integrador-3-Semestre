@@ -1,22 +1,25 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { History, Search, Loader2, AlertCircle } from 'lucide-react';
+import { History, Search, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Sk } from '@/components/ui/skeleton';
+import { useAuth } from '@/hooks/useAuth';
 
 const API = 'http://localhost:3000/api/mecanico/historico';
-const token = () => localStorage.getItem('smartbench_token');
+const PAGE_SIZE = 20;
 
 export default function MecanicoHistorico() {
+  const { getToken } = useAuth();
   const [historico, setHistorico] = useState([]);
   const [busca, setBusca] = useState('');
+  const [pagina, setPagina] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [erro, setErro] = useState(false);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch(API, { headers: { Authorization: `Bearer ${token()}` } });
+        const res = await fetch(API, { headers: { Authorization: `Bearer ${getToken()}` } });
         if (!res.ok) throw new Error();
         const data = await res.json();
         setHistorico(Array.isArray(data) ? data : data.dados ?? []);
@@ -26,10 +29,15 @@ export default function MecanicoHistorico() {
     load();
   }, []);
 
+  useEffect(() => { setPagina(1); }, [busca]);
+
   const filtrados = historico.filter(item =>
     item.ferramenta?.toLowerCase().includes(busca.toLowerCase()) ||
     item.tagRfid?.toLowerCase().includes(busca.toLowerCase())
   );
+
+  const totalPaginas = Math.max(1, Math.ceil(filtrados.length / PAGE_SIZE));
+  const paginados = filtrados.slice((pagina - 1) * PAGE_SIZE, pagina * PAGE_SIZE);
 
   if (isLoading) return (
     <div className="p-8 font-sans">
@@ -96,7 +104,7 @@ export default function MecanicoHistorico() {
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
             <input
               type="text"
-              placeholder="Pesquisar por ferramenta ou responsável..."
+              placeholder="Pesquisar por ferramenta ou TAG..."
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
               className="h-10 w-full rounded-lg border border-amber-500/20 bg-[#0f0900] pl-9 pr-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all"
@@ -115,7 +123,7 @@ export default function MecanicoHistorico() {
               </tr>
             </thead>
             <tbody>
-              {filtrados.map((item) => (
+              {paginados.map((item) => (
                 <tr key={item.id} className="border-b border-amber-500/5 hover:bg-amber-500/5 transition-colors">
                   <td className="px-5 py-3 font-mono text-xs text-slate-500 whitespace-nowrap">#{item.id}</td>
                   <td className="px-5 py-3 text-slate-400 whitespace-nowrap">{item.dataHora}</td>
@@ -140,11 +148,34 @@ export default function MecanicoHistorico() {
                   </td>
                 </tr>
               ))}
-              {filtrados.length === 0 && (
+              {paginados.length === 0 && (
                 <tr><td colSpan={5} className="px-5 py-10 text-center text-slate-600">Nenhum registro encontrado.</td></tr>
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Paginação */}
+        <div className="px-5 py-4 border-t border-amber-500/10 flex items-center justify-between">
+          <span className="text-xs text-slate-500">
+            {filtrados.length} registros · página {pagina} de {totalPaginas}
+          </span>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setPagina(p => Math.max(1, p - 1))}
+              disabled={pagina === 1}
+              className="cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1 text-xs text-slate-400 border border-amber-500/10 px-3 py-1.5 rounded-lg hover:border-amber-500/30 transition-colors"
+            >
+              <ChevronLeft size={13} /> Anterior
+            </button>
+            <button
+              onClick={() => setPagina(p => Math.min(totalPaginas, p + 1))}
+              disabled={pagina >= totalPaginas}
+              className="cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1 text-xs text-slate-400 border border-amber-500/10 px-3 py-1.5 rounded-lg hover:border-amber-500/30 transition-colors"
+            >
+              Próximo <ChevronRight size={13} />
+            </button>
+          </div>
         </div>
       </div>
     </div>

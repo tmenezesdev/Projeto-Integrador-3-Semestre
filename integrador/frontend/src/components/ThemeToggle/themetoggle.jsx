@@ -20,8 +20,13 @@ export default function ThemeToggle({ collapsed, trackOn, trackOff = '#334155' }
           }
         </button>
         <div
-          className="absolute left-full ml-3 px-2 py-1 text-slate-100 text-xs rounded-md whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 border"
-          style={{ background: '#1e1b3a', borderColor: `${trackOn}33` }}
+          className="absolute left-full ml-3 px-2.5 py-1.5 text-xs font-medium rounded-md whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 border"
+          style={{
+            background:   isDark ? '#1e1b3a' : '#ffffff',
+            borderColor:  `${trackOn}44`,
+            color:        isDark ? '#e2e8f0' : '#1e1b3a',
+            boxShadow:    isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.12)',
+          }}
         >
           {isDark ? 'Modo Escuro' : 'Modo Claro'}
         </div>
@@ -62,7 +67,10 @@ export default function ThemeToggle({ collapsed, trackOn, trackOff = '#334155' }
       </button>
 
       {/* Label — decorativo */}
-      <span className="text-sm font-medium text-slate-500 pointer-events-none whitespace-nowrap">
+      <span
+        className="text-sm font-medium pointer-events-none whitespace-nowrap"
+        style={{ color: isDark ? '#64748b' : '#1e1b3a' }}
+      >
         {isDark ? 'Modo Escuro' : 'Modo Claro'}
       </span>
     </div>

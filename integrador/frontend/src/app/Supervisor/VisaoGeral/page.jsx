@@ -18,9 +18,9 @@ import ModalAlertas     from '@/components/ModaisVisaoGeral/ModalAlertas';
 import ModalTransacoes  from '@/components/ModaisVisaoGeral/ModalTransacoes';
 import ModalMecanicos   from '@/components/ModaisVisaoGeral/ModalMecanicos';
 import ModalTaxaPrazo   from '@/components/ModaisVisaoGeral/ModalTaxaPrazo';
+import { useAuth } from '@/hooks/useAuth';
 
-const API   = 'http://localhost:3000/api/supervisor';
-const token = () => localStorage.getItem('smartbench_token');
+const API = 'http://localhost:3000/api/supervisor';
 
 function KpiCard({ label, value, accent, sub, icon: Icon, onClick }) {
   return (
@@ -63,6 +63,7 @@ function StatBar({ label, value, max, color }) {
 }
 
 export default function SupervisorVisaoGeral() {
+  const { getToken, getUser } = useAuth();
   const [kpis,         setKpis]         = useState(null);
   const [ferramentas,  setFerramentas]  = useState([]);
   const [alertas,      setAlertas]      = useState([]);
@@ -79,14 +80,11 @@ export default function SupervisorVisaoGeral() {
   const [loadingModal, setLoadingModal] = useState(false);
 
   useEffect(() => {
-    try {
-      const u = JSON.parse(localStorage.getItem('smartbench_user') || '{}');
-      setNomeUsuario(u.nome?.split(' ')[0] || '');
-    } catch {}
+    setNomeUsuario(getUser().nome?.split(' ')[0] || '');
 
     const load = async () => {
       try {
-        const h = { Authorization: `Bearer ${token()}` };
+        const h = { Authorization: `Bearer ${getToken()}` };
         const [ferrRes, alertRes, dashRes, histRes] = await Promise.all([
           fetch(`${API}/ferramentas-fora`, { headers: h }),
           fetch(`${API}/alertas`,          { headers: h }),
@@ -118,7 +116,7 @@ export default function SupervisorVisaoGeral() {
       setFluxoLoading(true);
       try {
         const r = await fetch(`${API}/fluxo-movimentacoes?periodo=${periodo}`, {
-          headers: { Authorization: `Bearer ${token()}` },
+          headers: { Authorization: `Bearer ${getToken()}` },
         });
         const json = await r.json();
         setFluxo(json.dados ?? []);
@@ -134,7 +132,7 @@ export default function SupervisorVisaoGeral() {
       setLoadingModal(true);
       try {
         const r = await fetch(`${API}/ferramentas`, {
-          headers: { Authorization: `Bearer ${token()}` },
+          headers: { Authorization: `Bearer ${getToken()}` },
         });
         const json = await r.json();
         setTodasFerr(json.dados ?? []);
