@@ -204,7 +204,7 @@ export default function MecanicoPerfil() {
   const handleFoto = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) return showToast('A foto deve ter no máximo 2MB.', 'erro');
+    if (file.size > 5 * 1024 * 1024) return showToast('A foto deve ter no máximo 5MB.', 'erro');
     setUploadingFoto(true);
     const fd = new FormData();
     fd.append('foto', file);
@@ -216,7 +216,7 @@ export default function MecanicoPerfil() {
       });
       const data = await res.json();
       if (!res.ok) return showToast(data.erro || 'Erro ao enviar foto.', 'erro');
-      setPerfil(p => ({ ...p, foto_url: data.foto_url }));
+      setPerfil(p => ({ ...p, foto_filename: data.foto_filename }));
       showToast('Foto atualizada!');
     } catch { showToast('Erro de conexão.', 'erro'); }
     finally { setUploadingFoto(false); }
@@ -230,6 +230,11 @@ export default function MecanicoPerfil() {
 
   const loginTime = getLoginTime(getToken());
   const browser   = getBrowserInfo();
+
+  // ✅ URL da foto - usando /uploads/imagens/ do middleware
+  const fotoUrl = perfil?.foto_filename 
+    ? `http://localhost:3000/uploads/imagens/${perfil.foto_filename}`
+    : null;
 
   return (
     <div className="p-6 md:p-10 font-sans min-h-full bg-[#0f0900]">
@@ -248,8 +253,8 @@ export default function MecanicoPerfil() {
           <div className="bg-[#1a1000] border border-amber-500/10 rounded-2xl p-6 flex flex-col items-center text-center">
             <div className="relative mb-4">
               <div className="w-24 h-24 rounded-2xl bg-amber-500/10 border-2 border-amber-500/20 flex items-center justify-center overflow-hidden">
-                {perfil?.foto_url
-                  ? <img src={perfil.foto_url} alt="Foto" className="w-full h-full object-cover" />
+                {fotoUrl
+                  ? <img src={fotoUrl} alt="Foto" className="w-full h-full object-cover" />
                   : <span className="text-2xl font-bold text-amber-400">{getInitials(perfil?.nome)}</span>
                 }
               </div>
