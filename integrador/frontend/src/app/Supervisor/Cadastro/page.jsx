@@ -84,7 +84,7 @@ export default function CadastroPage() {
         <div className="bg-[#0a1628] border border-slate-700/20 rounded-xl overflow-hidden shadow-2xl w-full">
           <div className="px-6 py-5 border-b border-slate-700/20 bg-[#0c1b31]/50 flex items-center justify-between">
             <h2 className="text-sm font-bold text-slate-200 flex items-center gap-2">
-              <UserPlus size={16} className="text-teal-500" /> Registro de Novo Operador
+              <UserPlus size={16} className="text-teal-500" /> Registro de Novo Operador                                                                                                                            
             </h2>
             <span className="text-[9px] bg-teal-500/10 text-teal-500 px-2 py-0.5 rounded font-black uppercase tracking-widest border border-teal-500/20">Acesso Supervisor</span>
           </div>
