@@ -298,7 +298,7 @@ export default function LoginPage() {
 
               <form onSubmit={handleLogin} className="flex flex-col gap-5">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">E-mail Corporativo</label>
+                  <label className="text-xs font-semibold text-white uppercase tracking-wider">E-mail Corporativo</label>
                   <input
                     type="email" value={email} onChange={e => setEmail(e.target.value)}
                     className="input-field" placeholder="email@empresa.com" disabled={isLoading}
@@ -307,7 +307,7 @@ export default function LoginPage() {
 
                 <div className="flex flex-col gap-1.5">
                   <div className="flex justify-between items-center">
-                    <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Senha</label>
+                    <label className="text-xs font-semibold text-white uppercase tracking-wider">Senha</label>
                     <a href="#" className="text-xs" style={{ color:'#7033ff' }}>Esqueceu?</a>
                   </div>
                   <input
