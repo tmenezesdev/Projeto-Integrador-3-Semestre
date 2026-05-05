@@ -159,7 +159,7 @@ export default function LoginPage() {
             <h1 className="text-5xl font-extrabold tracking-tight mb-2 text-white">
               Smart<span style={{ color:'#7033ff' }}>Bench</span>
             </h1>
-            <p className="text-slate-500 text-base">Gestão Inteligente de Ferramentas</p>
+            <p className="text-slate-400 text-base">Gestão Inteligente de Ferramentas</p>
           </div>
 
           {/* Card com borda animada */}
@@ -168,11 +168,11 @@ export default function LoginPage() {
 
 
               <h2 className="text-xl font-bold text-white text-center mb-1">Acesso Restrito</h2>
-              <p className="text-slate-500 text-sm text-center mb-6">Insira suas credenciais corporativas</p>
+              <p className="text-slate-400 text-sm text-center mb-6">Insira suas credenciais corporativas</p>
 
               <form onSubmit={handleLogin} className="flex flex-col gap-5">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">E-mail Corporativo</label>
+                  <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">E-mail Corporativo</label>
                   <input
                     type="email" value={email} onChange={e => setEmail(e.target.value)}
                     className="login-input" placeholder="email@empresa.com" disabled={isLoading}
@@ -181,7 +181,7 @@ export default function LoginPage() {
 
                 <div className="flex flex-col gap-1.5">
                   <div className="flex justify-between items-center">
-                    <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Senha</label>
+                    <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Senha</label>
                     <a href="#" className="text-xs" style={{ color:'#7033ff' }}>Esqueceu?</a>
                   </div>
                   <input
@@ -219,7 +219,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <p className="text-center text-xs text-slate-700 mt-6">
+          <p className="text-center text-xs text-slate-300 mt-6">
             &copy; 2026 SmartBench System · Acesso monitorado
           </p>
         </div>
