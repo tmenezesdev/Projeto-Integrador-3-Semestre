@@ -1,6 +1,7 @@
-import { getConnection, hashPassword } from '../config/database.js';
+import { getConnection, hashPassword, comparePassword } from '../config/database.js';
 import UsuarioModel from '../models/UsuarioModel.js';
 import FerramentaModel from '../models/FerramentaModel.js';
+import { removerArquivoAntigo } from '../middlewares/uploadMiddleware.js';
 
 class AdminController {
 
@@ -511,6 +512,110 @@ class AdminController {
     } catch (error) {
       console.error('Erro em fluxoMovimentacoes:', error);
       res.status(500).json({ sucesso: false, erro: 'Erro ao buscar fluxo.' });
+    } finally {
+      if (connection) connection.release();
+    }
+  }
+
+  // ─── Perfil do Admin ──────────────────────────────────────────────────────
+
+  static async obterPerfil(req, res) {
+    try {
+      const usuario = await UsuarioModel.buscarPorId(req.usuario.id);
+      if (!usuario) return res.status(404).json({ sucesso: false, erro: 'Usuário não encontrado' });
+      const { senha, ...dados } = usuario;
+      res.json({ sucesso: true, dados });
+    } catch (error) {
+      console.error('Erro em AdminController.obterPerfil:', error);
+      res.status(500).json({ sucesso: false, erro: 'Erro ao buscar perfil.' });
+    }
+  }
+
+  static async atualizarPerfil(req, res) {
+    const usuarioId = req.usuario.id;
+    const { nome, email } = req.body;
+
+    if (!nome?.trim()) return res.status(400).json({ sucesso: false, erro: 'Nome obrigatório.' });
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) return res.status(400).json({ sucesso: false, erro: 'E-mail inválido.' });
+
+    try {
+      const existente = await UsuarioModel.buscarPorEmail(email.trim().toLowerCase());
+      if (existente && existente.id !== usuarioId) {
+        return res.status(409).json({ sucesso: false, erro: 'E-mail já está em uso.' });
+      }
+      await UsuarioModel.atualizar(usuarioId, { nome: nome.trim(), email: email.trim().toLowerCase() });
+      res.json({ sucesso: true, mensagem: 'Perfil atualizado com sucesso.' });
+    } catch (error) {
+      console.error('Erro em AdminController.atualizarPerfil:', error);
+      res.status(500).json({ sucesso: false, erro: 'Erro ao atualizar perfil.' });
+    }
+  }
+
+  static async alterarSenha(req, res) {
+    const usuarioId = req.usuario.id;
+    const { senha_atual, nova_senha } = req.body;
+
+    if (!senha_atual || !nova_senha) return res.status(400).json({ sucesso: false, erro: 'Preencha todos os campos.' });
+    if (nova_senha.length < 6) return res.status(400).json({ sucesso: false, erro: 'A nova senha deve ter ao menos 6 caracteres.' });
+
+    let connection;
+    try {
+      connection = await getConnection();
+      const [rows] = await connection.execute('SELECT senha FROM usuarios WHERE id = ?', [usuarioId]);
+      if (!rows.length) return res.status(404).json({ sucesso: false, erro: 'Usuário não encontrado.' });
+
+      const senhaValida = await comparePassword(senha_atual, rows[0].senha);
+      if (!senhaValida) return res.status(401).json({ sucesso: false, erro: 'Senha atual incorreta.' });
+
+      const novoHash = await hashPassword(nova_senha);
+      await connection.execute('UPDATE usuarios SET senha = ? WHERE id = ?', [novoHash, usuarioId]);
+      res.json({ sucesso: true, mensagem: 'Senha alterada com sucesso.' });
+    } catch (error) {
+      console.error('Erro em AdminController.alterarSenha:', error);
+      res.status(500).json({ sucesso: false, erro: 'Erro ao alterar senha.' });
+    } finally {
+      if (connection) connection.release();
+    }
+  }
+
+  static async uploadFoto(req, res) {
+    if (!req.file) return res.status(400).json({ sucesso: false, erro: 'Nenhuma imagem enviada.' });
+
+    const usuarioId = req.usuario.id;
+    const port = process.env.PORT || 3000;
+    const novaFotoUrl = `http://localhost:${port}/uploads/imagens/${req.file.filename}`;
+
+    let connection;
+    try {
+      connection = await getConnection();
+      const [rows] = await connection.execute('SELECT foto_url FROM usuarios WHERE id = ?', [usuarioId]);
+      const fotoAntiga = rows[0]?.foto_url;
+      if (fotoAntiga) {
+        const nomeAntigo = fotoAntiga.split('/').pop();
+        removerArquivoAntigo(nomeAntigo);
+      }
+      await connection.execute('UPDATE usuarios SET foto_url = ? WHERE id = ?', [novaFotoUrl, usuarioId]);
+      res.json({ sucesso: true, foto_filename: req.file.filename });
+    } catch (error) {
+      console.error('Erro em AdminController.uploadFoto:', error);
+      res.status(500).json({ sucesso: false, erro: 'Erro ao salvar foto.' });
+    } finally {
+      if (connection) connection.release();
+    }
+  }
+
+  static async obterStats(req, res) {
+    let connection;
+    try {
+      connection = await getConnection();
+      const [[{ total_usuarios }]] = await connection.execute('SELECT COUNT(*) AS total_usuarios FROM usuarios');
+      const [[{ total_ferramentas }]] = await connection.execute('SELECT COUNT(*) AS total_ferramentas FROM ferramentas');
+      const [[{ alertas_ativos }]] = await connection.execute("SELECT COUNT(*) AS alertas_ativos FROM alertas WHERE status_alerta = 'ATIVO'");
+      res.json({ sucesso: true, dados: { total_usuarios, total_ferramentas, alertas_ativos } });
+    } catch (error) {
+      console.error('Erro em AdminController.obterStats:', error);
+      res.status(500).json({ sucesso: false, erro: 'Erro ao buscar estatísticas.' });
     } finally {
       if (connection) connection.release();
     }

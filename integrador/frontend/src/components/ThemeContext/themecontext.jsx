@@ -9,9 +9,14 @@ export function ThemeProvider({ children }) {
 
   useEffect(() => {
     const saved = localStorage.getItem('sb_theme');
+    const html = document.documentElement;
     if (saved === 'light') {
       setIsDark(false);
-      document.documentElement.classList.add('light-mode');
+      html.classList.remove('dark');
+      html.classList.add('light-mode');
+    } else {
+      html.classList.add('dark');
+      html.classList.remove('light-mode');
     }
   }, []);
 
@@ -21,9 +26,11 @@ export function ThemeProvider({ children }) {
     setIsDark(prev => {
       const next = !prev;
       if (next) {
+        html.classList.add('dark');
         html.classList.remove('light-mode');
         localStorage.setItem('sb_theme', 'dark');
       } else {
+        html.classList.remove('dark');
         html.classList.add('light-mode');
         localStorage.setItem('sb_theme', 'light');
       }

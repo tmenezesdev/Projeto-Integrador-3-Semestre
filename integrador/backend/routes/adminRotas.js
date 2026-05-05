@@ -1,10 +1,17 @@
 import express from 'express';
 import AdminController from '../controllers/AdminController.js';
 import { authMiddleware, adminMiddleware } from '../middlewares/authMiddleware.js';
+import { uploadImagens, handleUploadError } from '../middlewares/uploadMiddleware.js';
 
 const router = express.Router();
 router.use(authMiddleware);
 router.use(adminMiddleware);
+
+router.get('/perfil',       AdminController.obterPerfil);
+router.put('/perfil',       AdminController.atualizarPerfil);
+router.put('/perfil/senha', AdminController.alterarSenha);
+router.get('/perfil/stats', AdminController.obterStats);
+router.post('/perfil/foto', uploadImagens.single('foto'), handleUploadError, AdminController.uploadFoto);
 
 router.get('/dashboard', AdminController.dashboard);
 router.get('/usuarios', AdminController.listarUsuarios);

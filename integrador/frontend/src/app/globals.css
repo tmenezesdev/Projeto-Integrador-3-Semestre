@@ -234,3 +234,121 @@ input::-webkit-credentials-auto-fill-button {
   pointer-events: none;
   position: absolute;
 }
+
+/* ═══════════════════════════════════════════════
+   LOGIN PAGE — animações e estilos estáticos
+   ═══════════════════════════════════════════════ */
+
+@keyframes morph-purple {
+  0%   { border-radius:60% 40% 30% 70%/60% 30% 70% 40%; transform:translate(0px,   0px)   scale(1);    }
+  25%  { border-radius:30% 60% 70% 40%/50% 60% 30% 60%; transform:translate(50px, -40px)  scale(1.06); }
+  50%  { border-radius:50% 30% 60% 40%/30% 60% 40% 70%; transform:translate(-30px, 50px)  scale(0.94); }
+  75%  { border-radius:40% 70% 40% 60%/60% 40% 60% 30%; transform:translate(40px,  30px)  scale(1.04); }
+  100% { border-radius:60% 40% 30% 70%/60% 30% 70% 40%; transform:translate(0px,   0px)   scale(1);    }
+}
+@keyframes morph-amber {
+  0%   { border-radius:40% 60% 60% 40%/40% 40% 60% 60%; transform:translate(0px,   0px)   scale(1);    }
+  33%  { border-radius:70% 30% 40% 60%/60% 50% 40% 50%; transform:translate(-60px, 40px)  scale(1.08); }
+  66%  { border-radius:30% 70% 60% 40%/50% 30% 70% 40%; transform:translate(30px, -50px)  scale(0.92); }
+  100% { border-radius:40% 60% 60% 40%/40% 40% 60% 60%; transform:translate(0px,   0px)   scale(1);    }
+}
+@keyframes morph-teal {
+  0%   { border-radius:50% 50% 40% 60%/30% 70% 40% 60%; transform:translate(0px,   0px)   scale(1);    }
+  40%  { border-radius:60% 40% 70% 30%/60% 40% 50% 50%; transform:translate(-40px,-50px)  scale(1.1);  }
+  80%  { border-radius:30% 60% 50% 50%/50% 30% 60% 40%; transform:translate(50px,  30px)  scale(0.9);  }
+  100% { border-radius:50% 50% 40% 60%/30% 70% 40% 60%; transform:translate(0px,   0px)   scale(1);    }
+}
+@keyframes morph-pink {
+  0%   { border-radius:50% 50% 60% 40%/50% 40% 60% 50%; transform:translate(0px, 0px)    scale(1);    }
+  50%  { border-radius:70% 30% 40% 60%/40% 60% 30% 70%; transform:translate(-35px,45px)  scale(1.07); }
+  100% { border-radius:50% 50% 60% 40%/50% 40% 60% 50%; transform:translate(0px, 0px)    scale(1);    }
+}
+@keyframes streak {
+  0%   { transform:translateX(-100%) rotate(-25deg); opacity:0;   }
+  10%  { opacity:0.6; }
+  30%  { opacity:0; }
+  100% { transform:translateX(220%)  rotate(-25deg); opacity:0;   }
+}
+@keyframes float-up {
+  0%   { transform:translateY(0)      translateX(0);   opacity:0;   }
+  8%   { opacity:1; }
+  90%  { opacity:0.6; }
+  100% { transform:translateY(-140px) translateX(22px); opacity:0;  }
+}
+@keyframes card-in {
+  from { opacity:0; transform:translateY(32px) scale(0.97); }
+  to   { opacity:1; transform:translateY(0)    scale(1);    }
+}
+@keyframes title-in {
+  from { opacity:0; transform:translateY(-18px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes border-spin {
+  from { --angle: 0deg; }
+  to   { --angle: 360deg; }
+}
+@keyframes scan {
+  0%   { top:0%;   opacity:0.7; }
+  60%  { opacity:0.15; }
+  100% { top:100%; opacity:0; }
+}
+@keyframes grid-scroll {
+  from { background-position:0 0; }
+  to   { background-position:0 60px; }
+}
+
+.blob-purple { animation: morph-purple 12s ease-in-out infinite; }
+.blob-amber  { animation: morph-amber  15s ease-in-out infinite; }
+.blob-teal   { animation: morph-teal   18s ease-in-out infinite; }
+.blob-pink   { animation: morph-pink   10s ease-in-out infinite; }
+.streak      { animation: streak  7s ease-in-out infinite; }
+.streak-2    { animation: streak  9s ease-in-out 3.5s infinite; }
+.streak-3    { animation: streak 11s ease-in-out 6s   infinite; }
+.particle    { animation: float-up linear infinite; }
+.card-in     { animation: card-in  0.6s cubic-bezier(.22,.68,0,1.15) forwards; }
+.title-in    { animation: title-in 0.5s ease-out 0.1s both; }
+.scan-line   { animation: scan 5s ease-in 1.5s infinite; }
+.grid-anim   { animation: grid-scroll 10s linear infinite; }
+
+.card-border-wrap {
+  padding: 1px;
+  border-radius: 18px;
+  background: conic-gradient(
+    from var(--angle),
+    #7033ff 0%,
+    #2dd4bf 25%,
+    #f59e0b 50%,
+    #7033ff 75%,
+    #7033ff 100%
+  );
+  animation: border-spin 6s linear infinite;
+}
+.card-inner {
+  background: rgba(10, 8, 22, 0.92);
+  backdrop-filter: blur(24px);
+  border-radius: 17px;
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
+}
+.login-input {
+  height:44px; width:100%;
+  border-radius:8px;
+  border:1px solid rgba(112,51,255,0.2);
+  background:rgba(6,4,15,0.8);
+  padding:0 12px;
+  font-size:14px; color:#fff;
+  outline:none;
+  transition:border-color 0.2s, box-shadow 0.2s;
+}
+.login-input::placeholder { color:#3a3a4a; }
+.login-input:focus {
+  border-color:rgba(112,51,255,0.6);
+  box-shadow:0 0 0 3px rgba(112,51,255,0.12);
+}
+.login-input:disabled { opacity:0.5; cursor:not-allowed; }

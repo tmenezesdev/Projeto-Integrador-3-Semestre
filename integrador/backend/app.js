@@ -43,8 +43,11 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Servir arquivos estáticos (imagens)
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Servir arquivos estáticos — CORP cross-origin permite que o frontend (porta 3001) carregue as imagens
+app.use('/uploads', (req, res, next) => {
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  next();
+}, express.static(path.join(__dirname, 'uploads')));
 
 // Middleware para log de requisições (salva no banco de dados)
 app.use(logMiddleware);

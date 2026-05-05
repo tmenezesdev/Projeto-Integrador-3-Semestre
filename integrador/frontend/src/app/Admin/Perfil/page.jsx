@@ -6,12 +6,11 @@ import {
   AlertCircle, CheckCircle2, Shield, KeyRound,
   CalendarDays, Clock, BadgeCheck, Hash,
   Fingerprint, ShieldCheck, Globe,
-  Wrench, PackageOpen, History, Tag,
+  Users, Wrench, Bell,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 const BASE = 'http://localhost:3000/api/admin/perfil';
-const token = () => localStorage.getItem('smartbench_token');
 
 const inputCls = "h-10 w-full rounded-lg border border-slate-200 dark:border-[#7033ff]/20 bg-slate-50 dark:bg-[#0a0a12]/80 px-3 text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#7033ff]/40 focus:border-[#7033ff]/60 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed";
 
@@ -95,6 +94,24 @@ function getInitials(nome) {
   return nome.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase();
 }
 
+function getLoginTime(token) {
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.iat ? new Date(payload.iat * 1000).toISOString() : null;
+  } catch { return null; }
+}
+
+function getBrowserInfo() {
+  if (typeof navigator === 'undefined') return 'Navegador desconhecido';
+  const ua = navigator.userAgent;
+  if (ua.includes('Chrome')) return 'Google Chrome';
+  if (ua.includes('Firefox')) return 'Mozilla Firefox';
+  if (ua.includes('Safari')) return 'Safari';
+  if (ua.includes('Edge')) return 'Microsoft Edge';
+  return 'Navegador';
+}
+
 export default function AdminPerfil() {
   const { getToken } = useAuth();
   const [perfil, setPerfil] = useState(null);
@@ -117,23 +134,16 @@ export default function AdminPerfil() {
     const headers = { Authorization: `Bearer ${authToken}` };
 
     Promise.all([
-      fetch(`${BASE}`, { headers }).then(r => r.json()),
+      fetch(`${BASE}`,       { headers }).then(r => r.json()),
       fetch(`${BASE}/stats`, { headers }).then(r => r.json()),
     ])
       .then(([perfilRes, statsRes]) => {
         const dados = perfilRes.dados ?? perfilRes;
-        
-        console.log('📦 Resposta do servidor (Admin):', dados);
-        console.log('📷 foto_filename:', dados?.foto_filename);
-        
         setPerfil(dados);
         setForm({ nome: dados.nome || '', email: dados.email || '' });
         setStats(statsRes.dados ?? null);
       })
-      .catch((err) => {
-        console.error('❌ Erro ao carregar perfil:', err);
-        showToast('Erro ao carregar perfil.', 'erro');
-      })
+      .catch(() => showToast('Erro ao carregar perfil.', 'erro'))
       .finally(() => setLoading(false));
   }, []);
 
@@ -205,17 +215,10 @@ export default function AdminPerfil() {
         body: fd,
       });
       const data = await res.json();
-      
-      console.log('📤 Resposta do upload (Admin):', data);
-      console.log('📷 foto_filename recebido:', data?.foto_filename);
-      
       if (!res.ok) return showToast(data.erro || 'Erro ao enviar foto.', 'erro');
       setPerfil(p => ({ ...p, foto_filename: data.foto_filename }));
       showToast('Foto atualizada!');
-    } catch (err) { 
-      console.error('❌ Erro no upload:', err);
-      showToast('Erro de conexão.', 'erro'); 
-    }
+    } catch { showToast('Erro de conexão.', 'erro'); }
     finally { setUploadingFoto(false); }
   };
 
@@ -225,12 +228,12 @@ export default function AdminPerfil() {
     </div>
   );
 
-  const fotoUrl = perfil?.foto_filename 
+  const loginTime = getLoginTime(getToken());
+  const browser   = getBrowserInfo();
+
+  const fotoUrl = perfil?.foto_filename
     ? `http://localhost:3000/uploads/imagens/${perfil.foto_filename}`
     : null;
-    
-  console.log('🖼️ URL final da foto (Admin):', fotoUrl);
-  console.log('📷 perfil?.foto_filename:', perfil?.foto_filename);
 
   return (
     <div className="p-6 md:p-10 font-sans min-h-full bg-white dark:bg-[#0f0900]">
@@ -250,17 +253,7 @@ export default function AdminPerfil() {
             <div className="relative mb-4">
               <div className="w-24 h-24 rounded-2xl bg-[#7033ff]/10 border-2 border-[#7033ff]/20 flex items-center justify-center overflow-hidden">
                 {fotoUrl
-                  ? (
-                    <img 
-                      src={fotoUrl} 
-                      alt="Foto" 
-                      className="w-full h-full object-cover" 
-                      onError={(e) => {
-                        console.error('❌ Erro ao carregar imagem:', fotoUrl);
-                        e.target.style.display = 'none';
-                      }}
-                    />
-                  )
+                  ? <img src={fotoUrl} alt="Foto" className="w-full h-full object-cover" />
                   : <span className="text-2xl font-bold text-[#7033ff]">{getInitials(perfil?.nome)}</span>
                 }
               </div>
@@ -294,6 +287,55 @@ export default function AdminPerfil() {
             <InfoRow icon={Clock}        label="Tempo de conta" value={timeAgo(perfil?.data_criacao)} />
           </div>
 
+          {/* Estatísticas do sistema */}
+          {stats && (
+            <div className="bg-white dark:bg-[#13102a] border border-slate-200 dark:border-[#7033ff]/10 rounded-2xl p-6 shadow-sm">
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Visão do Sistema</p>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="bg-[#7033ff]/5 border border-[#7033ff]/10 rounded-xl p-3 text-center">
+                  <Users size={14} className="text-[#7033ff] mx-auto mb-1" />
+                  <p className="text-2xl font-black text-[#7033ff]">{stats.total_usuarios ?? 0}</p>
+                  <p className="text-[10px] text-slate-500 uppercase tracking-wider mt-1">Usuários</p>
+                </div>
+                <div className="bg-[#7033ff]/5 border border-[#7033ff]/10 rounded-xl p-3 text-center">
+                  <Wrench size={14} className="text-slate-400 mx-auto mb-1" />
+                  <p className="text-2xl font-black text-slate-700 dark:text-white">{stats.total_ferramentas ?? 0}</p>
+                  <p className="text-[10px] text-slate-500 uppercase tracking-wider mt-1">Ferramentas</p>
+                </div>
+                <div className="bg-[#7033ff]/5 border border-[#7033ff]/10 rounded-xl p-3 text-center">
+                  <Bell size={14} className="text-amber-500 mx-auto mb-1" />
+                  <p className="text-2xl font-black text-amber-500">{stats.alertas_ativos ?? 0}</p>
+                  <p className="text-[10px] text-slate-500 uppercase tracking-wider mt-1">Alertas</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Sessão atual */}
+          <div className="bg-white dark:bg-[#13102a] border border-slate-200 dark:border-[#7033ff]/10 rounded-2xl p-6 shadow-sm">
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Sessão Atual</p>
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-3 p-3 bg-[#7033ff]/5 border border-[#7033ff]/10 rounded-xl">
+                <Globe size={15} className="text-[#7033ff] flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="text-xs font-semibold text-slate-700 dark:text-slate-200">{browser}</p>
+                  <p className="text-[11px] text-slate-400">Sessão ativa</p>
+                </div>
+                <span className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
+              </div>
+              {loginTime && (
+                <div className="flex items-center gap-2 p-3 bg-[#7033ff]/5 border border-[#7033ff]/10 rounded-lg">
+                  <Clock size={12} className="text-[#7033ff]" />
+                  <span className="text-[11px] text-slate-400">Login em</span>
+                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    {new Date(loginTime).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                  <span className="text-[11px] text-slate-500">· {timeAgo(loginTime)}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
         </div>
 
         {/* ── Coluna direita ── */}
@@ -308,6 +350,9 @@ export default function AdminPerfil() {
                 </Field>
                 <Field label="E-mail" icon={Mail}>
                   <input className={inputCls} type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="seu@email.com" />
+                </Field>
+                <Field label="Função" icon={Shield}>
+                  <input className={inputCls} value="Administrador" disabled />
                 </Field>
               </div>
               <div className="flex justify-end pt-2 border-t border-slate-100 dark:border-[#7033ff]/10">
@@ -416,12 +461,12 @@ export default function AdminPerfil() {
           <SectionCard icon={KeyRound} title="Permissões de Acesso">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {[
-                { label: 'Gerenciar usuários',     desc: 'Criar, editar e excluir usuários' },
-                { label: 'Gerenciar ferramentas',  desc: 'Controle total do inventário' },
-                { label: 'Visualizar histórico',   desc: 'Acesso a todas as transações' },
-                { label: 'Gerenciar alertas',      desc: 'Resolver e configurar alertas' },
-                { label: 'Configurações do sistema', desc: 'Parâmetros e preferências' },
-                { label: 'Acesso a relatórios',    desc: 'Dashboard e métricas' },
+                { label: 'Gerenciar usuários',       desc: 'Criar, editar e excluir usuários' },
+                { label: 'Gerenciar ferramentas',     desc: 'Controle total do inventário' },
+                { label: 'Visualizar histórico',      desc: 'Acesso a todas as transações' },
+                { label: 'Gerenciar alertas',         desc: 'Resolver e configurar alertas' },
+                { label: 'Configurações do sistema',  desc: 'Parâmetros e preferências' },
+                { label: 'Acesso a relatórios',       desc: 'Dashboard e métricas' },
               ].map((p) => (
                 <div key={p.label} className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-[#0a0a12]/40 border border-slate-200 dark:border-[#7033ff]/10 rounded-xl">
                   <CheckCircle2 size={15} className="text-green-500 flex-shrink-0" />

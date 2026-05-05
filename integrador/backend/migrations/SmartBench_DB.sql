@@ -1,4 +1,4 @@
-CREATE DATABASE SmartBench_DB;
+CREATE DATABASE IF NOT EXISTS SmartBench_DB;
 USE SmartBench_DB;
 
 -- =========================================================================
@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     tag_cracha VARCHAR(50) UNIQUE NOT NULL,
     tipo_perfil ENUM('ADMIN', 'SUPERVISOR', 'MECANICO') NOT NULL,
     senha VARCHAR(255) NOT NULL,
+    foto_url VARCHAR(255) NULL DEFAULT NULL,
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -90,7 +91,10 @@ INSERT IGNORE INTO configuracoes_sistema (id, tempo_limite_horas, tempo_aviso_mi
 -- =========================================================================
 -- TRIGGER: Atualiza status da ferramenta ao registrar transação
 -- Ferramentas em MANUTENCAO não são alteradas automaticamente
+-- NOTA: Execute este script pelo MySQL CLI ou MySQL Workbench (Run SQL Script)
 -- =========================================================================
+DROP TRIGGER IF EXISTS trg_atualiza_status_ferramenta;
+
 DELIMITER //
 CREATE TRIGGER trg_atualiza_status_ferramenta
 AFTER INSERT ON transacoes
@@ -103,8 +107,7 @@ BEGIN
         UPDATE ferramentas SET status = 'DISPONIVEL'
         WHERE id = NEW.ferramenta_id AND status != 'MANUTENCAO';
     END IF;
-END;
-//
+END //
 DELIMITER ;
 
 -- =========================================================================
@@ -152,3 +155,4 @@ INSERT INTO reservas (usuario_id, ferramenta_id, data_prevista, status_reserva) 
 (4, 5, DATE_ADD(NOW(), INTERVAL 1 DAY),  'PENDENTE'),
 (5, 7, DATE_ADD(NOW(), INTERVAL 2 HOUR), 'PENDENTE'),
 (1, 4, DATE_SUB(NOW(), INTERVAL 2 DAY),  'CONCLUIDA');
+

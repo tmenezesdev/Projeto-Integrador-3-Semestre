@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
@@ -29,6 +29,18 @@ export default function LoginPage() {
   const [senha, setSenha]     = useState("");
   const [erro, setErro]       = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const particles = useMemo(() => PARTICLES.map((p, i) => (
+    <div key={i} className="particle absolute rounded-full pointer-events-none" style={{
+      width: p.w, height: p.w,
+      left: `${p.x}%`, top: `${p.y}%`,
+      background: p.color,
+      animationDuration: `${p.dur}s`,
+      animationDelay: `${p.delay}s`,
+      filter: 'blur(0.4px)',
+      boxShadow: `0 0 4px 1px ${p.color}55`,
+    }} />
+  )), []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -62,134 +74,6 @@ export default function LoginPage() {
 
   return (
     <>
-      <style>{`
-        /* ── Blobs morfantes ── */
-        @keyframes morph-purple {
-          0%   { border-radius:60% 40% 30% 70%/60% 30% 70% 40%; transform:translate(0px,   0px)   scale(1);    }
-          25%  { border-radius:30% 60% 70% 40%/50% 60% 30% 60%; transform:translate(50px, -40px)  scale(1.06); }
-          50%  { border-radius:50% 30% 60% 40%/30% 60% 40% 70%; transform:translate(-30px, 50px)  scale(0.94); }
-          75%  { border-radius:40% 70% 40% 60%/60% 40% 60% 30%; transform:translate(40px,  30px)  scale(1.04); }
-          100% { border-radius:60% 40% 30% 70%/60% 30% 70% 40%; transform:translate(0px,   0px)   scale(1);    }
-        }
-        @keyframes morph-amber {
-          0%   { border-radius:40% 60% 60% 40%/40% 40% 60% 60%; transform:translate(0px,   0px)   scale(1);    }
-          33%  { border-radius:70% 30% 40% 60%/60% 50% 40% 50%; transform:translate(-60px, 40px)  scale(1.08); }
-          66%  { border-radius:30% 70% 60% 40%/50% 30% 70% 40%; transform:translate(30px, -50px)  scale(0.92); }
-          100% { border-radius:40% 60% 60% 40%/40% 40% 60% 60%; transform:translate(0px,   0px)   scale(1);    }
-        }
-        @keyframes morph-teal {
-          0%   { border-radius:50% 50% 40% 60%/30% 70% 40% 60%; transform:translate(0px,   0px)   scale(1);    }
-          40%  { border-radius:60% 40% 70% 30%/60% 40% 50% 50%; transform:translate(-40px,-50px)  scale(1.1);  }
-          80%  { border-radius:30% 60% 50% 50%/50% 30% 60% 40%; transform:translate(50px,  30px)  scale(0.9);  }
-          100% { border-radius:50% 50% 40% 60%/30% 70% 40% 60%; transform:translate(0px,   0px)   scale(1);    }
-        }
-        @keyframes morph-pink {
-          0%   { border-radius:50% 50% 60% 40%/50% 40% 60% 50%; transform:translate(0px,0px)     scale(1);   }
-          50%  { border-radius:70% 30% 40% 60%/40% 60% 30% 70%; transform:translate(-35px,45px)  scale(1.07);}
-          100% { border-radius:50% 50% 60% 40%/50% 40% 60% 50%; transform:translate(0px,0px)     scale(1);   }
-        }
-
-        /* ── Streaks de luz ── */
-        @keyframes streak {
-          0%   { transform:translateX(-100%) rotate(-25deg); opacity:0;   }
-          10%  { opacity:0.6; }
-          30%  { opacity:0; }
-          100% { transform:translateX(220%)  rotate(-25deg); opacity:0;   }
-        }
-
-        /* ── Partículas ── */
-        @keyframes float-up {
-          0%   { transform:translateY(0)     translateX(0);   opacity:0;   }
-          8%   { opacity:1; }
-          90%  { opacity:0.6; }
-          100% { transform:translateY(-140px) translateX(22px); opacity:0; }
-        }
-
-        /* ── Entrada do card ── */
-        @keyframes card-in {
-          from { opacity:0; transform:translateY(32px) scale(0.97); }
-          to   { opacity:1; transform:translateY(0)    scale(1);    }
-        }
-        @keyframes title-in {
-          from { opacity:0; transform:translateY(-18px); }
-          to   { opacity:1; transform:translateY(0); }
-        }
-
-        /* ── Borda rotativa no card ── */
-        @keyframes border-spin {
-          from { --angle: 0deg; }
-          to   { --angle: 360deg; }
-        }
-        @property --angle {
-          syntax: '<angle>';
-          initial-value: 0deg;
-          inherits: false;
-        }
-        @keyframes scan {
-          0%   { top:0%;   opacity:0.7; }
-          60%  { opacity:0.15; }
-          100% { top:100%; opacity:0; }
-        }
-        @keyframes grid-scroll {
-          from { background-position:0 0; }
-          to   { background-position:0 60px; }
-        }
-
-        /* ── Classes ── */
-        .blob-purple { animation: morph-purple 12s ease-in-out infinite; }
-        .blob-amber  { animation: morph-amber  15s ease-in-out infinite; }
-        .blob-teal   { animation: morph-teal   18s ease-in-out infinite; }
-        .blob-pink   { animation: morph-pink   10s ease-in-out infinite; }
-        .streak      { animation: streak 7s ease-in-out infinite; }
-        .streak-2    { animation: streak 9s ease-in-out 3.5s infinite; }
-        .streak-3    { animation: streak 11s ease-in-out 6s infinite; }
-        .particle    { animation: float-up linear infinite; }
-        .card-in     { animation: card-in  0.6s cubic-bezier(.22,.68,0,1.15) forwards; }
-        .title-in    { animation: title-in 0.5s ease-out 0.1s both; }
-        .scan-line   { animation: scan 5s ease-in 1.5s infinite; }
-        .grid-anim   { animation: grid-scroll 10s linear infinite; }
-
-        /* Borda animada via conic-gradient */
-        .card-border-wrap {
-          padding: 1px;
-          border-radius: 18px;
-          background: conic-gradient(
-            from var(--angle),
-            #7033ff 0%,
-            #2dd4bf 25%,
-            #f59e0b 50%,
-            #7033ff 75%,
-            #7033ff 100%
-          );
-          animation: border-spin 6s linear infinite;
-        }
-        .card-inner {
-          background: rgba(10, 8, 22, 0.92);
-          backdrop-filter: blur(24px);
-          border-radius: 17px;
-          padding: 32px;
-          position: relative;
-          overflow: hidden;
-        }
-
-        .input-field {
-          height:44px; width:100%;
-          border-radius:8px;
-          border:1px solid rgba(112,51,255,0.2);
-          background:rgba(6,4,15,0.8);
-          padding:0 12px;
-          font-size:14px; color:#fff;
-          outline:none;
-          transition:border-color 0.2s, box-shadow 0.2s;
-        }
-        .input-field::placeholder { color:#3a3a4a; }
-        .input-field:focus {
-          border-color:rgba(112,51,255,0.6);
-          box-shadow:0 0 0 3px rgba(112,51,255,0.12);
-        }
-        .input-field:disabled { opacity:0.5; cursor:not-allowed; }
-      `}</style>
-
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden font-sans" style={{ background: '#04030d' }}>
 
         {/* Grid */}
@@ -217,7 +101,7 @@ export default function LoginPage() {
           top:'42%', left:'48%',
           width:'580px', height:'580px',
           background:'radial-gradient(circle, rgba(112,51,255,0.55) 0%, transparent 68%)',
-          filter:'blur(72px)', willChange:'transform',
+          filter:'blur(48px)', willChange:'transform',
         }} />
 
         {/* Blob âmbar — Mecânico */}
@@ -225,7 +109,7 @@ export default function LoginPage() {
           top:'72%', left:'18%',
           width:'420px', height:'420px',
           background:'radial-gradient(circle, rgba(245,158,11,0.45) 0%, transparent 68%)',
-          filter:'blur(90px)', willChange:'transform',
+          filter:'blur(56px)', willChange:'transform',
         }} />
 
         {/* Blob teal — Supervisor */}
@@ -233,7 +117,7 @@ export default function LoginPage() {
           top:'15%', left:'72%',
           width:'380px', height:'380px',
           background:'radial-gradient(circle, rgba(45,212,191,0.4) 0%, transparent 68%)',
-          filter:'blur(80px)', willChange:'transform',
+          filter:'blur(52px)', willChange:'transform',
         }} />
 
         {/* Blob rosa secundário — profundidade */}
@@ -241,7 +125,7 @@ export default function LoginPage() {
           top:'20%', left:'10%',
           width:'280px', height:'280px',
           background:'radial-gradient(circle, rgba(168,85,247,0.3) 0%, transparent 68%)',
-          filter:'blur(100px)', willChange:'transform',
+          filter:'blur(60px)', willChange:'transform',
         }} />
 
         {/* Streaks de luz */}
@@ -265,17 +149,7 @@ export default function LoginPage() {
         }} />
 
         {/* Partículas */}
-        {PARTICLES.map((p, i) => (
-          <div key={i} className="particle absolute rounded-full pointer-events-none" style={{
-            width:p.w, height:p.w,
-            left:`${p.x}%`, top:`${p.y}%`,
-            background:p.color,
-            animationDuration:`${p.dur}s`,
-            animationDelay:`${p.delay}s`,
-            filter:'blur(0.4px)',
-            boxShadow:`0 0 4px 1px ${p.color}55`,
-          }} />
-        ))}
+        {particles}
 
         {/* Conteúdo */}
         <div className="relative z-10 w-full max-w-md px-4">
@@ -301,7 +175,7 @@ export default function LoginPage() {
                   <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">E-mail Corporativo</label>
                   <input
                     type="email" value={email} onChange={e => setEmail(e.target.value)}
-                    className="input-field" placeholder="email@empresa.com" disabled={isLoading}
+                    className="login-input" placeholder="email@empresa.com" disabled={isLoading}
                   />
                 </div>
 
@@ -312,7 +186,7 @@ export default function LoginPage() {
                   </div>
                   <input
                     type="password" value={senha} onChange={e => setSenha(e.target.value)}
-                    className="input-field" placeholder="••••••••" disabled={isLoading}
+                    className="login-input" placeholder="••••••••" disabled={isLoading}
                   />
                 </div>
 
