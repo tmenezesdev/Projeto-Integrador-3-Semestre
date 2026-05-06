@@ -18,6 +18,8 @@ import mecanicoRotas from './routes/mecanicoRotas.js';
 import { logMiddleware } from './middlewares/logMiddleware.js';
 import { errorMiddleware } from './middlewares/errorMiddleware.js';
 
+import rfidRotas from './routes/rfidRotas.js';
+
 // Carregar variáveis do arquivo .env
 dotenv.config();
 
@@ -27,6 +29,9 @@ const __dirname = path.dirname(__filename);
 
 // Configurações do servidor
 const PORT = process.env.PORT || 3000;
+
+
+app.use('/api/rfid', rfidRotas);
 
 // Middlewares globais
 app.use(helmet()); // Segurança HTTP headers

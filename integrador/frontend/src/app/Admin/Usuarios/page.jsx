@@ -45,6 +45,9 @@ export default function AdminUsuarios() {
   const [showSenha, setShowSenha] = useState(false);
   const [saving, setSaving] = useState(false);
   const [formErro, setFormErro] = useState('');
+  
+  // NOVO ESTADO: Controla se estamos esperando o RFID do ESP32
+  const [escutandoRfid, setEscutandoRfid] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -58,13 +61,40 @@ export default function AdminUsuarios() {
 
   useEffect(() => { load(); }, [load]);
 
+  // NOVO EFEITO: Escuta o cartão apenas quando o modal de criar está aberto
+  useEffect(() => {
+    let intervalo;
+    if (modalCriar) {
+      setEscutandoRfid(true);
+      intervalo = setInterval(async () => {
+        try {
+          // 👇 MUDE ESTA LINHA AQUI 👇
+          const res = await fetch('http://localhost:3000/api/rfid');
+          const data = await res.json();
+          
+          if (data.tag) {
+            // Achou o cartão! Preenche o formulário e para de escutar
+            setForm(f => ({ ...f, tag_cracha: data.tag }));
+            setEscutandoRfid(false);
+          }
+        } catch (error) {
+          console.error("Erro ao buscar tag RFID:", error);
+        }
+      }, 1000);
+    } else {
+      setEscutandoRfid(false);
+    }
+
+    return () => clearInterval(intervalo);
+  }, [modalCriar]);
+
   const filtrados = usuarios.filter(u =>
     u.nome?.toLowerCase().includes(busca.toLowerCase()) ||
     u.email?.toLowerCase().includes(busca.toLowerCase()) ||
     u.tag_cracha?.toLowerCase().includes(busca.toLowerCase())
   );
 
-  const resetForm = () => { setForm({ nome: '', email: '', tag_cracha: '', tipo_perfil: 'MECANICO', senha: '' }); setFormErro(''); setShowSenha(false); };
+  const resetForm = () => { setForm({ nome: '', email: '', tag_cracha: '', tipo_perfil: 'MECANICO', senha: '' }); setFormErro(''); setShowSenha(false); setEscutandoRfid(false); };
 
   const handleCriar = async () => {
     if (!form.nome || !form.email || !form.tag_cracha || !form.senha) return setFormErro('Todos os campos são obrigatórios.');
@@ -252,7 +282,13 @@ export default function AdminUsuarios() {
               <input className={inputCls} type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="email@exemplo.com" />
             </Field>
             <Field label="Tag Crachá">
-              <input className={inputCls} value={form.tag_cracha} onChange={e => setForm(f => ({ ...f, tag_cracha: e.target.value.toUpperCase() }))} placeholder="TAG001" />
+              <input 
+                className={inputCls} 
+                value={form.tag_cracha} 
+                onChange={e => setForm(f => ({ ...f, tag_cracha: e.target.value.toUpperCase() }))} 
+                // Única alteração visual: O placeholder avisa dinamicamente que estamos escutando o leitor
+                placeholder={escutandoRfid ? "Aproxime o cartão do leitor..." : "TAG001"} 
+              />
             </Field>
             <Field label="Perfil">
               <select className={inputCls} value={form.tipo_perfil} onChange={e => setForm(f => ({ ...f, tipo_perfil: e.target.value }))}>
