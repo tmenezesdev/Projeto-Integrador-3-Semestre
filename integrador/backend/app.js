@@ -19,6 +19,7 @@ import { logMiddleware } from './middlewares/logMiddleware.js';
 import { errorMiddleware } from './middlewares/errorMiddleware.js';
 
 import rfidRotas from './routes/rfidRotas.js';
+import chatRotas from './routes/chatRotas.js';
 
 // Carregar variáveis do arquivo .env
 dotenv.config();
@@ -65,6 +66,7 @@ app.use('/api/usuarios', usuarioRotas);
 app.use('/api/supervisor', supervisorRotas);
 app.use('/api/admin', adminRotas);
 app.use('/api/mecanico', mecanicoRotas);
+app.use('/api/chat', chatRotas);
 
 // Rota raiz
 app.get('/', (req, res) => {

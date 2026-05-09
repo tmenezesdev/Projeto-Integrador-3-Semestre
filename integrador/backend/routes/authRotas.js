@@ -5,8 +5,10 @@ import { authMiddleware, adminMiddleware } from '../middlewares/authMiddleware.j
 const router = express.Router();
 
 // Rotas públicas de autenticação
-router.post('/login', AuthController.login);
-router.post('/registrar', AuthController.registrar);
+router.post('/login',           AuthController.login);
+router.post('/registrar',       AuthController.registrar);
+router.post('/esqueceu-senha',  AuthController.esqueceuSenha);
+router.post('/redefinir-senha', AuthController.redefinirSenha);
 
 // Rotas protegidas (precisam de autenticação)
 router.get('/perfil', authMiddleware, AuthController.obterPerfil);

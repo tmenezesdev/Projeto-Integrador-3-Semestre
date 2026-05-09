@@ -136,20 +136,15 @@ class MecanicoController {
     if (!req.file) return res.status(400).json({ sucesso: false, erro: 'Nenhuma imagem enviada.' });
 
     const usuarioId = req.usuario.id;
-    const port = process.env.PORT || 3000;
-    const novaFotoUrl = `http://localhost:${port}/uploads/imagens/${req.file.filename}`;
+    const novaFotoUrl = req.file.path; // Cloudinary retorna a URL completa em req.file.path
 
     let connection;
     try {
       connection = await getConnection();
 
-      // Remove foto anterior do disco se existir
       const [rows] = await connection.execute('SELECT foto_url FROM usuarios WHERE id = ?', [usuarioId]);
       const fotoAntiga = rows[0]?.foto_url;
-      if (fotoAntiga) {
-        const nomeAntigo = fotoAntiga.split('/').pop();
-        removerArquivoAntigo(nomeAntigo);
-      }
+      if (fotoAntiga) await removerArquivoAntigo(fotoAntiga);
 
       await connection.execute('UPDATE usuarios SET foto_url = ? WHERE id = ?', [novaFotoUrl, usuarioId]);
       res.json({ sucesso: true, foto_url: novaFotoUrl });

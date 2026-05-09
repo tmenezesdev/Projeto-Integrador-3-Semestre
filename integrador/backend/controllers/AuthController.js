@@ -1,6 +1,9 @@
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import UsuarioModel from '../models/UsuarioModel.js';
 import { JWT_CONFIG } from '../config/jwt.js';
+import { getConnection, hashPassword } from '../config/database.js';
+import { enviarEmailResetSenha } from '../services/emailService.js';
 
 // Controller para operações de autenticação
 class AuthController {
@@ -486,6 +489,92 @@ class AuthController {
                 erro: 'Erro interno do servidor',
                 mensagem: 'Não foi possível atualizar o usuário'
             });
+        }
+    }
+
+    // POST /auth/esqueceu-senha - Solicitar redefinição de senha
+    static async esqueceuSenha(req, res) {
+        const { email } = req.body;
+        if (!email?.trim()) {
+            return res.status(400).json({ sucesso: false, mensagem: 'E-mail obrigatório.' });
+        }
+
+        let conn;
+        try {
+            conn = await getConnection();
+            const [[usuario]] = await conn.execute(
+                'SELECT id, nome, email FROM usuarios WHERE email = ?',
+                [email.trim().toLowerCase()]
+            );
+
+            if (!usuario) {
+                return res.status(404).json({
+                    sucesso: false,
+                    mensagem: 'E-mail não cadastrado no sistema. Entre em contato com o seu supervisor.',
+                });
+            }
+
+            const token  = crypto.randomBytes(32).toString('hex');
+            const expiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
+
+            await conn.execute(
+                'UPDATE usuarios SET reset_token = ?, reset_token_expiry = ? WHERE id = ?',
+                [token, expiry, usuario.id]
+            );
+
+            try {
+                await enviarEmailResetSenha(usuario.email, usuario.nome, token);
+            } catch (emailError) {
+                console.error('Falha ao enviar email de reset:', emailError.message);
+                return res.status(500).json({
+                    sucesso: false,
+                    mensagem: 'Não foi possível enviar o e-mail. Verifique se EMAIL_USER e EMAIL_PASS estão configurados corretamente no servidor.',
+                });
+            }
+
+            res.json({ sucesso: true, mensagem: 'Instruções de redefinição enviadas para o seu e-mail.' });
+        } catch (error) {
+            console.error('Erro em esqueceuSenha:', error);
+            res.status(500).json({ sucesso: false, mensagem: 'Erro ao processar solicitação.' });
+        } finally {
+            if (conn) conn.release();
+        }
+    }
+
+    // POST /auth/redefinir-senha - Redefinir senha com token
+    static async redefinirSenha(req, res) {
+        const { token, nova_senha } = req.body;
+        if (!token || !nova_senha) {
+            return res.status(400).json({ sucesso: false, mensagem: 'Token e nova senha são obrigatórios.' });
+        }
+        if (nova_senha.length < 6) {
+            return res.status(400).json({ sucesso: false, mensagem: 'A senha deve ter pelo menos 6 caracteres.' });
+        }
+
+        let conn;
+        try {
+            conn = await getConnection();
+            const [[usuario]] = await conn.execute(
+                'SELECT id FROM usuarios WHERE reset_token = ? AND reset_token_expiry > NOW()',
+                [token]
+            );
+
+            if (!usuario) {
+                return res.status(400).json({ sucesso: false, mensagem: 'Link inválido ou expirado. Solicite um novo.' });
+            }
+
+            const hash = await hashPassword(nova_senha);
+            await conn.execute(
+                'UPDATE usuarios SET senha = ?, reset_token = NULL, reset_token_expiry = NULL WHERE id = ?',
+                [hash, usuario.id]
+            );
+
+            res.json({ sucesso: true, mensagem: 'Senha redefinida com sucesso!' });
+        } catch (error) {
+            console.error('Erro em redefinirSenha:', error);
+            res.status(500).json({ sucesso: false, mensagem: 'Erro ao redefinir senha.' });
+        } finally {
+            if (conn) conn.release();
         }
     }
 

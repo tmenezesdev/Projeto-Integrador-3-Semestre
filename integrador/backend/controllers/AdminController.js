@@ -640,7 +640,7 @@ class AdminController {
   }
 
   static async atualizarConfiguracoes(req, res) {
-    const { tempo_limite_horas, tempo_aviso_minutos, modo_manutencao } = req.body;
+    const { tempo_limite_horas, tempo_aviso_minutos, modo_manutencao, chat_ativo } = req.body;
 
     const atualizacao = {};
     if (tempo_limite_horas !== undefined) {
@@ -659,6 +659,9 @@ class AdminController {
     }
     if (modo_manutencao !== undefined) {
       atualizacao.modo_manutencao = Boolean(modo_manutencao);
+    }
+    if (chat_ativo !== undefined) {
+      atualizacao.chat_ativo = Boolean(chat_ativo);
     }
 
     if (Object.keys(atualizacao).length === 0) {
