@@ -13,11 +13,27 @@ import {
   KeyRound
 } from "lucide-react";
 
+// Converte "Carlos Silva" → "carlos.silva"
+const normalizarNome = (nome) =>
+  nome.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim().replace(/\s+/g, '.');
+
+const gerarEmail = (nome) => {
+  const n = normalizarNome(nome);
+  return n ? `${n}@gm.com` : '';
+};
+
+const gerarTag = (perfil) => {
+  const abbrev = perfil === 'SUPERVISOR' ? 'SUP' : 'MEC';
+  const num = String(Date.now()).slice(-3);
+  return `TAG-${abbrev}-${num}`;
+};
+
 export default function CadastroPage() {
   const [salvando, setSalvando] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [erro, setErro] = useState('');
   const [senhaGerada, setSenhaGerada] = useState('');
+  const [autoFill, setAutoFill] = useState({ email: true, tag: true });
 
   const [novoFuncionario, setNovoFuncionario] = useState({
     nome: '',
@@ -25,6 +41,23 @@ export default function CadastroPage() {
     tag_cracha: '',
     tipo_perfil: 'MECANICO'
   });
+
+  const handleNome = (nome) => {
+    setNovoFuncionario(prev => ({
+      ...prev,
+      nome,
+      email:      autoFill.email ? gerarEmail(nome)                : prev.email,
+      tag_cracha: autoFill.tag   ? gerarTag(prev.tipo_perfil)      : prev.tag_cracha,
+    }));
+  };
+
+  const handlePerfil = (perfil) => {
+    setNovoFuncionario(prev => ({
+      ...prev,
+      tipo_perfil: perfil,
+      tag_cracha: autoFill.tag ? gerarTag(perfil) : prev.tag_cracha,
+    }));
+  };
 
   const handleCadastrar = async (e) => {
     e.preventDefault();
@@ -53,6 +86,7 @@ export default function CadastroPage() {
       setSenhaGerada(data.dados.senhaTemporaria);
       setShowToast(true);
       setNovoFuncionario({ nome: '', email: '', tag_cracha: '', tipo_perfil: 'MECANICO' });
+      setAutoFill({ email: true, tag: true });
       setTimeout(() => setShowToast(false), 6000);
 
     } catch {
@@ -101,8 +135,8 @@ export default function CadastroPage() {
                 type="text"
                 placeholder="Ex: Carlos Silva"
                 value={novoFuncionario.nome}
-                onChange={(e) => setNovoFuncionario({ ...novoFuncionario, nome: e.target.value })}
-                className="w-full bg-[#060d1f] border border-slate-700/50 rounded-lg py-3.5 px-4 text-sm text-slate-200 placeholder:text-slate-800 focus:border-teal-500/50 outline-none transition-all"
+                onChange={(e) => handleNome(e.target.value)}
+                className="w-full bg-[#060d1f] border border-slate-700/50 rounded-lg py-3.5 px-4 text-sm text-slate-200 placeholder:text-slate-500 placeholder:italic focus:border-teal-500/50 outline-none transition-all"
               />
             </div>
 
@@ -117,8 +151,11 @@ export default function CadastroPage() {
                   type="email"
                   placeholder="carlos.silva@gm.com"
                   value={novoFuncionario.email}
-                  onChange={(e) => setNovoFuncionario({ ...novoFuncionario, email: e.target.value })}
-                  className="w-full bg-[#060d1f] border border-slate-700/50 rounded-lg py-3.5 px-4 text-sm text-slate-200 placeholder:text-slate-800 focus:border-teal-500/50 outline-none"
+                  onChange={(e) => {
+                    setAutoFill(prev => ({ ...prev, email: false }));
+                    setNovoFuncionario(prev => ({ ...prev, email: e.target.value }));
+                  }}
+                  className="w-full bg-[#060d1f] border border-slate-700/50 rounded-lg py-3.5 px-4 text-sm text-slate-200 placeholder:text-slate-500 placeholder:italic focus:border-teal-500/50 outline-none"
                 />
               </div>
               <div>
@@ -130,8 +167,11 @@ export default function CadastroPage() {
                   type="text"
                   placeholder="Ex: TAG-MEC-007"
                   value={novoFuncionario.tag_cracha}
-                  onChange={(e) => setNovoFuncionario({ ...novoFuncionario, tag_cracha: e.target.value.toUpperCase() })}
-                  className="w-full bg-[#060d1f] border border-slate-700/50 rounded-lg py-3.5 px-4 text-sm text-slate-200 placeholder:text-slate-800 focus:border-teal-500/50 outline-none font-mono"
+                  onChange={(e) => {
+                    setAutoFill(prev => ({ ...prev, tag: false }));
+                    setNovoFuncionario(prev => ({ ...prev, tag_cracha: e.target.value.toUpperCase() }));
+                  }}
+                  className="w-full bg-[#060d1f] border border-slate-700/50 rounded-lg py-3.5 px-4 text-sm text-slate-200 placeholder:text-slate-500 placeholder:italic focus:border-teal-500/50 outline-none font-mono"
                 />
               </div>
             </div>
@@ -143,7 +183,7 @@ export default function CadastroPage() {
               </label>
               <select
                 value={novoFuncionario.tipo_perfil}
-                onChange={(e) => setNovoFuncionario({ ...novoFuncionario, tipo_perfil: e.target.value })}
+                onChange={(e) => handlePerfil(e.target.value)}
                 className="w-full bg-[#060d1f] border border-slate-700/50 rounded-lg py-3.5 px-4 text-sm text-slate-200 focus:border-teal-500/50 outline-none cursor-pointer appearance-none"
               >
                 <option value="MECANICO">Mecânico</option>
@@ -171,7 +211,8 @@ export default function CadastroPage() {
               <button
                 type="submit"
                 disabled={salvando}
-                className="cursor-pointer flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white px-8 py-3 rounded-lg text-xs font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 shadow-lg shadow-teal-500/10 uppercase tracking-widest"
+                style={{ color: '#fff' }}
+                className="cursor-pointer flex items-center gap-2 bg-teal-600 hover:bg-teal-500 px-8 py-3 rounded-lg text-xs font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 shadow-lg shadow-teal-500/10 uppercase tracking-widest"
               >
                 {salvando ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Save size={14} />}
                 {salvando ? 'Salvando...' : 'Finalizar Cadastro'}

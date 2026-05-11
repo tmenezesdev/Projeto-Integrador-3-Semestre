@@ -3,6 +3,7 @@
 import React from 'react';
 import SidebarMecanico from '@/components/SidebarMecanico/sidebarmecanico';
 import AuthGuard from '@/components/AuthGuard/authguard';
+import ChatWidget from '@/components/ChatWidget/ChatWidget';
 
 export default function MecanicoLayout({ children }) {
   return (
@@ -12,6 +13,7 @@ export default function MecanicoLayout({ children }) {
         <main className="flex-1 overflow-y-auto bg-[#09090A]">
           {children}
         </main>
+        <ChatWidget />
       </div>
     </AuthGuard>
   );

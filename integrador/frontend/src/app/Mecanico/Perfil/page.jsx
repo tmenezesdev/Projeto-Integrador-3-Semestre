@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import PhotoCropModal from '@/components/PhotoCropModal/PhotoCropModal';
 import {
   UserCircle, Mail, Lock, Eye, EyeOff, Camera, Loader2,
   AlertCircle, CheckCircle2, Shield, KeyRound,
@@ -63,7 +64,7 @@ function Toast({ msg, type, onClose }) {
     return () => clearTimeout(t);
   }, [onClose]);
   return (
-    <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl border text-sm font-medium
+    <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] flex items-center gap-3 px-5 py-3 rounded-xl shadow-2xl border text-sm font-medium whitespace-nowrap
       ${type === 'ok'
         ? 'bg-green-500/10 border-green-500/20 text-green-400'
         : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>
@@ -121,6 +122,7 @@ export default function MecanicoPerfil() {
   const [savingSenha, setSavingSenha] = useState(false);
   const [toast, setToast] = useState(null);
   const [uploadingFoto, setUploadingFoto] = useState(false);
+  const [cropSrc, setCropSrc]             = useState(null);
   const fileRef = useRef();
 
   const [form, setForm] = useState({ nome: '', email: '' });
@@ -201,13 +203,19 @@ export default function MecanicoPerfil() {
     finally { setSavingSenha(false); }
   };
 
-  const handleFoto = async (e) => {
+  const handleFileSelect = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 5 * 1024 * 1024) return showToast('A foto deve ter no máximo 5MB.', 'erro');
+    const url = URL.createObjectURL(file);
+    setCropSrc(url);
+    e.target.value = '';
+  };
+
+  const handleCropConfirm = async (blob) => {
     setUploadingFoto(true);
     const fd = new FormData();
-    fd.append('foto', file);
+    fd.append('foto', blob, 'foto.jpg');
     try {
       const res = await fetch(`${BASE}/perfil/foto`, {
         method: 'POST',
@@ -216,8 +224,11 @@ export default function MecanicoPerfil() {
       });
       const data = await res.json();
       if (!res.ok) return showToast(data.erro || 'Erro ao enviar foto.', 'erro');
-      setPerfil(p => ({ ...p, foto_filename: data.foto_filename }));
-      showToast('Foto atualizada!');
+      setPerfil(p => ({ ...p, foto_url: data.foto_url }));
+      const u = JSON.parse(localStorage.getItem('smartbench_user') || '{}');
+      localStorage.setItem('smartbench_user', JSON.stringify({ ...u, foto_url: data.foto_url }));
+      setCropSrc(null);
+      showToast('Foto de perfil atualizada com sucesso!');
     } catch { showToast('Erro de conexão.', 'erro'); }
     finally { setUploadingFoto(false); }
   };
@@ -231,10 +242,7 @@ export default function MecanicoPerfil() {
   const loginTime = getLoginTime(getToken());
   const browser   = getBrowserInfo();
 
-  // ✅ URL da foto - usando /uploads/imagens/ do middleware
-  const fotoUrl = perfil?.foto_filename 
-    ? `http://localhost:3000/uploads/imagens/${perfil.foto_filename}`
-    : null;
+  const fotoUrl = perfil?.foto_url || null;
 
   return (
     <div className="p-6 md:p-10 font-sans min-h-full bg-[#0f0900]">
@@ -265,7 +273,7 @@ export default function MecanicoPerfil() {
               >
                 {uploadingFoto ? <Loader2 size={13} className="animate-spin text-white" /> : <Camera size={13} className="text-white" />}
               </button>
-              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFoto} />
+              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelect} />
             </div>
             <p className="font-bold text-white text-base leading-tight">{perfil?.nome}</p>
             <p className="text-slate-400 text-xs mt-1">{perfil?.email}</p>
@@ -485,6 +493,15 @@ export default function MecanicoPerfil() {
       </div>
 
       {toast && <Toast msg={toast.msg} type={toast.type} onClose={() => setToast(null)} />}
+
+      {cropSrc && (
+        <PhotoCropModal
+          imageSrc={cropSrc}
+          loading={uploadingFoto}
+          onConfirm={handleCropConfirm}
+          onCancel={() => { setCropSrc(null); URL.revokeObjectURL(cropSrc); }}
+        />
+      )}
     </div>
   );
 }

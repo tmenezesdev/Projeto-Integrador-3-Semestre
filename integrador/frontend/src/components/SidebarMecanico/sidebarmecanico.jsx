@@ -1,11 +1,11 @@
 'use client';
 
-import { PackageOpen, Wrench, History, AlertOctagon, HardHat, Shield  } from 'lucide-react';
+import { PackageOpen, Wrench, History, AlertOctagon, HardHat, Home } from 'lucide-react';
 import SidebarBase from '@/components/SidebarBase/sidebarbase';
 
 const navItems = [
-  { href: '/Mecanico/Dashboard', label: 'Minhas Retiradas', icon: PackageOpen, exact: true },
-  { href: '/Mecanico/Epis', label: "Segurança (EPI's)", icon: Shield },
+  { href: '/Mecanico/Epis', label: "Segurança (EPI's)", icon: Home, exact: true },
+  { href: '/Mecanico/Dashboard', label: 'Minhas Retiradas', icon: PackageOpen },
   { href: '/Mecanico/Ferramentas', label: 'Ferramentas', icon: Wrench },
   { href: '/Mecanico/Historico', label: 'Histórico', icon: History },
   { href: '/Mecanico/Alertas', label: 'Alertas', icon: AlertOctagon },

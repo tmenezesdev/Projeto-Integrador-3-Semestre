@@ -28,7 +28,9 @@ export default function LoginPage() {
   const [email, setEmail]     = useState("");
   const [senha, setSenha]     = useState("");
   const [erro, setErro]       = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading]   = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetMsg, setResetMsg]         = useState({ tipo: '', texto: '' });
 
   const particles = useMemo(() => PARTICLES.map((p, i) => (
     <div key={i} className="particle absolute rounded-full pointer-events-none" style={{
@@ -41,6 +43,28 @@ export default function LoginPage() {
       boxShadow: `0 0 4px 1px ${p.color}55`,
     }} />
   )), []);
+
+  const handleEsqueceuSenha = async () => {
+    if (!email.trim()) {
+      setResetMsg({ tipo: 'erro', texto: 'Preencha o campo de e-mail antes de continuar.' });
+      return;
+    }
+    setResetLoading(true);
+    setResetMsg({ tipo: '', texto: '' });
+    try {
+      const res  = await fetch('http://localhost:3000/api/auth/esqueceu-senha', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      setResetMsg({ tipo: res.ok ? 'sucesso' : 'erro', texto: data.mensagem });
+    } catch {
+      setResetMsg({ tipo: 'erro', texto: 'Não foi possível conectar ao servidor.' });
+    } finally {
+      setResetLoading(false);
+    }
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -74,7 +98,7 @@ export default function LoginPage() {
 
   return (
     <>
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden font-sans" style={{ background: '#04030d' }}>
+      <section data-login-page className="relative min-h-screen flex items-center justify-center overflow-hidden font-sans" style={{ background: '#04030d' }}>
 
         {/* Grid */}
         <div className="grid-anim absolute inset-0 pointer-events-none" style={{
@@ -182,13 +206,27 @@ export default function LoginPage() {
                 <div className="flex flex-col gap-1.5">
                   <div className="flex justify-between items-center">
                     <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Senha</label>
-                    <a href="#" className="text-xs" style={{ color:'#7033ff' }}>Esqueceu?</a>
+                    <button type="button" onClick={handleEsqueceuSenha} disabled={resetLoading} className="text-xs cursor-pointer" style={{ color:'#7033ff', background:'none', border:'none', padding:0, opacity: resetLoading ? 0.6 : 1 }}>
+                      {resetLoading ? 'Enviando...' : 'Esqueceu?'}
+                    </button>
                   </div>
                   <input
                     type="password" value={senha} onChange={e => setSenha(e.target.value)}
                     className="login-input" placeholder="••••••••" disabled={isLoading}
                   />
                 </div>
+
+                {resetMsg.texto && (
+                  <div style={{
+                    background: resetMsg.tipo === 'sucesso' ? 'rgba(34,197,94,0.08)' : 'rgba(239,68,68,0.08)',
+                    border: `1px solid ${resetMsg.tipo === 'sucesso' ? 'rgba(34,197,94,0.25)' : 'rgba(239,68,68,0.25)'}`,
+                    borderRadius: 8, padding: '10px 14px',
+                  }}>
+                    <p style={{ color: resetMsg.tipo === 'sucesso' ? '#4ade80' : '#f87171', fontSize: 12, textAlign: 'center', margin: 0, lineHeight: 1.5 }}>
+                      {resetMsg.texto}
+                    </p>
+                  </div>
+                )}
 
                 {erro && (
                   <div style={{ background:'rgba(239,68,68,0.08)', border:'1px solid rgba(239,68,68,0.25)', borderRadius:8, padding:'10px 14px' }}>

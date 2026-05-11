@@ -159,8 +159,9 @@ html.light-mode .bg-\[\#0f0900\]  { background-color: #fffcf5 !important; }
 html.light-mode .bg-\[\#13102a\]  { background-color: #ffffff !important; }
 html.light-mode .bg-\[\#1a1000\]  { background-color: #ffffff !important; }
 html.light-mode .bg-\[\#0f1a35\]  { background-color: #ffffff !important; }
-html.light-mode .bg-\[\#0a1628\]  { background-color: #f4f8ff !important; }
-html.light-mode .bg-\[\#0c1b31\]  { background-color: #ecf4ff !important; }
+html.light-mode .bg-\[\#0a1628\]    { background-color: #f4f8ff !important; }
+html.light-mode .bg-\[\#0c1b31\]    { background-color: #ecf4ff !important; }
+html.light-mode .bg-\[\#0c1b31\]\/50 { background-color: rgba(226,238,255,0.7) !important; }
 html.light-mode .bg-\[\#1a1030\]  { background-color: #f3f0ff !important; }
 html.light-mode .bg-\[\#13102a\]\/80 { background-color: rgba(255,255,255,0.9) !important; }
 html.light-mode .bg-\[\#1a1000\]\/80 { background-color: rgba(255,255,255,0.9) !important; }
@@ -234,6 +235,21 @@ input::-webkit-credentials-auto-fill-button {
   pointer-events: none;
   position: absolute;
 }
+
+/* ═══════════════════════════════════════════════
+   LOGIN PAGE — imune ao light mode
+   O login tem fundo escuro fixo (inline style) e
+   não deve ser afetado pelas overrides de tema.
+   ═══════════════════════════════════════════════ */
+
+html.light-mode [data-login-page],
+html.light-mode [data-login-page] * {
+  color-scheme: dark;
+}
+html.light-mode [data-login-page] .text-white    { color: #ffffff   !important; }
+html.light-mode [data-login-page] .text-slate-300 { color: #cbd5e1  !important; }
+html.light-mode [data-login-page] .text-slate-400 { color: #94a3b8  !important; }
+html.light-mode [data-login-page] .bg-\[\#09090A\] { background-color: #04030d !important; }
 
 /* ═══════════════════════════════════════════════
    LOGIN PAGE — animações e estilos estáticos
