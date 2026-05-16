@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/bg_secondary"
+    android:orientation="vertical"
+    android:padding="@dimen/margin_large">
+
+    <View android:layout_width="40dp" android:layout_height="4dp"
+        android:layout_gravity="center_horizontal" android:layout_marginBottom="@dimen/margin_medium"
+        android:background="@color/border_light" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Registrar Devolução"
+        android:textColor="@color/text_primary"
+        android:textSize="@dimen/text_large"
+        android:textStyle="bold"
+        android:layout_marginBottom="@dimen/margin_medium" />
+
+    <!-- Info da ferramenta -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_medium"
+        app:cardBackgroundColor="@color/bg_card"
+        app:cardCornerRadius="@dimen/card_corner_radius"
+        app:strokeColor="@color/border_default"
+        app:strokeWidth="1dp">
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="@dimen/margin_medium">
+
+            <TextView android:id="@+id/tvFerramenta"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:textColor="@color/text_primary" android:textStyle="bold"
+                android:textSize="@dimen/text_medium" />
+
+            <TextView android:id="@+id/tvTag"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:textColor="@color/text_muted" android:textSize="@dimen/text_small"
+                android:fontFamily="monospace" />
+
+            <TextView android:id="@+id/tvResponsavel"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:textColor="@color/text_secondary" android:textSize="@dimen/text_body" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Observação -->
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_large"
+        android:hint="Observação (opcional)"
+        app:boxStrokeColor="?attr/colorPrimary"
+        app:hintTextColor="?attr/colorPrimary">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etObservacao"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine"
+            android:lines="3"
+            android:textColor="@color/text_primary" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <com.google.android.material.button.MaterialButton android:id="@+id/btnCancelar"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:layout_marginEnd="@dimen/margin_small"
+            android:text="@string/btn_cancelar" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/btnConfirmar"
+            android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:layout_marginStart="@dimen/margin_small"
+            android:text="Confirmar Devolução" android:textColor="@color/white"
+            app:cornerRadius="@dimen/button_corner_radius" />
+    </LinearLayout>
+</LinearLayout>

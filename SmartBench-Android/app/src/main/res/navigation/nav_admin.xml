@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_admin"
+    app:startDestination="@id/adminDashboardFragment">
+
+    <fragment
+        android:id="@+id/adminDashboardFragment"
+        android:name="com.smartbench.app.ui.admin.dashboard.AdminDashboardFragment"
+        android:label="Dashboard" />
+
+    <fragment
+        android:id="@+id/adminUsuariosFragment"
+        android:name="com.smartbench.app.ui.admin.usuarios.AdminUsuariosFragment"
+        android:label="Usuários" />
+
+    <fragment
+        android:id="@+id/adminFerramentasFragment"
+        android:name="com.smartbench.app.ui.admin.ferramentas.AdminFerramentasFragment"
+        android:label="Ferramentas" />
+
+    <fragment
+        android:id="@+id/adminAlertasFragment"
+        android:name="com.smartbench.app.ui.admin.alertas.AdminAlertasFragment"
+        android:label="Alertas" />
+
+    <fragment
+        android:id="@+id/adminPerfilFragment"
+        android:name="com.smartbench.app.ui.admin.perfil.AdminPerfilFragment"
+        android:label="Perfil">
+        <action
+            android:id="@+id/action_perfil_to_historico"
+            app:destination="@id/adminHistoricoFragment" />
+        <action
+            android:id="@+id/action_perfil_to_configuracoes"
+            app:destination="@id/adminConfiguracoesFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/adminHistoricoFragment"
+        android:name="com.smartbench.app.ui.admin.historico.AdminHistoricoFragment"
+        android:label="Histórico" />
+
+    <fragment
+        android:id="@+id/adminConfiguracoesFragment"
+        android:name="com.smartbench.app.ui.admin.configuracoes.AdminConfiguracoesFragment"
+        android:label="Configurações" />
+
+</navigation>

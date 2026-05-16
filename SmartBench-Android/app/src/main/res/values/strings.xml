@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SmartBench</string>
+
+    <!-- Login -->
+    <string name="login_title">SmartBench</string>
+    <string name="login_subtitle">Sistema de Gestão de Ferramentas</string>
+    <string name="hint_email">E-mail corporativo</string>
+    <string name="hint_password">Senha</string>
+    <string name="btn_login">Entrar</string>
+    <string name="link_forgot_password">Esqueceu a senha?</string>
+    <string name="logging_in">Entrando…</string>
+
+    <!-- Navegação Admin -->
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_usuarios">Usuários</string>
+    <string name="nav_ferramentas">Ferramentas</string>
+    <string name="nav_alertas">Alertas</string>
+    <string name="nav_perfil">Perfil</string>
+    <string name="nav_historico">Histórico</string>
+    <string name="nav_configuracoes">Config.</string>
+
+    <!-- Navegação Supervisor -->
+    <string name="nav_visao_geral">Visão Geral</string>
+    <string name="nav_atrasos">Atrasos</string>
+    <string name="nav_cadastro">Cadastro</string>
+    <string name="nav_ferramentas_fora">Fora</string>
+
+    <!-- Navegação Mecânico -->
+    <string name="nav_epis">EPIs</string>
+    <string name="nav_retiradas">Retiradas</string>
+
+    <!-- Status ferramentas -->
+    <string name="status_disponivel">DISPONÍVEL</string>
+    <string name="status_em_uso">EM USO</string>
+    <string name="status_manutencao">MANUTENÇÃO</string>
+
+    <!-- Status alertas -->
+    <string name="status_ativo">ATIVO</string>
+    <string name="status_resolvido">RESOLVIDO</string>
+
+    <!-- Operações -->
+    <string name="op_retirada">RETIRADA</string>
+    <string name="op_devolucao">DEVOLUÇÃO</string>
+    <string name="metodo_rfid">RFID AUTO</string>
+    <string name="metodo_manual">MANUAL</string>
+
+    <!-- Perfis -->
+    <string name="perfil_admin">Administrador</string>
+    <string name="perfil_supervisor">Supervisor</string>
+    <string name="perfil_mecanico">Mecânico</string>
+
+    <!-- Ações comuns -->
+    <string name="btn_salvar">Salvar</string>
+    <string name="btn_cancelar">Cancelar</string>
+    <string name="btn_criar">Criar</string>
+    <string name="btn_editar">Editar</string>
+    <string name="btn_excluir">Excluir</string>
+    <string name="btn_resolver">Resolver</string>
+    <string name="btn_devolver">Devolver</string>
+    <string name="btn_atualizar">Atualizar</string>
+    <string name="btn_exportar">Exportar CSV</string>
+    <string name="btn_sair">Sair</string>
+    <string name="btn_confirmar">Confirmar</string>
+
+    <!-- Mensagens -->
+    <string name="msg_campo_obrigatorio">Campo obrigatório</string>
+    <string name="msg_email_invalido">E-mail inválido</string>
+    <string name="msg_senha_curta">Mínimo 6 caracteres</string>
+    <string name="msg_sem_conexao">Sem conexão com o servidor</string>
+    <string name="msg_erro_generico">Erro ao processar requisição</string>
+    <string name="msg_lista_vazia">Nenhum item encontrado</string>
+    <string name="msg_logout">Deseja sair da conta?</string>
+
+    <!-- Dashboard -->
+    <string name="label_total_ferramentas">Total Ferramentas</string>
+    <string name="label_total_usuarios">Total Usuários</string>
+    <string name="label_transacoes_hoje">Transações Hoje</string>
+    <string name="label_alertas_ativos">Alertas Ativos</string>
+    <string name="label_em_uso">Em Uso</string>
+    <string name="label_manutencao">Manutenção</string>
+    <string name="label_mecanicos_ativos">Mecânicos Ativos</string>
+    <string name="label_atividade_recente">Atividade Recente</string>
+    <string name="label_distribuicao">Distribuição do Inventário</string>
+
+    <!-- Busca -->
+    <string name="hint_buscar">Buscar…</string>
+
+    <!-- Página anterior / próxima -->
+    <string name="btn_anterior">Anterior</string>
+    <string name="btn_proximo">Próximo</string>
+
+    <!-- Confirmação deleção -->
+    <string name="dialog_deletar_titulo">Confirmar exclusão</string>
+    <string name="dialog_deletar_msg">Tem certeza que deseja excluir %1$s? Esta ação não pode ser desfeita.</string>
+
+    <!-- EPIs -->
+    <string name="epi_titulo">Equipamentos de Proteção Individual</string>
+    <string name="epi_nr6">Uso obrigatório — NR-6 (Ministério do Trabalho)</string>
+
+    <!-- Gráfico -->
+    <string name="chart_retiradas">Retiradas</string>
+    <string name="chart_devolucoes">Devoluções</string>
+    <string name="periodo_7d">7 dias</string>
+    <string name="periodo_15d">15 dias</string>
+    <string name="periodo_90d">90 dias</string>
+</resources>

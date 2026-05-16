@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Tema base escuro para todas as telas -->
+    <style name="Theme.SmartBench.Base" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="android:windowBackground">@color/bg_primary</item>
+        <item name="android:colorBackground">@color/bg_primary</item>
+        <item name="colorSurface">@color/bg_card</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorSurfaceVariant">@color/bg_secondary</item>
+        <item name="colorOnSurfaceVariant">@color/text_secondary</item>
+        <item name="colorError">@color/error</item>
+        <item name="android:statusBarColor">@color/bg_primary</item>
+        <item name="android:navigationBarColor">@color/bg_secondary</item>
+    </style>
+
+    <!-- Tema Admin — roxo #7033FF -->
+    <style name="Theme.SmartBench.Admin" parent="Theme.SmartBench.Base">
+        <item name="colorPrimary">@color/admin_primary</item>
+        <item name="colorPrimaryVariant">@color/admin_primary_variant</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/admin_primary</item>
+        <item name="colorSecondaryContainer">@color/admin_primary_container</item>
+        <item name="colorOnSecondaryContainer">@color/admin_primary</item>
+        <item name="colorTertiary">@color/admin_primary</item>
+    </style>
+
+    <!-- Tema Supervisor — teal #2DD4BF -->
+    <style name="Theme.SmartBench.Supervisor" parent="Theme.SmartBench.Base">
+        <item name="colorPrimary">@color/supervisor_primary</item>
+        <item name="colorPrimaryVariant">@color/supervisor_primary_variant</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorSecondary">@color/supervisor_primary</item>
+        <item name="colorSecondaryContainer">@color/supervisor_primary_container</item>
+        <item name="colorOnSecondaryContainer">@color/supervisor_primary</item>
+        <item name="colorTertiary">@color/supervisor_primary</item>
+    </style>
+
+    <!-- Tema Mecânico — âmbar #F59E0B -->
+    <style name="Theme.SmartBench.Mecanico" parent="Theme.SmartBench.Base">
+        <item name="colorPrimary">@color/mecanico_primary</item>
+        <item name="colorPrimaryVariant">@color/mecanico_primary_variant</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorSecondary">@color/mecanico_primary</item>
+        <item name="colorSecondaryContainer">@color/mecanico_primary_container</item>
+        <item name="colorOnSecondaryContainer">@color/mecanico_primary</item>
+        <item name="colorTertiary">@color/mecanico_primary</item>
+    </style>
+
+    <!-- Estilo de bottom sheet -->
+    <style name="SmartBench.BottomSheetDialog" parent="Theme.Material3.Dark.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="bottomSheetStyle">@style/SmartBench.BottomSheet</item>
+    </style>
+
+    <style name="SmartBench.BottomSheet" parent="Widget.Material3.BottomSheet">
+        <item name="android:background">@color/bg_secondary</item>
+    </style>
+
+</resources>

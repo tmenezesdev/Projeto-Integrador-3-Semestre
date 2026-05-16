@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/supervisorVisaoGeralFragment"
+        android:icon="@drawable/ic_dashboard"
+        android:title="@string/nav_visao_geral" />
+    <item
+        android:id="@+id/supervisorAtrasosFragment"
+        android:icon="@drawable/ic_clock_alert"
+        android:title="@string/nav_atrasos" />
+    <item
+        android:id="@+id/supervisorCadastroFragment"
+        android:icon="@drawable/ic_person_add"
+        android:title="@string/nav_cadastro" />
+    <item
+        android:id="@+id/supervisorFerramentasForaFragment"
+        android:icon="@drawable/ic_build"
+        android:title="@string/nav_ferramentas_fora" />
+    <item
+        android:id="@+id/supervisorHistoricoFragment"
+        android:icon="@drawable/ic_history"
+        android:title="@string/nav_historico" />
+</menu>

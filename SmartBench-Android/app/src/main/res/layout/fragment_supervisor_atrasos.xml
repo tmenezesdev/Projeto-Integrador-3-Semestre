@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_primary"
+    android:orientation="vertical"
+    android:paddingBottom="72dp">
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center_vertical"
+        android:padding="@dimen/margin_medium">
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="Atrasos"
+            android:textColor="@color/text_primary" android:textSize="@dimen/text_title" android:textStyle="bold" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/btnAtualizar"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/btn_atualizar" />
+    </LinearLayout>
+
+    <!-- KPIs -->
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:paddingHorizontal="@dimen/margin_medium"
+        android:layout_marginBottom="@dimen/margin_small">
+        <com.google.android.material.card.MaterialCardView android:layout_width="0dp"
+            android:layout_height="64dp" android:layout_weight="1" android:layout_marginEnd="4dp"
+            app:cardBackgroundColor="@color/bg_card" app:cardCornerRadius="@dimen/card_corner_radius"
+            app:strokeColor="@color/border_default" app:strokeWidth="1dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+                android:orientation="vertical" android:gravity="center" android:padding="4dp">
+                <TextView android:id="@+id/tvTotal" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="--" android:textColor="?attr/colorPrimary" android:textSize="20sp" android:textStyle="bold"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Total" android:textColor="@color/text_secondary" android:textSize="10sp" android:gravity="center"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+        <com.google.android.material.card.MaterialCardView android:layout_width="0dp"
+            android:layout_height="64dp" android:layout_weight="1" android:layout_marginHorizontal="2dp"
+            app:cardBackgroundColor="@color/bg_card" app:cardCornerRadius="@dimen/card_corner_radius"
+            app:strokeColor="@color/border_default" app:strokeWidth="1dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+                android:orientation="vertical" android:gravity="center" android:padding="4dp">
+                <TextView android:id="@+id/tvCritico" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="--" android:textColor="@color/atraso_critico" android:textSize="20sp" android:textStyle="bold"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Crítico" android:textColor="@color/text_secondary" android:textSize="10sp" android:gravity="center"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+        <com.google.android.material.card.MaterialCardView android:layout_width="0dp"
+            android:layout_height="64dp" android:layout_weight="1" android:layout_marginHorizontal="2dp"
+            app:cardBackgroundColor="@color/bg_card" app:cardCornerRadius="@dimen/card_corner_radius"
+            app:strokeColor="@color/border_default" app:strokeWidth="1dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+                android:orientation="vertical" android:gravity="center" android:padding="4dp">
+                <TextView android:id="@+id/tvAlto" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="--" android:textColor="@color/atraso_alto" android:textSize="20sp" android:textStyle="bold"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Alto" android:textColor="@color/text_secondary" android:textSize="10sp" android:gravity="center"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+        <com.google.android.material.card.MaterialCardView android:layout_width="0dp"
+            android:layout_height="64dp" android:layout_weight="1" android:layout_marginStart="4dp"
+            app:cardBackgroundColor="@color/bg_card" app:cardCornerRadius="@dimen/card_corner_radius"
+            app:strokeColor="@color/border_default" app:strokeWidth="1dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
+                android:orientation="vertical" android:gravity="center" android:padding="4dp">
+                <TextView android:id="@+id/tvModerado" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="--" android:textColor="@color/atraso_moderado" android:textSize="20sp" android:textStyle="bold"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Moderado" android:textColor="@color/text_secondary" android:textSize="10sp" android:gravity="center"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+
+    <!-- Filtros -->
+    <com.google.android.material.chip.ChipGroup android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/margin_medium" android:layout_marginBottom="@dimen/margin_small"
+        app:singleSelection="true">
+        <com.google.android.material.chip.Chip android:id="@+id/chipTodos"
+            style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:text="Todos" android:checked="true"/>
+        <com.google.android.material.chip.Chip android:id="@+id/chipCritico"
+            style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:text="Crítico"/>
+        <com.google.android.material.chip.Chip android:id="@+id/chipAlto"
+            style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:text="Alto"/>
+        <com.google.android.material.chip.Chip android:id="@+id/chipModerado"
+            style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:text="Moderado"/>
+    </com.google.android.material.chip.ChipGroup>
+
+    <ProgressBar android:id="@+id/progressBar" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:layout_gravity="center" android:visibility="gone" />
+
+    <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvAtrasos"
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:clipToPadding="false" android:paddingHorizontal="@dimen/margin_medium" />
+
+</LinearLayout>

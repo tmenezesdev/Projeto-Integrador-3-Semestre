@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_supervisor"
+    app:startDestination="@id/supervisorVisaoGeralFragment">
+
+    <fragment
+        android:id="@+id/supervisorVisaoGeralFragment"
+        android:name="com.smartbench.app.ui.supervisor.visaogeral.SupervisorVisaoGeralFragment"
+        android:label="Visão Geral" />
+
+    <fragment
+        android:id="@+id/supervisorAtrasosFragment"
+        android:name="com.smartbench.app.ui.supervisor.atrasos.SupervisorAtrasosFragment"
+        android:label="Atrasos" />
+
+    <fragment
+        android:id="@+id/supervisorCadastroFragment"
+        android:name="com.smartbench.app.ui.supervisor.cadastro.SupervisorCadastroFragment"
+        android:label="Cadastro" />
+
+    <fragment
+        android:id="@+id/supervisorFerramentasForaFragment"
+        android:name="com.smartbench.app.ui.supervisor.ferramentasfora.SupervisorFerramentasForaFragment"
+        android:label="Ferramentas Fora" />
+
+    <fragment
+        android:id="@+id/supervisorHistoricoFragment"
+        android:name="com.smartbench.app.ui.supervisor.historico.SupervisorHistoricoFragment"
+        android:label="Histórico" />
+
+</navigation>

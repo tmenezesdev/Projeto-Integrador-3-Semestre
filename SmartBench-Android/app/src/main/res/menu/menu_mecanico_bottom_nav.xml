@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/mecanicoEpisFragment"
+        android:icon="@drawable/ic_shield"
+        android:title="@string/nav_epis" />
+    <item
+        android:id="@+id/mecanicoDashboardFragment"
+        android:icon="@drawable/ic_wrench"
+        android:title="@string/nav_retiradas" />
+    <item
+        android:id="@+id/mecanicoFerramentasFragment"
+        android:icon="@drawable/ic_build"
+        android:title="@string/nav_ferramentas" />
+    <item
+        android:id="@+id/mecanicoAlertasFragment"
+        android:icon="@drawable/ic_bell"
+        android:title="@string/nav_alertas" />
+    <item
+        android:id="@+id/mecanicoPerfilFragment"
+        android:icon="@drawable/ic_person"
+        android:title="@string/nav_perfil" />
+</menu>

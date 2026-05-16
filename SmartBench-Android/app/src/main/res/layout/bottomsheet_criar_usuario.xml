@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/bg_secondary">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/margin_large">
+
+        <!-- Handle indicator -->
+        <View
+            android:layout_width="40dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="@dimen/margin_medium"
+            android:background="@color/border_light" />
+
+        <TextView
+            android:id="@+id/tvTitulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Novo Usuário"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_large"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/margin_medium" />
+
+        <!-- Nome -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilNome"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_small"
+            android:hint="Nome completo"
+            app:boxStrokeColor="?attr/colorPrimary"
+            app:hintTextColor="?attr/colorPrimary">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etNome"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:textColor="@color/text_primary" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Email -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilEmail"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_small"
+            android:hint="E-mail corporativo"
+            app:boxStrokeColor="?attr/colorPrimary"
+            app:hintTextColor="?attr/colorPrimary">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress"
+                android:textColor="@color/text_primary" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Tag Crachá -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilTag"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_small"
+            android:hint="Tag do Crachá (RFID)"
+            app:boxStrokeColor="?attr/colorPrimary"
+            app:hintTextColor="?attr/colorPrimary">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etTag"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapCharacters"
+                android:textColor="@color/text_primary"
+                android:fontFamily="monospace" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Perfil Spinner -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Perfil de Acesso"
+            android:textColor="@color/text_secondary"
+            android:textSize="@dimen/text_small"
+            android:layout_marginBottom="4dp" />
+
+        <Spinner
+            android:id="@+id/spinnerPerfil"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_input"
+            android:paddingHorizontal="12dp"
+            android:layout_marginBottom="@dimen/margin_small" />
+
+        <!-- Senha -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilSenha"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_large"
+            android:hint="Senha"
+            app:boxStrokeColor="?attr/colorPrimary"
+            app:endIconMode="password_toggle"
+            app:hintTextColor="?attr/colorPrimary">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etSenha"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:textColor="@color/text_primary" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Botões -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCancelar"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="@dimen/margin_small"
+                android:text="@string/btn_cancelar" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSalvar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="@dimen/margin_small"
+                android:text="@string/btn_salvar"
+                android:textColor="@color/white"
+                app:cornerRadius="@dimen/button_corner_radius" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

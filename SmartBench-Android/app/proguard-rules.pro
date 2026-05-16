@@ -1,0 +1,8 @@
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class retrofit2.** { *; }
+-keep class okhttp3.** { *; }
+-keep class com.smartbench.app.data.model.** { *; }
+-keep class com.github.mikephil.charting.** { *; }
+-dontwarn okhttp3.**
+-dontwarn retrofit2.**

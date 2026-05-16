@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_mecanico"
+    app:startDestination="@id/mecanicoEpisFragment">
+
+    <fragment
+        android:id="@+id/mecanicoEpisFragment"
+        android:name="com.smartbench.app.ui.mecanico.epis.MecanicoEpisFragment"
+        android:label="EPIs" />
+
+    <fragment
+        android:id="@+id/mecanicoDashboardFragment"
+        android:name="com.smartbench.app.ui.mecanico.dashboard.MecanicoDashboardFragment"
+        android:label="Minhas Retiradas" />
+
+    <fragment
+        android:id="@+id/mecanicoFerramentasFragment"
+        android:name="com.smartbench.app.ui.mecanico.ferramentas.MecanicoFerramentasFragment"
+        android:label="Ferramentas" />
+
+    <fragment
+        android:id="@+id/mecanicoAlertasFragment"
+        android:name="com.smartbench.app.ui.mecanico.alertas.MecanicoAlertasFragment"
+        android:label="Alertas" />
+
+    <fragment
+        android:id="@+id/mecanicoPerfilFragment"
+        android:name="com.smartbench.app.ui.mecanico.perfil.MecanicoPerfilFragment"
+        android:label="Perfil" />
+
+</navigation>

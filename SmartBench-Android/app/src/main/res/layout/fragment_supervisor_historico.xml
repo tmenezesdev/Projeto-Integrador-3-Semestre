@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_primary"
+    android:orientation="vertical"
+    android:paddingBottom="72dp">
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center_vertical"
+        android:padding="@dimen/margin_medium">
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="Histórico"
+            android:textColor="@color/text_primary" android:textSize="@dimen/text_title" android:textStyle="bold" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/btnExportar"
+            style="@style/Widget.Material3.Button.Icon"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/btn_exportar" app:icon="@drawable/ic_download" />
+    </LinearLayout>
+
+    <!-- Busca -->
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_medium" android:layout_marginBottom="@dimen/margin_small"
+        android:hint="@string/hint_buscar" app:startIconDrawable="@drawable/ic_search"
+        app:boxStrokeColor="?attr/colorPrimary" app:hintTextColor="?attr/colorPrimary">
+        <com.google.android.material.textfield.TextInputEditText android:id="@+id/etBusca"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:inputType="text" android:textColor="@color/text_primary" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Filtro operação -->
+    <com.google.android.material.chip.ChipGroup android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:paddingHorizontal="@dimen/margin_medium"
+        android:layout_marginBottom="@dimen/margin_small" app:singleSelection="true">
+        <com.google.android.material.chip.Chip android:id="@+id/chipTodos"
+            style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:text="Todos" android:checked="true"/>
+        <com.google.android.material.chip.Chip android:id="@+id/chipRetiradas"
+            style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:text="Retiradas"/>
+        <com.google.android.material.chip.Chip android:id="@+id/chipDevolucoes"
+            style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:text="Devoluções"/>
+    </com.google.android.material.chip.ChipGroup>
+
+    <ProgressBar android:id="@+id/progressBar" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:layout_gravity="center" android:visibility="gone" />
+
+    <androidx.recyclerview.widget.RecyclerView android:id="@+id/recyclerView"
+        android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
+        android:clipToPadding="false" android:paddingHorizontal="@dimen/margin_medium" />
+
+    <!-- Paginação -->
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="center" android:padding="@dimen/margin_small">
+        <com.google.android.material.button.MaterialButton android:id="@+id/btnAnterior"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/btn_anterior" />
+        <TextView android:id="@+id/tvPagina"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/margin_medium"
+            android:text="Pág 1" android:textColor="@color/text_secondary" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/btnProximo"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/btn_proximo" />
+    </LinearLayout>
+
+</LinearLayout>

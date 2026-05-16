@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Cores primárias por perfil -->
+    <color name="admin_primary">#7033FF</color>
+    <color name="admin_primary_variant">#5B21B6</color>
+    <color name="admin_primary_container">#7033FF26</color>
+
+    <color name="supervisor_primary">#2DD4BF</color>
+    <color name="supervisor_primary_variant">#0D9488</color>
+    <color name="supervisor_primary_container">#2DD4BF26</color>
+
+    <color name="mecanico_primary">#F59E0B</color>
+    <color name="mecanico_primary_variant">#D97706</color>
+    <color name="mecanico_primary_container">#F59E0B26</color>
+
+    <!-- Status de ferramentas -->
+    <color name="status_disponivel">#22C55E</color>
+    <color name="status_em_uso">#F59E0B</color>
+    <color name="status_manutencao">#EF4444</color>
+
+    <!-- Status de alertas -->
+    <color name="status_ativo">#EF4444</color>
+    <color name="status_resolvido">#22C55E</color>
+
+    <!-- Operações -->
+    <color name="op_retirada">#F97316</color>
+    <color name="op_devolucao">#22C55E</color>
+
+    <!-- Níveis de atraso -->
+    <color name="atraso_moderado">#EAB308</color>
+    <color name="atraso_alto">#F97316</color>
+    <color name="atraso_critico">#EF4444</color>
+
+    <!-- Fundo / Surface (tema escuro) -->
+    <color name="bg_primary">#0D0A1A</color>
+    <color name="bg_secondary">#13102A</color>
+    <color name="bg_card">#1A1730</color>
+    <color name="bg_card_hover">#221E3A</color>
+
+    <!-- Texto -->
+    <color name="text_primary">#F1F0F7</color>
+    <color name="text_secondary">#9CA3AF</color>
+    <color name="text_muted">#6B7280</color>
+
+    <!-- Bordas -->
+    <color name="border_default">#2D2B45</color>
+    <color name="border_light">#3D3B55</color>
+
+    <!-- Branco/Preto -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+
+    <!-- Erros -->
+    <color name="error">#EF4444</color>
+    <color name="error_container">#EF444426</color>
+
+    <!-- Sucesso -->
+    <color name="success">#22C55E</color>
+    <color name="success_container">#22C55E26</color>
+
+    <!-- Warning -->
+    <color name="warning">#F59E0B</color>
+    <color name="warning_container">#F59E0B26</color>
+</resources>

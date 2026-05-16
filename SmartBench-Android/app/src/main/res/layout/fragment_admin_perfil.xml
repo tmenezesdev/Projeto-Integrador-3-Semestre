@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_primary"
+    android:clipToPadding="false"
+    android:paddingBottom="80dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/margin_medium">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Meu Perfil"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_title"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/margin_medium" />
+
+        <!-- Card Avatar + Info -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_medium"
+            app:cardBackgroundColor="@color/bg_card"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:strokeColor="@color/border_default"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="@dimen/margin_large">
+
+                <ImageView
+                    android:id="@+id/ivAvatar"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:src="@drawable/ic_person"
+                    android:scaleType="centerCrop" />
+
+                <TextView
+                    android:id="@+id/tvNome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin_small"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_large"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvEmail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="@dimen/text_body" />
+
+                <TextView
+                    android:id="@+id/tvPerfil"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="4dp"
+                    android:textColor="@color/admin_primary"
+                    android:textSize="@dimen/text_small"
+                    android:background="@drawable/bg_card" />
+
+                <TextView
+                    android:id="@+id/tvMembro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="@color/text_muted"
+                    android:textSize="@dimen/text_small" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Card Alterar Senha -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_medium"
+            app:cardBackgroundColor="@color/bg_card"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:strokeColor="@color/border_default"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/margin_medium">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Alterar Senha"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_medium"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="@dimen/margin_small" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/margin_small"
+                    android:hint="Senha atual"
+                    app:boxStrokeColor="?attr/colorPrimary"
+                    app:endIconMode="password_toggle"
+                    app:hintTextColor="?attr/colorPrimary">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etSenhaAtual"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:textColor="@color/text_primary" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/margin_medium"
+                    android:hint="Nova senha (mín. 6 caracteres)"
+                    app:boxStrokeColor="?attr/colorPrimary"
+                    app:endIconMode="password_toggle"
+                    app:hintTextColor="?attr/colorPrimary">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etNovaSenha"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:textColor="@color/text_primary" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAlterarSenha"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Alterar Senha"
+                    android:textColor="@color/white"
+                    app:cornerRadius="@dimen/button_corner_radius" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Atalhos -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnHistorico"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_small"
+            android:text="Ver Histórico" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnConfiguracoes"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_medium"
+            android:text="Configurações do Sistema" />
+
+        <!-- Botão Sair -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLogout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sair"
+            android:backgroundTint="@color/error"
+            android:textColor="@color/white"
+            app:cornerRadius="@dimen/button_corner_radius"
+            app:icon="@drawable/ic_logout" />
+
+    </LinearLayout>
+</ScrollView>

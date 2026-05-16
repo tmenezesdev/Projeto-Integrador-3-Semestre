@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_medium">16dp</dimen>
+    <dimen name="margin_large">24dp</dimen>
+    <dimen name="margin_xlarge">32dp</dimen>
+
+    <dimen name="card_corner_radius">12dp</dimen>
+    <dimen name="card_elevation">2dp</dimen>
+    <dimen name="chip_corner_radius">20dp</dimen>
+    <dimen name="button_corner_radius">8dp</dimen>
+
+    <dimen name="text_small">12sp</dimen>
+    <dimen name="text_body">14sp</dimen>
+    <dimen name="text_medium">16sp</dimen>
+    <dimen name="text_large">18sp</dimen>
+    <dimen name="text_title">22sp</dimen>
+    <dimen name="text_kpi">28sp</dimen>
+
+    <dimen name="kpi_card_height">100dp</dimen>
+    <dimen name="avatar_size">64dp</dimen>
+    <dimen name="icon_size">24dp</dimen>
+    <dimen name="bottom_nav_height">56dp</dimen>
+</resources>

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_primary"
+    android:clipToPadding="false"
+    android:paddingBottom="80dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/margin_medium">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Configurações"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_title"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/margin_medium" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_medium"
+            app:cardBackgroundColor="@color/bg_card"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:strokeColor="@color/border_default"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/margin_medium">
+
+                <!-- Tempo Limite -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilTempoLimite"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/margin_small"
+                    android:hint="Tempo Limite de Uso (horas)"
+                    app:boxStrokeColor="?attr/colorPrimary"
+                    app:hintTextColor="?attr/colorPrimary"
+                    app:helperText="Ferramentas fora por mais que este tempo geram alerta">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etTempoLimite"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:textColor="@color/text_primary" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Tempo Aviso -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilTempoAviso"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/margin_medium"
+                    android:hint="Tempo de Aviso (minutos)"
+                    app:boxStrokeColor="?attr/colorPrimary"
+                    app:hintTextColor="?attr/colorPrimary"
+                    app:helperText="Minutos antes do limite para enviar aviso">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etTempoAviso"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:textColor="@color/text_primary" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Toggle Modo Manutenção -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="@dimen/margin_small">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Modo Manutenção"
+                            android:textColor="@color/text_primary"
+                            android:textStyle="bold" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Bloqueia novas retiradas via RFID"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="@dimen/text_small" />
+                    </LinearLayout>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchManutencao"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <!-- Toggle Chat -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="@dimen/margin_medium">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Chat Interno"
+                            android:textColor="@color/text_primary"
+                            android:textStyle="bold" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Habilita o chat entre usuários"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="@dimen/text_small" />
+                    </LinearLayout>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchChat"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <!-- Botão Salvar -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSalvar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Salvar Alterações"
+                    android:textColor="@color/white"
+                    app:cornerRadius="@dimen/button_corner_radius" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+</ScrollView>
