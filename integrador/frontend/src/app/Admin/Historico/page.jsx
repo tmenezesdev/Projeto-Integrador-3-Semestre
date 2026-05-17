@@ -1,11 +1,12 @@
 'use client';
+import { BASE_URL } from '@/lib/apiConfig';
 
 import { useState, useEffect } from 'react';
 import { History, Search, Loader2, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Sk } from '@/components/ui/skeleton';
 import { useAuth } from '@/hooks/useAuth';
 
-const API = 'http://localhost:3000/api/admin/historico';
+const API = BASE_URL + '/api/admin/historico';
 const PAGE_SIZE = 20;
 
 export default function AdminHistorico() {

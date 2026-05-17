@@ -1,4 +1,5 @@
 'use client';
+import { BASE_URL } from '@/lib/apiConfig';
 
 import { useState, useEffect } from "react";
 import { History, Search, Download, AlertCircle, ArrowUpRight, ArrowDownLeft, ChevronLeft, ChevronRight } from "lucide-react";
@@ -6,7 +7,7 @@ import { Sk } from '@/components/ui/skeleton';
 import ExcelJS from 'exceljs';
 import { useAuth } from '@/hooks/useAuth';
 
-const API_URL = 'http://localhost:3000/api/supervisor/historico';
+const API_URL = BASE_URL + '/api/supervisor/historico';
 const PAGE_SIZE = 20;
 
 function gerarGraficoBase64(labels, retiradas, devolucoes) {

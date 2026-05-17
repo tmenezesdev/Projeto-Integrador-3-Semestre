@@ -1,4 +1,5 @@
 'use client';
+import { BASE_URL } from '@/lib/apiConfig';
 
 import { useState } from "react";
 import {
@@ -67,7 +68,7 @@ export default function CadastroPage() {
 
     try {
       const token = localStorage.getItem('smartbench_token');
-      const res = await fetch('http://localhost:3000/api/supervisor/funcionarios', {
+      const res = await fetch(BASE_URL + '/api/supervisor/funcionarios', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

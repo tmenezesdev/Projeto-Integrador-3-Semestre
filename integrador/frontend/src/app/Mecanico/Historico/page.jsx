@@ -1,11 +1,12 @@
 'use client';
+import { BASE_URL } from '@/lib/apiConfig';
 
 import { useState, useEffect } from 'react';
 import { History, Search, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Sk } from '@/components/ui/skeleton';
 import { useAuth } from '@/hooks/useAuth';
 
-const API = 'http://localhost:3000/api/mecanico/historico';
+const API = BASE_URL + '/api/mecanico/historico';
 const PAGE_SIZE = 20;
 
 export default function MecanicoHistorico() {

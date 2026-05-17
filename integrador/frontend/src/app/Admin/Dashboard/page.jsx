@@ -1,4 +1,5 @@
 'use client';
+import { BASE_URL } from '@/lib/apiConfig';
 
 import { useState, useEffect } from 'react';
 import {
@@ -13,7 +14,7 @@ import {
 } from 'recharts';
 import { useAuth } from '@/hooks/useAuth';
 
-const API = 'http://localhost:3000/api/admin';
+const API = BASE_URL + '/api/admin';
 
 function KpiCard({ label, value, icon: Icon, accent, sub }) {
   return (

@@ -33,6 +33,7 @@ export default function SidebarSupervisor() {
       theme={theme}
       role="Supervisor"
       LogoIcon={ShieldCheck}
+      profileHref="/Supervisor/Perfil"
     />
   );
 }

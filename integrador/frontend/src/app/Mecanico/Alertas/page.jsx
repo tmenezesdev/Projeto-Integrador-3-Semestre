@@ -1,10 +1,11 @@
 'use client';
+import { BASE_URL } from '@/lib/apiConfig';
 
 import { useState, useEffect } from 'react';
 import { AlertOctagon, Search, Loader2, AlertCircle } from 'lucide-react';
 import { Sk } from '@/components/ui/skeleton';
 
-const API = 'http://localhost:3000/api/mecanico/alertas';
+const API = BASE_URL + '/api/mecanico/alertas';
 const token = () => localStorage.getItem('smartbench_token');
 
 export default function MecanicoAlertas() {

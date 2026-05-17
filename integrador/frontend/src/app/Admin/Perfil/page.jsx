@@ -1,4 +1,5 @@
 'use client';
+import { BASE_URL } from '@/lib/apiConfig';
 
 import { useState, useEffect, useRef } from 'react';
 import {
@@ -10,7 +11,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
-const BASE = 'http://localhost:3000/api/admin/perfil';
+const BASE = BASE_URL + '/api/admin/perfil';
 
 const inputCls = "h-10 w-full rounded-lg border border-slate-200 dark:border-[#7033ff]/20 bg-slate-50 dark:bg-[#0a0a12]/80 px-3 text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#7033ff]/40 focus:border-[#7033ff]/60 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed";
 
@@ -232,7 +233,7 @@ export default function AdminPerfil() {
   const browser   = getBrowserInfo();
 
   const fotoUrl = perfil?.foto_filename
-    ? `http://localhost:3000/uploads/imagens/${perfil.foto_filename}`
+    ? `${BASE_URL}/uploads/imagens/${perfil.foto_filename}`
     : null;
 
   return (

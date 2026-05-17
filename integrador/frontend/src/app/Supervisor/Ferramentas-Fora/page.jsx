@@ -1,4 +1,5 @@
 'use client';
+import { BASE_URL } from '@/lib/apiConfig';
 
 import { useState, useEffect, useCallback } from "react";
 import {
@@ -14,7 +15,7 @@ import {
 import { Sk } from '@/components/ui/skeleton';
 import ModalDevolucao from "@/components/ModalDevolucao/page";
 
-const API = 'http://localhost:3000/api/supervisor';
+const API = BASE_URL + '/api/supervisor';
 
 function getSupervisorId() {
   try {
@@ -94,15 +95,16 @@ export default function FerramentasForaPage() {
     }
   };
 
-  const ferramentasProcessadas = ferramentas.map(ferramenta => {
-    const horasFora = ferramenta.tempoFora ? parseInt(ferramenta.tempoFora.split(':')[0]) : 0;
-    const isAtrasado = horasFora >= 4;
-
-    return {
+  const ferramentasProcessadas = ferramentas
+    .filter((f, index, self) =>
+      index === self.findIndex(t => t.id === f.id && t.responsavel === f.responsavel)
+    )
+    .map((ferramenta, index) => ({
       ...ferramenta,
-      statusCorrigido: isAtrasado ? 'ATRASADO' : 'EM USO'
-    };
-  });
+      _uniqueKey: `${ferramenta.id}-${ferramenta.responsavel}-${index}`,
+      // statusAlerta já vem calculado pelo backend com base no tempo_limite_horas configurado
+      statusCorrigido: ferramenta.statusAlerta === 'ATRASADA' ? 'ATRASADO' : 'EM USO'
+    }));
 
   const totalFora = ferramentasProcessadas.length;
   const atrasadas = ferramentasProcessadas.filter(f => f.statusCorrigido === 'ATRASADO').length;
@@ -250,7 +252,7 @@ export default function FerramentasForaPage() {
 
             return (
               <div
-                key={f.id}
+                key={f._uniqueKey}
                 className={`bg-[#0a1628] rounded-xl p-6 border transition-all duration-300 hover:shadow-lg ${atrasada
                     ? 'border-red-500/20 hover:border-red-500/40'
                     : 'border-slate-700/30 hover:border-teal-500/30'

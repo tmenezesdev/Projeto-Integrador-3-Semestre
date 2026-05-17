@@ -1,10 +1,11 @@
 'use client';
+import { BASE_URL } from '@/lib/apiConfig';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Headphones, X, Send, MessageSquare } from 'lucide-react';
 
-const API        = 'http://localhost:3000/api/chat';
-const API_STATUS = 'http://localhost:3000/api/chat/status';
+const API        = BASE_URL + '/api/chat';
+const API_STATUS = BASE_URL + '/api/chat/status';
 const token = () => localStorage.getItem('smartbench_token');
 
 const COR = {
@@ -26,7 +27,7 @@ const COR = {
 };
 
 export default function ChatWidget() {
-  const [chatAtivo, setChatAtivo] = useState(null);
+  const [chatAtivo, setChatAtivo] = useState(true);
   const [open, setOpen]           = useState(false);
   const [mensagens, setMensagens] = useState([]);
   const [texto, setTexto]         = useState('');
@@ -68,7 +69,7 @@ export default function ChatWidget() {
     }
   }, [mensagens, open]);
 
-  if (!chatAtivo) return null;
+  if (chatAtivo === false) return null;
 
   const handleOpen = () => {
     setOpen(true);

@@ -1,10 +1,11 @@
 'use client';
+import { BASE_URL } from '@/lib/apiConfig';
 
 import { useState, useEffect, useCallback } from 'react';
 import { Wrench, Search, Plus, Pencil, Trash2, Loader2, AlertCircle, X } from 'lucide-react';
 import { Sk } from '@/components/ui/skeleton';
 
-const API = 'http://localhost:3000/api/admin/ferramentas';
+const API = BASE_URL + '/api/admin/ferramentas';
 const token = () => localStorage.getItem('smartbench_token');
 const STATUS_OPTS = ['DISPONIVEL', 'EM_USO', 'MANUTENCAO'];
 

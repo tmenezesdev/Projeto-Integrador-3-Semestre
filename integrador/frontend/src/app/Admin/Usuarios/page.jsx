@@ -1,10 +1,11 @@
 'use client';
+import { BASE_URL } from '@/lib/apiConfig';
 
 import { useState, useEffect, useCallback } from 'react';
 import { Users, Search, Plus, Pencil, Trash2, Loader2, AlertCircle, X, Eye, EyeOff } from 'lucide-react';
 import { Sk } from '@/components/ui/skeleton';
 
-const API = 'http://localhost:3000/api/admin/usuarios';
+const API = BASE_URL + '/api/admin/usuarios';
 const token = () => localStorage.getItem('smartbench_token');
 const PERFIS = ['MECANICO', 'SUPERVISOR', 'ADMIN'];
 
@@ -69,7 +70,7 @@ export default function AdminUsuarios() {
       intervalo = setInterval(async () => {
         try {
           // 👇 MUDE ESTA LINHA AQUI 👇
-          const res = await fetch('http://localhost:3000/api/rfid');
+          const res = await fetch(BASE_URL + '/api/rfid');
           const data = await res.json();
           
           if (data.tag) {

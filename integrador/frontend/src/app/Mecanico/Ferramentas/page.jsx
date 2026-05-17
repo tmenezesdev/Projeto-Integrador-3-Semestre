@@ -1,11 +1,12 @@
 'use client';
+import { BASE_URL } from '@/lib/apiConfig';
 
 import { useState, useEffect } from 'react';
 import { Wrench, Search, AlertCircle, X, Clock, User, Tag, Hash, Timer } from 'lucide-react';
 import { Sk } from '@/components/ui/skeleton';
 import { useAuth } from '@/hooks/useAuth';
 
-const BASE = 'http://localhost:3000/api/mecanico';
+const BASE = BASE_URL + '/api/mecanico';
 
 const statusColor = (s) => {
   if (s === 'DISPONIVEL') return 'bg-green-500/10 text-green-400 border-green-900/50';

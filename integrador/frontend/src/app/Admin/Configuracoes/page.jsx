@@ -1,10 +1,11 @@
 'use client';
+import { BASE_URL } from '@/lib/apiConfig';
 
 import { useState, useEffect } from 'react';
 import { Settings, Loader2, AlertCircle, Save, CheckCircle } from 'lucide-react';
 import { Sk } from '@/components/ui/skeleton';
 
-const API = 'http://localhost:3000/api/admin/configuracoes';
+const API = BASE_URL + '/api/admin/configuracoes';
 const token = () => localStorage.getItem('smartbench_token');
 
 function Field({ label, description, children }) {

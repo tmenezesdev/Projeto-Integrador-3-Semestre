@@ -1,4 +1,5 @@
 'use client';
+import { BASE_URL } from '@/lib/apiConfig';
 
 import { useState, useEffect } from 'react';
 import {
@@ -20,7 +21,7 @@ import ModalMecanicos   from '@/components/ModaisVisaoGeral/ModalMecanicos';
 import ModalTaxaPrazo   from '@/components/ModaisVisaoGeral/ModalTaxaPrazo';
 import { useAuth } from '@/hooks/useAuth';
 
-const API = 'http://localhost:3000/api/supervisor';
+const API = BASE_URL + '/api/supervisor';
 
 function KpiCard({ label, value, accent, sub, icon: Icon, onClick }) {
   return (
@@ -369,10 +370,10 @@ export default function SupervisorVisaoGeral() {
                 <CheckCircle2 size={28} className="text-emerald-500 mx-auto mb-2 opacity-50" />
                 <p className="text-slate-500 text-sm">Bancada completa — tudo no lugar!</p>
               </div>
-            ) : ferramentas.slice(0, 7).map((f) => {
+            ) : ferramentas.slice(0, 7).map((f, idx) => {
               const atrasada = f.statusAlerta === 'ATRASADA';
               return (
-                <div key={f.id} className="px-6 py-3.5 flex items-center justify-between hover:bg-teal-500/5 transition-colors">
+                <div key={`${f.id}-${f.responsavel}-${idx}`} className="px-6 py-3.5 flex items-center justify-between hover:bg-teal-500/5 transition-colors">
                   <div className="flex items-center gap-3">
                     <div className={`w-2 h-2 rounded-full shrink-0 ${atrasada ? 'bg-red-400 animate-pulse' : 'bg-teal-400'}`} />
                     <div>

@@ -1,10 +1,11 @@
 'use client';
+import { BASE_URL } from '@/lib/apiConfig';
 
 import { useState, useEffect, useCallback } from 'react';
 import { AlertOctagon, Search, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
 import { Sk } from '@/components/ui/skeleton';
 
-const API_ALERTAS = 'http://localhost:3000/api/admin/alertas';
+const API_ALERTAS = BASE_URL + '/api/admin/alertas';
 const token = () => localStorage.getItem('smartbench_token');
 
 export default function AdminAlertas() {

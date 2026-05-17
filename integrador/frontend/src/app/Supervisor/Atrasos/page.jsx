@@ -1,4 +1,5 @@
 'use client';
+import { BASE_URL } from '@/lib/apiConfig';
 
 import { useState, useEffect, useCallback } from "react";
 import {
@@ -16,7 +17,7 @@ import { Sk } from '@/components/ui/skeleton';
 import ModalDevolucao from "@/components/ModalDevolucao/page";
 import { useAuth } from '@/hooks/useAuth';
 
-const API = 'http://localhost:3000/api/supervisor';
+const API = BASE_URL + '/api/supervisor';
 
 function NivelAtraso({ horas }) {
   if (horas >= 24) return { label: 'Crítico',  cor: 'text-red-400',    bg: 'bg-red-500/10',    border: 'border-red-500/20',    dot: 'bg-red-400'    };
@@ -267,13 +268,15 @@ export default function AtrasosPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5">
-          {dadosFiltrados.map((f) => {
+          {dadosFiltrados.filter((f, i, self) =>
+              i === self.findIndex(t => t.id === f.id && t.responsavel === f.responsavel)
+            ).map((f, idx) => {
             const horas = getHoras(f);
             const nivel = NivelAtraso({ horas });
 
             return (
               <div
-                key={f.id}
+                key={`${f.id}-${f.responsavel}-${idx}`}
                 className={`bg-[#0a1628] rounded-xl p-6 border transition-all duration-300 hover:shadow-lg ${nivel.border} hover:brightness-110`}
               >
                 {/* Topo */}

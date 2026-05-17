@@ -1,5 +1,6 @@
 "use client";
 
+import { BASE_URL } from '@/lib/apiConfig';
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2, CheckCircle2 } from "lucide-react";
@@ -37,7 +38,7 @@ function RedefinirSenhaForm() {
     setIsLoading(true);
     setStatus(null);
     try {
-      const res  = await fetch("http://localhost:3000/api/auth/redefinir-senha", {
+      const res  = await fetch(BASE_URL + "/api/auth/redefinir-senha", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, nova_senha: novaSenha }),

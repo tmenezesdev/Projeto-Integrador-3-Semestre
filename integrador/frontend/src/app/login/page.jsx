@@ -1,5 +1,6 @@
 "use client";
 
+import { BASE_URL } from '@/lib/apiConfig';
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
@@ -52,7 +53,7 @@ export default function LoginPage() {
     setResetLoading(true);
     setResetMsg({ tipo: '', texto: '' });
     try {
-      const res  = await fetch('http://localhost:3000/api/auth/esqueceu-senha', {
+      const res  = await fetch(BASE_URL + '/api/auth/esqueceu-senha', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -72,7 +73,7 @@ export default function LoginPage() {
     if (!email || !senha) { setErro("Preencha e-mail e senha."); return; }
     setIsLoading(true);
     try {
-      const res  = await fetch("http://localhost:3000/api/auth/login", {
+      const res  = await fetch(BASE_URL + "/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, senha }),

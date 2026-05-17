@@ -1,6 +1,104 @@
-import { getConnection, create, hashPassword } from '../config/database.js';
+import { getConnection, create, hashPassword, comparePassword } from '../config/database.js';
+import UsuarioModel from '../models/UsuarioModel.js';
 
 class SupervisorController {
+
+  async obterPerfil(req, res) {
+    try {
+      const usuario = await UsuarioModel.buscarPorId(req.usuario.id);
+      if (!usuario) return res.status(404).json({ sucesso: false, erro: 'Usuário não encontrado' });
+      const { senha, ...dados } = usuario;
+      res.json({ sucesso: true, dados });
+    } catch (error) {
+      console.error('Erro em obterPerfil (supervisor):', error);
+      res.status(500).json({ sucesso: false, erro: 'Erro ao buscar perfil.' });
+    }
+  }
+
+  async atualizarPerfil(req, res) {
+    const usuarioId = req.usuario.id;
+    const { nome, email } = req.body;
+    if (!nome?.trim()) return res.status(400).json({ sucesso: false, erro: 'Nome obrigatório.' });
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) return res.status(400).json({ sucesso: false, erro: 'E-mail inválido.' });
+    try {
+      const existente = await UsuarioModel.buscarPorEmail(email.trim().toLowerCase());
+      if (existente && existente.id !== usuarioId)
+        return res.status(409).json({ sucesso: false, erro: 'E-mail já está em uso.' });
+      await UsuarioModel.atualizar(usuarioId, { nome: nome.trim(), email: email.trim().toLowerCase() });
+      res.json({ sucesso: true, mensagem: 'Perfil atualizado com sucesso.' });
+    } catch (error) {
+      console.error('Erro em atualizarPerfil (supervisor):', error);
+      res.status(500).json({ sucesso: false, erro: 'Erro ao atualizar perfil.' });
+    }
+  }
+
+  async alterarSenha(req, res) {
+    const usuarioId = req.usuario.id;
+    const { senha_atual, nova_senha } = req.body;
+    if (!senha_atual || !nova_senha) return res.status(400).json({ sucesso: false, erro: 'Preencha todos os campos.' });
+    if (nova_senha.length < 6) return res.status(400).json({ sucesso: false, erro: 'A nova senha deve ter ao menos 6 caracteres.' });
+    let connection;
+    try {
+      connection = await getConnection();
+      const [rows] = await connection.execute('SELECT senha FROM usuarios WHERE id = ?', [usuarioId]);
+      if (!rows.length) return res.status(404).json({ sucesso: false, erro: 'Usuário não encontrado.' });
+      const senhaValida = await comparePassword(senha_atual, rows[0].senha);
+      if (!senhaValida) return res.status(401).json({ sucesso: false, erro: 'Senha atual incorreta.' });
+      const novoHash = await hashPassword(nova_senha);
+      await connection.execute('UPDATE usuarios SET senha = ? WHERE id = ?', [novoHash, usuarioId]);
+      res.json({ sucesso: true, mensagem: 'Senha alterada com sucesso.' });
+    } catch (error) {
+      console.error('Erro em alterarSenha (supervisor):', error);
+      res.status(500).json({ sucesso: false, erro: 'Erro ao alterar senha.' });
+    } finally {
+      if (connection) connection.release();
+    }
+  }
+
+  async uploadFoto(req, res) {
+    if (!req.file) return res.status(400).json({ sucesso: false, erro: 'Nenhuma imagem enviada.' });
+    const usuarioId = req.usuario.id;
+    const novaFotoUrl = req.file.path;
+    let connection;
+    try {
+      connection = await getConnection();
+      await connection.execute('UPDATE usuarios SET foto_url = ? WHERE id = ?', [novaFotoUrl, usuarioId]);
+      res.json({ sucesso: true, foto_url: novaFotoUrl });
+    } catch (error) {
+      console.error('Erro em uploadFoto (supervisor):', error);
+      res.status(500).json({ sucesso: false, erro: 'Erro ao salvar foto.' });
+    } finally {
+      if (connection) connection.release();
+    }
+  }
+
+  async obterStats(req, res) {
+    let connection;
+    try {
+      connection = await getConnection();
+      const [[{ funcionarios }]] = await connection.execute(
+        `SELECT COUNT(*) AS funcionarios FROM usuarios WHERE tipo_perfil = 'MECANICO'`
+      );
+      const [[{ ferramentas_campo }]] = await connection.execute(
+        `SELECT COUNT(*) AS ferramentas_campo FROM ferramentas WHERE status = 'EM_USO'`
+      );
+      const [[{ atrasos }]] = await connection.execute(
+        `SELECT COUNT(*) AS atrasos FROM ferramentas f
+         JOIN transacoes t ON f.id = t.ferramenta_id
+         JOIN configuracoes_sistema c ON c.id = 1
+         WHERE f.status = 'EM_USO' AND t.tipo = 'RETIRADA'
+           AND t.id = (SELECT MAX(id) FROM transacoes WHERE ferramenta_id = f.id)
+           AND TIMESTAMPDIFF(MINUTE, t.data_hora, NOW()) > (c.tempo_limite_horas * 60)`
+      );
+      res.json({ sucesso: true, dados: { funcionarios, ferramentas_campo, atrasos } });
+    } catch (error) {
+      console.error('Erro em obterStats (supervisor):', error);
+      res.status(500).json({ sucesso: false, erro: 'Erro ao buscar estatísticas.' });
+    } finally {
+      if (connection) connection.release();
+    }
+  }
 
   async listarFerramentasFora(req, res) {
     let connection;
@@ -15,11 +113,16 @@ class SupervisorController {
           u.tipo_perfil AS cargo,
           DATE_FORMAT(t.data_hora, '%H:%i') AS horaRetirada,
           TIMESTAMPDIFF(MINUTE, t.data_hora, NOW()) AS minutosFora,
-          IF(a.id IS NOT NULL AND a.status_alerta = 'ATIVO', 'ATRASADA', 'EM_USO') AS statusAlerta
+          IF(
+            TIMESTAMPDIFF(MINUTE, t.data_hora, NOW()) > (c.tempo_limite_horas * 60),
+            'ATRASADA',
+            'EM_USO'
+          ) AS statusAlerta,
+          c.tempo_limite_horas AS tempoLimiteHoras
         FROM ferramentas f
         JOIN transacoes t ON f.id = t.ferramenta_id
         JOIN usuarios u ON t.usuario_id = u.id
-        LEFT JOIN alertas a ON f.id = a.ferramenta_id AND a.status_alerta = 'ATIVO'
+        JOIN configuracoes_sistema c ON c.id = 1
         WHERE f.status = 'EM_USO'
           AND t.tipo = 'RETIRADA'
           AND t.id = (SELECT MAX(id) FROM transacoes WHERE ferramenta_id = f.id)
