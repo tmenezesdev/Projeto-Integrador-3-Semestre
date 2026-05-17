@@ -39,7 +39,10 @@ export default function FerramentasForaPage() {
     setErro(false);
 
     try {
-      const res = await fetch(`${API}/ferramentas-fora`);
+      const token = localStorage.getItem('smartbench_token');
+      const res = await fetch(`${API}/ferramentas-fora`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       if (!res.ok) throw new Error();
 
       const data = await res.json();
