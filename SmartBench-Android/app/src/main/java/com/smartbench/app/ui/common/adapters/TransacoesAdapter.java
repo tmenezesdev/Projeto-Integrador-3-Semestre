@@ -83,12 +83,13 @@ public class TransacoesAdapter extends RecyclerView.Adapter<TransacoesAdapter.VH
         void bind(Transacao t) {
             b.tvFerramenta.setText(t.ferramenta != null ? t.ferramenta : "--");
             b.tvResponsavel.setText(t.responsavel != null ? t.responsavel : "--");
-            b.tvData.setText(DateUtils.formatDisplay(t.dataHora));
+            b.tvData.setText(DateUtils.formatDisplay(t.getDataHora()));
 
-            int corOp = ColorUtils.getColorForOperacao(t.tipo);
+            String tipoOp = t.getTipo();
+            int corOp = ColorUtils.getColorForOperacao(tipoOp);
             b.viewIndicador.setBackgroundColor(corOp);
 
-            b.tvOperacao.setText(t.tipo != null ? t.tipo : "--");
+            b.tvOperacao.setText(tipoOp != null ? tipoOp : "--");
             GradientDrawable bgOp = new GradientDrawable();
             bgOp.setShape(GradientDrawable.RECTANGLE);
             bgOp.setCornerRadius(50f);

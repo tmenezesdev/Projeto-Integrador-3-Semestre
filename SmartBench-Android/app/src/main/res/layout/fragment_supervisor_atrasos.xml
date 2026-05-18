@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_primary"
+   
     android:orientation="vertical"
     android:paddingBottom="72dp">
 
@@ -25,8 +25,8 @@
         android:layout_marginBottom="@dimen/margin_small">
         <com.google.android.material.card.MaterialCardView android:layout_width="0dp"
             android:layout_height="64dp" android:layout_weight="1" android:layout_marginEnd="4dp"
-            app:cardBackgroundColor="@color/bg_card" app:cardCornerRadius="@dimen/card_corner_radius"
-            app:strokeColor="@color/border_default" app:strokeWidth="1dp">
+            app:cardBackgroundColor="?attr/bgCard" app:cardCornerRadius="@dimen/card_corner_radius"
+            app:strokeColor="?attr/colorPrimary" app:strokeWidth="1dp">
             <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
                 android:orientation="vertical" android:gravity="center" android:padding="4dp">
                 <TextView android:id="@+id/tvTotal" android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -37,8 +37,8 @@
         </com.google.android.material.card.MaterialCardView>
         <com.google.android.material.card.MaterialCardView android:layout_width="0dp"
             android:layout_height="64dp" android:layout_weight="1" android:layout_marginHorizontal="2dp"
-            app:cardBackgroundColor="@color/bg_card" app:cardCornerRadius="@dimen/card_corner_radius"
-            app:strokeColor="@color/border_default" app:strokeWidth="1dp">
+            app:cardBackgroundColor="?attr/bgCard" app:cardCornerRadius="@dimen/card_corner_radius"
+            app:strokeColor="?attr/colorPrimary" app:strokeWidth="1dp">
             <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
                 android:orientation="vertical" android:gravity="center" android:padding="4dp">
                 <TextView android:id="@+id/tvCritico" android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -49,8 +49,8 @@
         </com.google.android.material.card.MaterialCardView>
         <com.google.android.material.card.MaterialCardView android:layout_width="0dp"
             android:layout_height="64dp" android:layout_weight="1" android:layout_marginHorizontal="2dp"
-            app:cardBackgroundColor="@color/bg_card" app:cardCornerRadius="@dimen/card_corner_radius"
-            app:strokeColor="@color/border_default" app:strokeWidth="1dp">
+            app:cardBackgroundColor="?attr/bgCard" app:cardCornerRadius="@dimen/card_corner_radius"
+            app:strokeColor="?attr/colorPrimary" app:strokeWidth="1dp">
             <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
                 android:orientation="vertical" android:gravity="center" android:padding="4dp">
                 <TextView android:id="@+id/tvAlto" android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -61,8 +61,8 @@
         </com.google.android.material.card.MaterialCardView>
         <com.google.android.material.card.MaterialCardView android:layout_width="0dp"
             android:layout_height="64dp" android:layout_weight="1" android:layout_marginStart="4dp"
-            app:cardBackgroundColor="@color/bg_card" app:cardCornerRadius="@dimen/card_corner_radius"
-            app:strokeColor="@color/border_default" app:strokeWidth="1dp">
+            app:cardBackgroundColor="?attr/bgCard" app:cardCornerRadius="@dimen/card_corner_radius"
+            app:strokeColor="?attr/colorPrimary" app:strokeWidth="1dp">
             <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
                 android:orientation="vertical" android:gravity="center" android:padding="4dp">
                 <TextView android:id="@+id/tvModerado" android:layout_width="wrap_content" android:layout_height="wrap_content"

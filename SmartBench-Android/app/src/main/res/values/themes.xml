@@ -12,6 +12,11 @@
         <item name="colorError">@color/error</item>
         <item name="android:statusBarColor">@color/bg_primary</item>
         <item name="android:navigationBarColor">@color/bg_secondary</item>
+        <!-- Atributos de fundo customizados (fallback) -->
+        <item name="bgPrimary">@color/bg_primary</item>
+        <item name="bgSecondary">@color/bg_secondary</item>
+        <item name="bgCard">@color/bg_card</item>
+        <item name="bgCardHover">@color/bg_card_hover</item>
     </style>
 
     <!-- Tema Admin — roxo #7033FF -->
@@ -23,6 +28,18 @@
         <item name="colorSecondaryContainer">@color/admin_primary_container</item>
         <item name="colorOnSecondaryContainer">@color/admin_primary</item>
         <item name="colorTertiary">@color/admin_primary</item>
+        <!-- Fundos Admin -->
+        <item name="android:windowBackground">@color/admin_bg_primary</item>
+        <item name="android:colorBackground">@color/admin_bg_primary</item>
+        <item name="colorSurface">@color/admin_bg_card</item>
+        <item name="colorSurfaceVariant">@color/admin_bg_secondary</item>
+        <item name="bgPrimary">@color/admin_bg_primary</item>
+        <item name="bgSecondary">@color/admin_bg_secondary</item>
+        <item name="bgCard">@color/admin_bg_card</item>
+        <item name="bgCardHover">@color/admin_bg_card_hover</item>
+        <!-- Status/Nav bar -->
+        <item name="android:statusBarColor">@color/admin_bg_secondary</item>
+        <item name="android:navigationBarColor">@color/admin_bg_primary</item>
     </style>
 
     <!-- Tema Supervisor — teal #2DD4BF -->
@@ -34,6 +51,18 @@
         <item name="colorSecondaryContainer">@color/supervisor_primary_container</item>
         <item name="colorOnSecondaryContainer">@color/supervisor_primary</item>
         <item name="colorTertiary">@color/supervisor_primary</item>
+        <!-- Fundos Supervisor -->
+        <item name="android:windowBackground">@color/supervisor_bg_primary</item>
+        <item name="android:colorBackground">@color/supervisor_bg_primary</item>
+        <item name="colorSurface">@color/supervisor_bg_card</item>
+        <item name="colorSurfaceVariant">@color/supervisor_bg_secondary</item>
+        <item name="bgPrimary">@color/supervisor_bg_primary</item>
+        <item name="bgSecondary">@color/supervisor_bg_secondary</item>
+        <item name="bgCard">@color/supervisor_bg_card</item>
+        <item name="bgCardHover">@color/supervisor_bg_card_hover</item>
+        <!-- Status/Nav bar -->
+        <item name="android:statusBarColor">@color/supervisor_bg_secondary</item>
+        <item name="android:navigationBarColor">@color/supervisor_bg_primary</item>
     </style>
 
     <!-- Tema Mecânico — âmbar #F59E0B -->
@@ -45,6 +74,18 @@
         <item name="colorSecondaryContainer">@color/mecanico_primary_container</item>
         <item name="colorOnSecondaryContainer">@color/mecanico_primary</item>
         <item name="colorTertiary">@color/mecanico_primary</item>
+        <!-- Fundos Mecânico -->
+        <item name="android:windowBackground">@color/mecanico_bg_primary</item>
+        <item name="android:colorBackground">@color/mecanico_bg_primary</item>
+        <item name="colorSurface">@color/mecanico_bg_card</item>
+        <item name="colorSurfaceVariant">@color/mecanico_bg_secondary</item>
+        <item name="bgPrimary">@color/mecanico_bg_primary</item>
+        <item name="bgSecondary">@color/mecanico_bg_secondary</item>
+        <item name="bgCard">@color/mecanico_bg_card</item>
+        <item name="bgCardHover">@color/mecanico_bg_card_hover</item>
+        <!-- Status/Nav bar -->
+        <item name="android:statusBarColor">@color/mecanico_bg_secondary</item>
+        <item name="android:navigationBarColor">@color/mecanico_bg_primary</item>
     </style>
 
     <!-- Estilo de bottom sheet -->
@@ -54,7 +95,7 @@
     </style>
 
     <style name="SmartBench.BottomSheet" parent="Widget.Material3.BottomSheet">
-        <item name="android:background">@color/bg_secondary</item>
+        <item name="android:background">?attr/bgSecondary</item>
     </style>
 
 </resources>

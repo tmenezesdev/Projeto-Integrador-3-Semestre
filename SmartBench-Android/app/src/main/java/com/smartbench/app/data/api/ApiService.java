@@ -1,6 +1,7 @@
 package com.smartbench.app.data.api;
 
 import com.smartbench.app.data.model.entity.Alerta;
+import com.smartbench.app.data.model.entity.ChatMensagem;
 import com.smartbench.app.data.model.entity.ConfiguracaoSistema;
 import com.smartbench.app.data.model.entity.Ferramenta;
 import com.smartbench.app.data.model.entity.FluxoPonto;
@@ -11,6 +12,7 @@ import com.smartbench.app.data.model.request.CriarFuncionarioRequest;
 import com.smartbench.app.data.model.request.DevolucaoRequest;
 import com.smartbench.app.data.model.request.LoginRequest;
 import com.smartbench.app.data.model.response.ApiResponse;
+import com.smartbench.app.data.model.response.ChatStatus;
 import com.smartbench.app.data.model.response.DashboardAdminResponse;
 import com.smartbench.app.data.model.response.DashboardSupervisorResponse;
 import com.smartbench.app.data.model.response.LoginResponse;
@@ -32,6 +34,16 @@ import retrofit2.http.Query;
 
 public interface ApiService {
 
+    // ===================== CHAT =====================
+    @GET("api/chat/status")
+    Call<ChatStatus> getChatStatus();
+
+    @GET("api/chat")
+    Call<List<ChatMensagem>> getMensagens();
+
+    @POST("api/chat")
+    Call<ApiResponse<Void>> enviarMensagem(@Body Map<String, String> body);
+
     // ===================== AUTH =====================
     @POST("api/auth/login")
     Call<ApiResponse<LoginResponse>> login(@Body LoginRequest body);
@@ -43,8 +55,9 @@ public interface ApiService {
     Call<ApiResponse<Void>> redefinirSenha(@Body Map<String, String> body);
 
     // ===================== ADMIN =====================
+    // Dashboard retorna dados diretos sem wrapper ApiResponse
     @GET("api/admin/dashboard")
-    Call<ApiResponse<DashboardAdminResponse>> getAdminDashboard();
+    Call<DashboardAdminResponse> getAdminDashboard();
 
     // Usuários
     @GET("api/admin/usuarios")
@@ -110,11 +123,12 @@ public interface ApiService {
     Call<ApiResponse<Void>> uploadFotoAdmin(@Part MultipartBody.Part foto);
 
     // ===================== SUPERVISOR =====================
+    // visaogeral e ferramentas-fora retornam dados diretos sem wrapper
     @GET("api/supervisor/visaogeral")
-    Call<ApiResponse<DashboardSupervisorResponse>> getVisaoGeral();
+    Call<DashboardSupervisorResponse> getVisaoGeral();
 
     @GET("api/supervisor/ferramentas-fora")
-    Call<ApiResponse<List<Ferramenta>>> getFerramentasFora();
+    Call<List<Ferramenta>> getFerramentasFora();
 
     @POST("api/supervisor/ferramentas-fora/devolucao")
     Call<ApiResponse<Void>> registrarDevolucao(@Body DevolucaoRequest body);
@@ -122,8 +136,9 @@ public interface ApiService {
     @GET("api/supervisor/historico")
     Call<ApiResponse<List<Transacao>>> getHistoricoSupervisor();
 
+    // alertas supervisor retorna array direto sem wrapper
     @GET("api/supervisor/alertas")
-    Call<ApiResponse<List<Alerta>>> getAlertasSupervisor();
+    Call<List<Alerta>> getAlertasSupervisor();
 
     @GET("api/supervisor/fluxo-movimentacoes")
     Call<ApiResponse<List<FluxoPonto>>> getFluxoSupervisor(@Query("periodo") int dias);

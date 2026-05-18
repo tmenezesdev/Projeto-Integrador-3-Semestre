@@ -19,7 +19,10 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.google.android.material.color.MaterialColors;
 import com.smartbench.app.R;
+import com.smartbench.app.data.model.entity.Alerta;
+import com.smartbench.app.data.model.entity.Ferramenta;
 import com.smartbench.app.data.model.entity.FluxoPonto;
 import com.smartbench.app.data.model.response.DashboardSupervisorResponse;
 import com.smartbench.app.data.model.response.Resource;
@@ -33,11 +36,12 @@ public class SupervisorVisaoGeralFragment extends Fragment {
 
     private FragmentSupervisorVisaoGeralBinding binding;
     private SupervisorVisaoGeralViewModel viewModel;
-    private FerramentasAdapter ferramentasAdapter;
+    private FerramentasAdapter adapterFora;
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         binding = FragmentSupervisorVisaoGeralBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -47,25 +51,28 @@ public class SupervisorVisaoGeralFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(this).get(SupervisorVisaoGeralViewModel.class);
 
-        ferramentasAdapter = new FerramentasAdapter(new FerramentasAdapter.OnItemAction() {
-            @Override public void onEditar(com.smartbench.app.data.model.entity.Ferramenta f) {}
-            @Override public void onDeletar(com.smartbench.app.data.model.entity.Ferramenta f) {}
-            @Override public void onClick(com.smartbench.app.data.model.entity.Ferramenta f) {}
+        // Adapter da lista "Ferramentas Fora Agora"
+        adapterFora = new FerramentasAdapter(new FerramentasAdapter.OnItemAction() {
+            @Override public void onEditar(Ferramenta f) {}
+            @Override public void onDeletar(Ferramenta f) {}
+            @Override public void onClick(Ferramenta f) {}
         }, false);
-
         binding.rvFerramentasFora.setLayoutManager(new LinearLayoutManager(requireContext()));
-        binding.rvFerramentasFora.setAdapter(ferramentasAdapter);
+        binding.rvFerramentasFora.setAdapter(adapterFora);
 
         setupChipGroup();
 
         binding.swipeRefresh.setOnRefreshListener(() -> {
             viewModel.carregar();
-            viewModel.carregarFluxo(7);
+            viewModel.carregarFluxo(periodoAtual());
         });
 
+        // Observer: dados gerais (totalFerramentas, transacoesHoje, mecanicosAtivos)
         viewModel.visaoGeral.observe(getViewLifecycleOwner(), resource -> {
             switch (resource.status) {
-                case LOADING: binding.swipeRefresh.setRefreshing(true); break;
+                case LOADING:
+                    binding.swipeRefresh.setRefreshing(true);
+                    break;
                 case SUCCESS:
                     binding.swipeRefresh.setRefreshing(false);
                     if (resource.data != null) populateDashboard(resource.data);
@@ -77,6 +84,36 @@ public class SupervisorVisaoGeralFragment extends Fragment {
             }
         });
 
+        // Observer: ferramentas fora → Em Uso, Atrasadas, Taxa no Prazo, lista
+        viewModel.ferramentasFora.observe(getViewLifecycleOwner(), resource -> {
+            if (resource.status == Resource.Status.SUCCESS && resource.data != null) {
+                List<Ferramenta> lista = resource.data;
+                int emUso = 0, atrasadas = 0;
+                for (Ferramenta f : lista) {
+                    if ("ATRASADA".equals(f.statusAlerta)) atrasadas++;
+                    else emUso++;
+                }
+                binding.tvEmUso.setText(String.valueOf(emUso));
+                binding.tvAtrasadas.setText(String.valueOf(atrasadas));
+                atualizarTaxa(emUso, atrasadas);
+
+                List<Ferramenta> preview = lista.subList(0, Math.min(7, lista.size()));
+                adapterFora.setData(new ArrayList<>(preview));
+            }
+        });
+
+        // Observer: alertas → Alertas Ativos
+        viewModel.alertas.observe(getViewLifecycleOwner(), resource -> {
+            if (resource.status == Resource.Status.SUCCESS && resource.data != null) {
+                int ativos = 0;
+                for (Alerta a : resource.data) {
+                    if ("ATIVO".equals(a.statusAlerta)) ativos++;
+                }
+                binding.tvAlertasAtivos.setText(String.valueOf(ativos));
+            }
+        });
+
+        // Observer: fluxo do gráfico
         viewModel.fluxo.observe(getViewLifecycleOwner(), resource -> {
             if (resource.status == Resource.Status.SUCCESS && resource.data != null) {
                 setupChart(resource.data);
@@ -84,31 +121,40 @@ public class SupervisorVisaoGeralFragment extends Fragment {
         });
 
         viewModel.carregar();
-        viewModel.carregarFluxo(7);
+        viewModel.carregarFluxo(15); // padrão 15 dias como no web
+    }
+
+    private void populateDashboard(DashboardSupervisorResponse data) {
+        binding.tvTotalFerramentas.setText(String.valueOf(data.totalFerramentas));
+        binding.tvTransacoesHoje.setText(String.valueOf(data.transacoesHoje));
+        binding.tvMecanicosAtivos.setText(String.valueOf(data.mecanicosAtivos));
+    }
+
+    private void atualizarTaxa(int emUso, int atrasadas) {
+        int total = emUso + atrasadas;
+        if (total == 0) {
+            binding.tvTaxaPrazo.setText("100%");
+            return;
+        }
+        int taxa = Math.round((float) emUso / total * 100);
+        binding.tvTaxaPrazo.setText(taxa + "%");
     }
 
     private void setupChipGroup() {
         binding.chipGroupPeriodo.setOnCheckedStateChangeListener((group, ids) -> {
             if (ids.isEmpty()) return;
             int id = ids.get(0);
-            int dias = 7;
-            if (id == R.id.chip15d) dias = 15;
+            int dias = 15;
+            if (id == R.id.chip7d)  dias = 7;
             else if (id == R.id.chip90d) dias = 90;
             viewModel.carregarFluxo(dias);
         });
     }
 
-    private void populateDashboard(DashboardSupervisorResponse data) {
-        binding.tvTotalFerramentas.setText(String.valueOf(data.totalFerramentas));
-        binding.tvEmUso.setText(String.valueOf(data.emUso));
-        binding.tvAtrasadas.setText(String.valueOf(data.atrasadas));
-        binding.tvAlertasAtivos.setText(String.valueOf(data.alertasAtivos));
-        binding.tvTransacoesHoje.setText(String.valueOf(data.transacoesHoje));
-        binding.tvMecanicosAtivos.setText(String.valueOf(data.mecanicosAtivos));
-        String taxa = String.format("%.0f%%", data.taxaNoPrazo);
-        binding.tvTaxaPrazo.setText(taxa);
-
-        if (data.ferramentasFora != null) ferramentasAdapter.setData(data.ferramentasFora);
+    private int periodoAtual() {
+        if (binding.chip7d.isChecked())  return 7;
+        if (binding.chip90d.isChecked()) return 90;
+        return 15;
     }
 
     private void setupChart(List<FluxoPonto> pontos) {
@@ -122,38 +168,62 @@ public class SupervisorVisaoGeralFragment extends Fragment {
         XAxis xAxis = chart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setTextColor(Color.parseColor("#9CA3AF"));
+        xAxis.setTextSize(10f);
         xAxis.setDrawGridLines(false);
+        xAxis.setGranularity(1f);
+        // Quantidade de labels visíveis proporcional ao período
+        int labelCount = pontos.size() <= 7 ? pontos.size() : pontos.size() <= 15 ? 5 : 6;
+        xAxis.setLabelCount(labelCount, true);
+        xAxis.setLabelRotationAngle(-35f);
 
         List<String> labels = new ArrayList<>();
         List<Entry> ret = new ArrayList<>(), dev = new ArrayList<>();
         for (int i = 0; i < pontos.size(); i++) {
             FluxoPonto p = pontos.get(i);
-            String d = p.data != null && p.data.length() >= 10 ? p.data.substring(5) : p.data;
-            labels.add(d != null ? d : "");
+            // Backend retorna "14. jan" — mostrar só o dia
+            String d = p.data != null ? p.data.split("\\.")[0].trim() : "";
+            labels.add(d);
             ret.add(new Entry(i, p.retiradas));
             dev.add(new Entry(i, p.devolucoes));
         }
         xAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
         chart.getAxisLeft().setTextColor(Color.parseColor("#9CA3AF"));
+        chart.getAxisLeft().setGridColor(Color.parseColor("#1F2937"));
         chart.getAxisRight().setEnabled(false);
 
-        int primaryColor = 0xFF2DD4BF; // Supervisor teal
+        int primaryColor = MaterialColors.getColor(binding.chartFluxo,
+                com.google.android.material.R.attr.colorPrimary, Color.WHITE);
 
+        // Retiradas — cor do perfil (teal para Supervisor)
         LineDataSet setRet = new LineDataSet(ret, "Retiradas");
-        setRet.setColor(primaryColor); setRet.setFillColor(primaryColor);
-        setRet.setDrawFilled(true); setRet.setFillAlpha(30); setRet.setLineWidth(2f);
-        setRet.setDrawCircles(false); setRet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        setRet.setColor(primaryColor);
+        setRet.setFillColor(primaryColor);
+        setRet.setDrawFilled(true);
+        setRet.setFillAlpha(45);
+        setRet.setLineWidth(2f);
+        setRet.setDrawCircles(false);
+        setRet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
         setRet.setValueTextColor(Color.TRANSPARENT);
 
+        // Devoluções — cinza #475569 (igual ao web)
         LineDataSet setDev = new LineDataSet(dev, "Devoluções");
-        setDev.setColor(0xFF22C55E); setDev.setFillColor(0xFF22C55E);
-        setDev.setDrawFilled(true); setDev.setFillAlpha(30); setDev.setLineWidth(2f);
-        setDev.setDrawCircles(false); setDev.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        setDev.setColor(0xFF475569);
+        setDev.setFillColor(0xFF475569);
+        setDev.setDrawFilled(true);
+        setDev.setFillAlpha(30);
+        setDev.setLineWidth(2f);
+        setDev.setDrawCircles(false);
+        setDev.setMode(LineDataSet.Mode.CUBIC_BEZIER);
         setDev.setValueTextColor(Color.TRANSPARENT);
 
         chart.setData(new LineData(setRet, setDev));
-        chart.animateX(600); chart.invalidate();
+        chart.animateX(600);
+        chart.invalidate();
     }
 
-    @Override public void onDestroyView() { super.onDestroyView(); binding = null; }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
 }

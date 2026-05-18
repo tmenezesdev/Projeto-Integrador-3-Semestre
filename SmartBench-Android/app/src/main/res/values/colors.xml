@@ -31,7 +31,27 @@
     <color name="atraso_alto">#F97316</color>
     <color name="atraso_critico">#EF4444</color>
 
-    <!-- Fundo / Surface (tema escuro) -->
+    <!-- Fundos do BottomNav por perfil (para colorSurfaceVariant) -->
+    <color name="supervisor_bg_nav">#080F1E</color>
+    <color name="mecanico_bg_nav">#130A00</color>
+
+    <!-- Fundos por perfil -->
+    <color name="admin_bg_primary">#0D0A1A</color>
+    <color name="admin_bg_secondary">#13102A</color>
+    <color name="admin_bg_card">#1A1730</color>
+    <color name="admin_bg_card_hover">#221E3A</color>
+
+    <color name="supervisor_bg_primary">#060D1F</color>
+    <color name="supervisor_bg_secondary">#0A1628</color>
+    <color name="supervisor_bg_card">#0F1D35</color>
+    <color name="supervisor_bg_card_hover">#162540</color>
+
+    <color name="mecanico_bg_primary">#0F0900</color>
+    <color name="mecanico_bg_secondary">#1A1000</color>
+    <color name="mecanico_bg_card">#1F1400</color>
+    <color name="mecanico_bg_card_hover">#2A1C00</color>
+
+    <!-- Fundo / Surface (tema escuro — fallback) -->
     <color name="bg_primary">#0D0A1A</color>
     <color name="bg_secondary">#13102A</color>
     <color name="bg_card">#1A1730</color>

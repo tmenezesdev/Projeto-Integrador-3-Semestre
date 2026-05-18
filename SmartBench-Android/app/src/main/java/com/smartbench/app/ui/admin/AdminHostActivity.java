@@ -10,28 +10,26 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.smartbench.app.R;
 import com.smartbench.app.data.local.SessionManager;
-import com.smartbench.app.databinding.ActivityHostBinding;
+import com.smartbench.app.databinding.ActivityAdminHostBinding;
 import com.smartbench.app.ui.auth.LoginActivity;
 
 public class AdminHostActivity extends AppCompatActivity {
 
-    private ActivityHostBinding binding;
+    private ActivityAdminHostBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityHostBinding.inflate(getLayoutInflater());
+        binding = ActivityAdminHostBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.navHostFragment);
 
-        if (navHostFragment != null) {
-            NavController navController = navHostFragment.getNavController();
-            navController.setGraph(R.navigation.nav_admin);
-            binding.bottomNavigationView.inflateMenu(R.menu.menu_admin_bottom_nav);
-            NavigationUI.setupWithNavController(binding.bottomNavigationView, navController);
-        }
+        if (navHostFragment == null) return;
+
+        NavController navController = navHostFragment.getNavController();
+        NavigationUI.setupWithNavController(binding.bottomNavigationView, navController);
     }
 
     public void logout() {

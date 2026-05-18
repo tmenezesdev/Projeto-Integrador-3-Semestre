@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_primary"
+    android:background="?attr/bgPrimary"
     android:orientation="vertical"
     android:padding="@dimen/margin_large">
 
@@ -15,48 +15,131 @@
         android:src="@drawable/ic_history"
         android:contentDescription="Voltar" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_large"
-        android:text="Recuperar senha"
-        android:textColor="@color/text_primary"
-        android:textSize="24sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="@dimen/margin_large"
-        android:text="Informe seu e-mail e enviaremos as instruções."
-        android:textColor="@color/text_secondary"
-        android:textSize="@dimen/text_body" />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tilEmail"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+    <!-- === PAINEL A: solicitar reset por e-mail === -->
+    <LinearLayout
+        android:id="@+id/panelEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/hint_email"
-        app:boxStrokeColor="?attr/colorPrimary"
-        app:hintTextColor="?attr/colorPrimary">
+        android:orientation="vertical">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etEmail"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            android:text="Recuperar senha"
+            android:textColor="@color/text_primary"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="@dimen/margin_large"
+            android:text="Informe seu e-mail e enviaremos as instruções."
+            android:textColor="@color/text_secondary"
+            android:textSize="@dimen/text_body" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilEmail"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textEmailAddress"
-            android:textColor="@color/text_primary" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:hint="@string/hint_email"
+            app:boxStrokeColor="?attr/colorPrimary"
+            app:hintTextColor="?attr/colorPrimary">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnEnviar"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress"
+                android:textColor="@color/text_primary" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnEnviar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            android:text="Enviar instruções"
+            android:textColor="@color/white"
+            app:cornerRadius="@dimen/button_corner_radius" />
+
+    </LinearLayout>
+
+    <!-- === PAINEL B: definir nova senha (acessado via deep link) === -->
+    <LinearLayout
+        android:id="@+id/panelNovaSenha"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_large"
-        android:text="Enviar instruções"
-        android:textColor="@color/white"
-        app:cornerRadius="@dimen/button_corner_radius" />
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            android:text="Nova senha"
+            android:textColor="@color/text_primary"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="@dimen/margin_large"
+            android:text="Crie uma senha com pelo menos 6 caracteres."
+            android:textColor="@color/text_secondary"
+            android:textSize="@dimen/text_body" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilNovaSenha"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nova senha"
+            app:boxStrokeColor="?attr/colorPrimary"
+            app:hintTextColor="?attr/colorPrimary"
+            app:endIconMode="password_toggle">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etNovaSenha"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:textColor="@color/text_primary" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilConfirmarSenha"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:hint="Confirmar nova senha"
+            app:boxStrokeColor="?attr/colorPrimary"
+            app:hintTextColor="?attr/colorPrimary"
+            app:endIconMode="password_toggle">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etConfirmarSenha"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:textColor="@color/text_primary" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnConfirmar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            android:text="Redefinir senha"
+            android:textColor="@color/white"
+            app:cornerRadius="@dimen/button_corner_radius" />
+
+    </LinearLayout>
 
 </LinearLayout>

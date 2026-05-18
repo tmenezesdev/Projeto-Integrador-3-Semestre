@@ -29,4 +29,9 @@
         android:name="com.smartbench.app.ui.mecanico.perfil.MecanicoPerfilFragment"
         android:label="Perfil" />
 
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="com.smartbench.app.ui.chat.ChatFragment"
+        android:label="Chat" />
+
 </navigation>

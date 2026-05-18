@@ -17,9 +17,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.smartbench.app.R;
 import com.smartbench.app.data.model.entity.Ferramenta;
+import com.smartbench.app.data.model.response.Resource;
 import com.smartbench.app.databinding.FragmentListSearchBinding;
-import com.smartbench.app.ui.common.adapters.FerramentasAdapter;
 import com.smartbench.app.ui.admin.ferramentas.dialogs.CriarEditarFerramentaBottomSheet;
+import com.smartbench.app.ui.common.adapters.FerramentasAdapter;
 
 public class AdminFerramentasFragment extends Fragment {
 
@@ -29,7 +30,8 @@ public class AdminFerramentasFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         binding = FragmentListSearchBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -47,7 +49,7 @@ public class AdminFerramentasFragment extends Fragment {
         adapter = new FerramentasAdapter(new FerramentasAdapter.OnItemAction() {
             @Override public void onEditar(Ferramenta f) { abrirEditar(f); }
             @Override public void onDeletar(Ferramenta f) { confirmarDelete(f); }
-            @Override public void onClick(Ferramenta f) { /* sem ação no Admin */ }
+            @Override public void onClick(Ferramenta f) {}
         }, true);
 
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -57,51 +59,45 @@ public class AdminFerramentasFragment extends Fragment {
 
         binding.etBusca.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int i, int i1, int i2) {}
-            @Override public void onTextChanged(CharSequence s, int i, int i1, int i2) { adapter.filter(s.toString()); }
+            @Override public void onTextChanged(CharSequence s, int i, int i1, int i2) {
+                adapter.filter(s.toString());
+            }
             @Override public void afterTextChanged(Editable s) {}
         });
 
-        observeViewModels();
-        viewModel.carregar();
-    }
-
-    private void observeViewModels() {
         viewModel.ferramentas.observe(getViewLifecycleOwner(), resource -> {
-            switch (resource.status) {
-                case LOADING: binding.progressBar.setVisibility(View.VISIBLE); break;
-                case SUCCESS:
-                    binding.progressBar.setVisibility(View.GONE);
-                    if (resource.data != null && !resource.data.isEmpty()) {
-                        adapter.setData(resource.data);
-                        binding.layoutVazio.setVisibility(View.GONE);
-                    } else {
-                        binding.layoutVazio.setVisibility(View.VISIBLE);
-                    }
-                    break;
-                case ERROR:
-                    binding.progressBar.setVisibility(View.GONE);
-                    Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show();
-                    break;
+            if (resource.status == Resource.Status.LOADING) {
+                binding.progressBar.setVisibility(View.VISIBLE);
+            } else if (resource.status == Resource.Status.SUCCESS) {
+                binding.progressBar.setVisibility(View.GONE);
+                boolean vazio = resource.data == null || resource.data.isEmpty();
+                binding.layoutVazio.setVisibility(vazio ? View.VISIBLE : View.GONE);
+                if (!vazio) adapter.setData(resource.data);
+            } else {
+                binding.progressBar.setVisibility(View.GONE);
+                Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show();
             }
         });
 
         viewModel.operacao.observe(getViewLifecycleOwner(), resource -> {
-            if (resource.status == com.smartbench.app.data.model.response.Resource.Status.SUCCESS) {
+            if (resource.status == Resource.Status.SUCCESS) {
                 Toast.makeText(requireContext(), "Operação realizada", Toast.LENGTH_SHORT).show();
                 viewModel.carregar();
-            } else if (resource.status == com.smartbench.app.data.model.response.Resource.Status.ERROR) {
+            } else if (resource.status == Resource.Status.ERROR) {
                 Toast.makeText(requireContext(), resource.message, Toast.LENGTH_LONG).show();
             }
         });
 
         viewModel.deletarResult.observe(getViewLifecycleOwner(), resource -> {
-            if (resource.status == com.smartbench.app.data.model.response.Resource.Status.SUCCESS) {
+            if (resource.status == Resource.Status.SUCCESS) {
                 Toast.makeText(requireContext(), "Ferramenta excluída", Toast.LENGTH_SHORT).show();
                 viewModel.carregar();
-            } else if (resource.status == com.smartbench.app.data.model.response.Resource.Status.ERROR) {
+            } else if (resource.status == Resource.Status.ERROR) {
                 Toast.makeText(requireContext(), resource.message, Toast.LENGTH_LONG).show();
             }
         });
+
+        viewModel.carregar();
     }
 
     private void abrirCriar() {
@@ -125,5 +121,9 @@ public class AdminFerramentasFragment extends Fragment {
                 .show();
     }
 
-    @Override public void onDestroyView() { super.onDestroyView(); binding = null; }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
 }

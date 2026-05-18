@@ -14,7 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.smartbench.app.data.model.entity.Alerta;
+import com.smartbench.app.data.model.response.Resource;
 import com.smartbench.app.databinding.FragmentListSearchBinding;
 import com.smartbench.app.ui.common.adapters.AlertasAdapter;
 
@@ -26,7 +26,8 @@ public class AdminAlertasFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         binding = FragmentListSearchBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -41,42 +42,46 @@ public class AdminAlertasFragment extends Fragment {
         binding.layoutPaginacao.setVisibility(View.GONE);
 
         adapter = new AlertasAdapter(alerta -> viewModel.resolver(alerta.id), true);
-
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.recyclerView.setAdapter(adapter);
 
         binding.etBusca.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int i, int i1, int i2) {}
-            @Override public void onTextChanged(CharSequence s, int i, int i1, int i2) { adapter.filter(s.toString()); }
+            @Override public void onTextChanged(CharSequence s, int i, int i1, int i2) {
+                adapter.filter(s.toString());
+            }
             @Override public void afterTextChanged(Editable s) {}
         });
 
         viewModel.alertas.observe(getViewLifecycleOwner(), resource -> {
-            switch (resource.status) {
-                case LOADING: binding.progressBar.setVisibility(View.VISIBLE); break;
-                case SUCCESS:
-                    binding.progressBar.setVisibility(View.GONE);
-                    if (resource.data != null && !resource.data.isEmpty()) {
-                        adapter.setData(resource.data);
-                        binding.layoutVazio.setVisibility(View.GONE);
-                    } else binding.layoutVazio.setVisibility(View.VISIBLE);
-                    break;
-                case ERROR:
-                    binding.progressBar.setVisibility(View.GONE);
-                    Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show();
-                    break;
+            if (resource.status == Resource.Status.LOADING) {
+                binding.progressBar.setVisibility(View.VISIBLE);
+            } else if (resource.status == Resource.Status.SUCCESS) {
+                binding.progressBar.setVisibility(View.GONE);
+                boolean vazio = resource.data == null || resource.data.isEmpty();
+                binding.layoutVazio.setVisibility(vazio ? View.VISIBLE : View.GONE);
+                if (!vazio) adapter.setData(resource.data);
+            } else {
+                binding.progressBar.setVisibility(View.GONE);
+                Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show();
             }
         });
 
         viewModel.resolverResult.observe(getViewLifecycleOwner(), resource -> {
-            if (resource.status == com.smartbench.app.data.model.response.Resource.Status.SUCCESS) {
+            if (resource.status == Resource.Status.SUCCESS) {
                 Toast.makeText(requireContext(), "Alerta resolvido", Toast.LENGTH_SHORT).show();
                 viewModel.carregar();
+            } else if (resource.status == Resource.Status.ERROR) {
+                Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show();
             }
         });
 
         viewModel.carregar();
     }
 
-    @Override public void onDestroyView() { super.onDestroyView(); binding = null; }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
 }

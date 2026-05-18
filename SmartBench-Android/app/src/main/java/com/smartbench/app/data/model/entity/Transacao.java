@@ -11,31 +11,46 @@ public class Transacao {
     @SerializedName("ferramenta_id")
     public int ferramentaId;
 
-    public String tipo;   // RETIRADA | DEVOLUCAO
-    public String metodo; // RFID_AUTOMATICO | MANUAL
+    // historico retorna "operacao"; outros endpoints retornam "tipo"
+    public String tipo;
+    public String operacao;
+
+    public String metodo;
     public String observacao;
 
-    @SerializedName("data_hora")
+    // historico retorna "dataHora"; outros retornam "data_hora"
+    @SerializedName("dataHora")
     public String dataHora;
 
-    // Campos de join (retornados pela API nos endpoints de histórico)
+    @SerializedName("data_hora")
+    public String dataHoraSnake;
+
+    public String getDataHora() {
+        return dataHora != null ? dataHora : dataHoraSnake;
+    }
+
+    public String getTipo() {
+        return operacao != null ? operacao : tipo;
+    }
+
+    // Campos de join
     public String ferramenta;
 
-    @SerializedName("tag_rfid")
+    @SerializedName("tagRfid")
     public String tagRfid;
 
     public String responsavel;
     public String cargo;
 
-    @SerializedName("hora_retirada")
+    @SerializedName("horaRetirada")
     public String horaRetirada;
 
-    @SerializedName("minutos_fora")
+    @SerializedName("minutosFora")
     public Long minutosFora;
 
-    @SerializedName("tempo_fora_label")
+    @SerializedName("tempoForaLabel")
     public String tempoForaLabel;
 
-    @SerializedName("status_alerta")
+    @SerializedName("statusAlerta")
     public String statusAlerta;
 }

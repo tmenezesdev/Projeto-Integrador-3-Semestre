@@ -32,7 +32,8 @@ function brevoRequest(payload) {
 
 export async function enviarEmailResetSenha(email, nome, token) {
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
-    const link = `${frontendUrl}/reset-senha?token=${token}`;
+    const webLink    = `${frontendUrl}/reset-senha?token=${token}`;
+    const appLink    = `smartbench://reset-senha?token=${token}`;
 
     await brevoRequest({
         sender: { name: 'SmartBench System', email: 'smartbench.sistema@gmail.com' },
@@ -52,9 +53,17 @@ export async function enviarEmailResetSenha(email, nome, token) {
       <h2 style="color:#fff;margin:0 0 12px;font-size:20px;">Olá, ${nome}!</h2>
       <p style="color:#94a3b8;line-height:1.7;margin:0 0 12px;">Recebemos uma solicitação para redefinir sua senha no <strong style="color:#a87fff;">SmartBench</strong>.</p>
       <p style="color:#94a3b8;line-height:1.7;margin:0 0 28px;">Este link expira em <strong style="color:#f59e0b;">1 hora</strong>.</p>
-      <div style="text-align:center;margin-bottom:28px;">
-        <a href="${link}" style="display:inline-block;background:#7033ff;color:#fff;text-decoration:none;padding:14px 36px;border-radius:10px;font-weight:700;font-size:15px;">Redefinir Senha</a>
+
+      <p style="color:#94a3b8;font-size:13px;margin:0 0 10px;text-align:center;">Usando o <strong style="color:#fff;">app Android</strong>? Toque aqui:</p>
+      <div style="text-align:center;margin-bottom:16px;">
+        <a href="${appLink}" style="display:inline-block;background:#7033ff;color:#fff;text-decoration:none;padding:14px 36px;border-radius:10px;font-weight:700;font-size:15px;">Abrir no App Android</a>
       </div>
+
+      <p style="color:#64748b;font-size:12px;margin:0 0 10px;text-align:center;">Usando o <strong style="color:#94a3b8;">navegador (computador/web)</strong>? Toque aqui:</p>
+      <div style="text-align:center;margin-bottom:28px;">
+        <a href="${webLink}" style="display:inline-block;background:rgba(112,51,255,0.25);color:#a87fff;text-decoration:none;padding:12px 28px;border-radius:10px;font-weight:600;font-size:14px;border:1px solid rgba(112,51,255,0.4);">Redefinir via Web</a>
+      </div>
+
       <hr style="border:none;border-top:1px solid rgba(112,51,255,0.15);margin:0 0 20px;">
       <p style="color:#334155;font-size:12px;text-align:center;margin:0;">© 2026 SmartBench System</p>
     </div>

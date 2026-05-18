@@ -19,9 +19,12 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.google.android.material.color.MaterialColors;
 import com.smartbench.app.R;
 import com.smartbench.app.data.model.entity.FluxoPonto;
+import com.smartbench.app.data.model.entity.Transacao;
 import com.smartbench.app.data.model.response.DashboardAdminResponse;
+import com.smartbench.app.data.model.response.Resource;
 import com.smartbench.app.databinding.FragmentAdminDashboardBinding;
 import com.smartbench.app.ui.common.adapters.TransacoesAdapter;
 
@@ -36,7 +39,8 @@ public class AdminDashboardFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         binding = FragmentAdminDashboardBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -44,22 +48,21 @@ public class AdminDashboardFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         viewModel = new ViewModelProvider(this).get(AdminDashboardViewModel.class);
 
-        setupRecyclerView();
+        setupAtividadeRecente();
         setupChipGroup();
         setupObservers();
         setupSwipeRefresh();
 
-        viewModel.carregarDashboard();
-        viewModel.carregarFluxo(7);
+        viewModel.carregarTudo(7);
     }
 
-    private void setupRecyclerView() {
+    private void setupAtividadeRecente() {
         atividadeAdapter = new TransacoesAdapter();
         binding.rvAtividadeRecente.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvAtividadeRecente.setAdapter(atividadeAdapter);
+        binding.rvAtividadeRecente.setNestedScrollingEnabled(false);
     }
 
     private void setupChipGroup() {
@@ -75,31 +78,36 @@ public class AdminDashboardFragment extends Fragment {
 
     private void setupObservers() {
         viewModel.dashboard.observe(getViewLifecycleOwner(), resource -> {
-            switch (resource.status) {
-                case LOADING:
-                    binding.swipeRefresh.setRefreshing(true);
-                    break;
-                case SUCCESS:
-                    binding.swipeRefresh.setRefreshing(false);
-                    populateDashboard(resource.data);
-                    break;
-                case ERROR:
-                    binding.swipeRefresh.setRefreshing(false);
-                    break;
+            if (resource.status == Resource.Status.LOADING) {
+                binding.swipeRefresh.setRefreshing(true);
+            } else if (resource.status == Resource.Status.SUCCESS) {
+                binding.swipeRefresh.setRefreshing(false);
+                populateDashboard(resource.data);
+            } else {
+                binding.swipeRefresh.setRefreshing(false);
             }
         });
 
         viewModel.fluxo.observe(getViewLifecycleOwner(), resource -> {
-            if (resource.status == com.smartbench.app.data.model.response.Resource.Status.SUCCESS && resource.data != null) {
+            if (resource.status == Resource.Status.SUCCESS && resource.data != null) {
                 setupChart(resource.data);
+            }
+        });
+
+        viewModel.atividadeRecente.observe(getViewLifecycleOwner(), resource -> {
+            if (resource.status == Resource.Status.SUCCESS && resource.data != null && !resource.data.isEmpty()) {
+                int limit = Math.min(resource.data.size(), 5);
+                atividadeAdapter.setData(resource.data.subList(0, limit));
             }
         });
     }
 
     private void setupSwipeRefresh() {
         binding.swipeRefresh.setOnRefreshListener(() -> {
-            viewModel.carregarDashboard();
-            viewModel.carregarFluxo(7);
+            int diasSelecionados = 7;
+            if (binding.chip15d.isChecked()) diasSelecionados = 15;
+            else if (binding.chip90d.isChecked()) diasSelecionados = 90;
+            viewModel.carregarTudo(diasSelecionados);
         });
     }
 
@@ -109,10 +117,6 @@ public class AdminDashboardFragment extends Fragment {
         binding.tvTotalUsuarios.setText(String.valueOf(data.totalUsuarios));
         binding.tvTransacoesHoje.setText(String.valueOf(data.transacoesHoje));
         binding.tvAlertasAtivos.setText(String.valueOf(data.alertasAtivos));
-
-        if (data.atividadeRecente != null) {
-            atividadeAdapter.setData(data.atividadeRecente);
-        }
     }
 
     private void setupChart(List<FluxoPonto> pontos) {
@@ -133,7 +137,6 @@ public class AdminDashboardFragment extends Fragment {
         xAxis.setDrawGridLines(false);
         xAxis.setGranularity(1f);
 
-        // Rótulos do eixo X (datas curtas)
         List<String> labels = new ArrayList<>();
         for (FluxoPonto p : pontos) {
             String d = p.data != null && p.data.length() >= 10 ? p.data.substring(5) : p.data;
@@ -147,7 +150,6 @@ public class AdminDashboardFragment extends Fragment {
         left.setGridColor(0x33FFFFFF);
         chart.getAxisRight().setEnabled(false);
 
-        // Datasets
         List<Entry> retiradas = new ArrayList<>();
         List<Entry> devolucoes = new ArrayList<>();
         for (int i = 0; i < pontos.size(); i++) {
@@ -155,7 +157,8 @@ public class AdminDashboardFragment extends Fragment {
             devolucoes.add(new Entry(i, pontos.get(i).devolucoes));
         }
 
-        int primaryColor = 0xFF7033FF; // Admin roxo
+        int primaryColor = MaterialColors.getColor(binding.chartFluxo,
+                com.google.android.material.R.attr.colorPrimary, Color.WHITE);
 
         LineDataSet setRet = new LineDataSet(retiradas, "Retiradas");
         setRet.setColor(primaryColor);

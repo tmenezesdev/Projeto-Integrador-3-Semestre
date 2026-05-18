@@ -46,4 +46,5 @@
         android:name="com.smartbench.app.ui.admin.configuracoes.AdminConfiguracoesFragment"
         android:label="Configurações" />
 
+
 </navigation>

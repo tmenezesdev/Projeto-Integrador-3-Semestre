@@ -1,6 +1,5 @@
 package com.smartbench.app.ui.admin.perfil;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +16,7 @@ import com.bumptech.glide.Glide;
 import com.smartbench.app.R;
 import com.smartbench.app.data.local.SessionManager;
 import com.smartbench.app.data.model.entity.Usuario;
+import com.smartbench.app.data.model.response.Resource;
 import com.smartbench.app.databinding.FragmentAdminPerfilBinding;
 import com.smartbench.app.ui.admin.AdminHostActivity;
 import com.smartbench.app.utils.DateUtils;
@@ -28,7 +28,8 @@ public class AdminPerfilFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         binding = FragmentAdminPerfilBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -38,9 +39,9 @@ public class AdminPerfilFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(this).get(AdminPerfilViewModel.class);
 
-        // Navegar para Histórico e Configurações
         binding.btnHistorico.setOnClickListener(v ->
                 Navigation.findNavController(v).navigate(R.id.action_perfil_to_historico));
+
         binding.btnConfiguracoes.setOnClickListener(v ->
                 Navigation.findNavController(v).navigate(R.id.action_perfil_to_configuracoes));
 
@@ -51,27 +52,32 @@ public class AdminPerfilFragment extends Fragment {
         });
 
         binding.btnAlterarSenha.setOnClickListener(v -> {
-            String atual = binding.etSenhaAtual.getText() != null ? binding.etSenhaAtual.getText().toString() : "";
-            String nova = binding.etNovaSenha.getText() != null ? binding.etNovaSenha.getText().toString() : "";
+            String atual = binding.etSenhaAtual.getText() != null
+                    ? binding.etSenhaAtual.getText().toString().trim() : "";
+            String nova = binding.etNovaSenha.getText() != null
+                    ? binding.etNovaSenha.getText().toString().trim() : "";
+
             if (atual.isEmpty() || nova.length() < 6) {
-                Toast.makeText(requireContext(), "Informe a senha atual e mínimo 6 caracteres para a nova", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(),
+                        "Informe a senha atual e mínimo 6 caracteres para a nova",
+                        Toast.LENGTH_SHORT).show();
                 return;
             }
             viewModel.alterarSenha(atual, nova);
         });
 
         viewModel.perfil.observe(getViewLifecycleOwner(), resource -> {
-            if (resource.status == com.smartbench.app.data.model.response.Resource.Status.SUCCESS && resource.data != null) {
+            if (resource.status == Resource.Status.SUCCESS && resource.data != null) {
                 populatePerfil(resource.data);
             }
         });
 
         viewModel.senhaResult.observe(getViewLifecycleOwner(), resource -> {
-            if (resource.status == com.smartbench.app.data.model.response.Resource.Status.SUCCESS) {
+            if (resource.status == Resource.Status.SUCCESS) {
                 Toast.makeText(requireContext(), "Senha alterada com sucesso!", Toast.LENGTH_SHORT).show();
                 binding.etSenhaAtual.setText("");
                 binding.etNovaSenha.setText("");
-            } else if (resource.status == com.smartbench.app.data.model.response.Resource.Status.ERROR) {
+            } else if (resource.status == Resource.Status.ERROR) {
                 Toast.makeText(requireContext(), resource.message, Toast.LENGTH_LONG).show();
             }
         });
@@ -85,7 +91,6 @@ public class AdminPerfilFragment extends Fragment {
         binding.tvPerfil.setText("Administrador");
         binding.tvMembro.setText("Membro desde: " + DateUtils.formatDateOnly(u.dataCriacao));
 
-        // Carregar foto se existir
         if (u.fotoUrl != null && !u.fotoUrl.isEmpty()) {
             Glide.with(this).load(u.fotoUrl).circleCrop().into(binding.ivAvatar);
         } else {
@@ -93,5 +98,9 @@ public class AdminPerfilFragment extends Fragment {
         }
     }
 
-    @Override public void onDestroyView() { super.onDestroyView(); binding = null; }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
 }

@@ -36,14 +36,26 @@ public class AuthRepository {
                     sessionManager.saveSession(loginResponse);
                     result.setValue(Resource.success(loginResponse));
                 } else {
-                    String msg = response.body() != null ? response.body().mensagem : "Credenciais inválidas";
+                    String msg = "Credenciais inválidas";
+                    if (response.body() != null && response.body().mensagem != null) {
+                        msg = response.body().mensagem;
+                    } else if (response.errorBody() != null) {
+                        try {
+                            String raw = response.errorBody().string();
+                            com.google.gson.JsonObject obj = com.google.gson.JsonParser.parseString(raw).getAsJsonObject();
+                            if (obj.has("mensagem")) msg = obj.get("mensagem").getAsString();
+                        } catch (Exception ignored) {}
+                    }
                     result.setValue(Resource.error(msg));
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse<LoginResponse>> call, Throwable t) {
-                result.setValue(Resource.error("Não foi possível conectar ao servidor"));
+                String msg = (t.getMessage() != null && t.getMessage().contains("timeout"))
+                        ? "Servidor demorando para responder. Tente novamente."
+                        : "Não foi possível conectar ao servidor";
+                result.setValue(Resource.error(msg));
             }
         });
     }

@@ -7,31 +7,38 @@ public class Ferramenta {
     public String nome;
 
     @SerializedName("tag_rfid")
-    public String tagRfid;
+    public String tagRfid;          // admin endpoints usam tag_rfid
+
+    @SerializedName("tagRfid")
+    public String tagRfidCamel;     // supervisor/ferramentas-fora usa tagRfid
 
     @SerializedName("peso_referencia")
     public Double pesoReferencia;
 
-    public String status; // DISPONIVEL | EM_USO | MANUTENCAO
+    public String status;
 
     @SerializedName("data_cadastro")
     public String dataCadastro;
 
-    // Campos de join retornados quando ferramenta está EM_USO
+    // Campos retornados por /ferramentas-fora e /minhas-retiradas
     public String responsavel;
     public String cargo;
 
-    @SerializedName("hora_retirada")
+    @SerializedName("horaRetirada")
     public String horaRetirada;
 
-    @SerializedName("minutos_fora")
+    @SerializedName("minutosFora")
     public Long minutosFora;
 
-    @SerializedName("tempo_fora_label")
+    @SerializedName("tempoForaLabel")
     public String tempoForaLabel;
 
-    @SerializedName("status_alerta")
+    @SerializedName("statusAlerta")
     public String statusAlerta;
+
+    public String getTagRfid() {
+        return tagRfid != null ? tagRfid : tagRfidCamel;
+    }
 
     public boolean isAtrasada() {
         return "ATRASADA".equals(statusAlerta);
@@ -40,7 +47,7 @@ public class Ferramenta {
     public String getNivelAtraso() {
         if (minutosFora == null) return null;
         if (minutosFora >= 1440) return "CRITICO";
-        if (minutosFora >= 480) return "ALTO";
+        if (minutosFora >= 480)  return "ALTO";
         return "MODERADO";
     }
 }

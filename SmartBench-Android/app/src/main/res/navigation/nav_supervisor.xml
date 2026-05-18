@@ -29,4 +29,18 @@
         android:name="com.smartbench.app.ui.supervisor.historico.SupervisorHistoricoFragment"
         android:label="Histórico" />
 
+    <fragment
+        android:id="@+id/supervisorPerfilFragment"
+        android:name="com.smartbench.app.ui.supervisor.perfil.SupervisorPerfilFragment"
+        android:label="Perfil">
+        <action
+            android:id="@+id/action_supervisor_perfil_to_historico"
+            app:destination="@id/supervisorHistoricoFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="com.smartbench.app.ui.chat.ChatFragment"
+        android:label="Chat" />
+
 </navigation>

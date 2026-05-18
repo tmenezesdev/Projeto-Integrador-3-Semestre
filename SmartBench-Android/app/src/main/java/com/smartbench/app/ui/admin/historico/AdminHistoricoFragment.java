@@ -15,23 +15,27 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.smartbench.app.data.model.entity.Transacao;
+import com.smartbench.app.data.model.response.Resource;
 import com.smartbench.app.databinding.FragmentListSearchBinding;
 import com.smartbench.app.ui.common.adapters.TransacoesAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AdminHistoricoFragment extends Fragment {
 
     private static final int PAGE_SIZE = 20;
+
     private FragmentListSearchBinding binding;
     private AdminHistoricoViewModel viewModel;
     private TransacoesAdapter adapter;
-    private List<Transacao> listaCompleta;
+    private List<Transacao> listaFiltrada = new ArrayList<>();
     private int paginaAtual = 0;
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         binding = FragmentListSearchBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -52,60 +56,91 @@ public class AdminHistoricoFragment extends Fragment {
         binding.etBusca.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int i, int i1, int i2) {}
             @Override public void onTextChanged(CharSequence s, int i, int i1, int i2) {
-                adapter.filter(s.toString());
-                paginaAtual = 0;
-                renderPagina();
+                filtrarEAtualizar(s.toString());
             }
             @Override public void afterTextChanged(Editable s) {}
         });
 
-        binding.btnAnterior.setOnClickListener(v -> { if (paginaAtual > 0) { paginaAtual--; renderPagina(); } });
+        binding.btnAnterior.setOnClickListener(v -> {
+            if (paginaAtual > 0) {
+                paginaAtual--;
+                renderPagina();
+            }
+        });
+
         binding.btnProximo.setOnClickListener(v -> {
-            if (listaCompleta != null && (paginaAtual + 1) * PAGE_SIZE < listaCompleta.size()) {
+            if ((paginaAtual + 1) * PAGE_SIZE < listaFiltrada.size()) {
                 paginaAtual++;
                 renderPagina();
             }
         });
 
         viewModel.historico.observe(getViewLifecycleOwner(), resource -> {
-            switch (resource.status) {
-                case LOADING: binding.progressBar.setVisibility(View.VISIBLE); break;
-                case SUCCESS:
-                    binding.progressBar.setVisibility(View.GONE);
-                    listaCompleta = resource.data;
-                    paginaAtual = 0;
-                    renderPagina();
-                    break;
-                case ERROR:
-                    binding.progressBar.setVisibility(View.GONE);
-                    Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show();
-                    break;
+            if (resource.status == Resource.Status.LOADING) {
+                binding.progressBar.setVisibility(View.VISIBLE);
+            } else if (resource.status == Resource.Status.SUCCESS) {
+                binding.progressBar.setVisibility(View.GONE);
+                listaFiltrada = resource.data != null ? new ArrayList<>(resource.data) : new ArrayList<>();
+                paginaAtual = 0;
+                renderPagina();
+            } else {
+                binding.progressBar.setVisibility(View.GONE);
+                Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show();
             }
         });
 
         viewModel.carregar();
     }
 
+    private void filtrarEAtualizar(String query) {
+        List<Transacao> full = viewModel.historico.getValue() != null
+                && viewModel.historico.getValue().data != null
+                ? viewModel.historico.getValue().data
+                : new ArrayList<>();
+
+        if (query == null || query.isEmpty()) {
+            listaFiltrada = new ArrayList<>(full);
+        } else {
+            String q = query.toLowerCase();
+            listaFiltrada = new ArrayList<>();
+            for (Transacao t : full) {
+                if ((t.ferramenta != null && t.ferramenta.toLowerCase().contains(q))
+                        || (t.responsavel != null && t.responsavel.toLowerCase().contains(q))
+                        || (t.tagRfid != null && t.tagRfid.toLowerCase().contains(q))) {
+                    listaFiltrada.add(t);
+                }
+            }
+        }
+        paginaAtual = 0;
+        renderPagina();
+    }
+
     private void renderPagina() {
-        if (listaCompleta == null || listaCompleta.isEmpty()) {
+        if (binding == null) return;
+
+        if (listaFiltrada.isEmpty()) {
             binding.layoutVazio.setVisibility(View.VISIBLE);
+            adapter.setData(new ArrayList<>());
+            binding.tvPagina.setText("Pág 0 / 0");
+            binding.btnAnterior.setEnabled(false);
+            binding.btnProximo.setEnabled(false);
             return;
         }
+
         binding.layoutVazio.setVisibility(View.GONE);
         int start = paginaAtual * PAGE_SIZE;
-        int end = Math.min(start + PAGE_SIZE, listaCompleta.size());
-        List<Transacao> pagina = listaCompleta.subList(start, end);
+        int end = Math.min(start + PAGE_SIZE, listaFiltrada.size());
+        adapter.setData(listaFiltrada.subList(start, end));
 
-        // Cria uma nova lista para o adapter mostrar apenas a página
-        TransacoesAdapter pageAdapter = new TransacoesAdapter();
-        pageAdapter.setData(pagina);
-        binding.recyclerView.setAdapter(pageAdapter);
-
-        int totalPaginas = (int) Math.ceil((double) listaCompleta.size() / PAGE_SIZE);
+        int totalPaginas = (int) Math.ceil((double) listaFiltrada.size() / PAGE_SIZE);
         binding.tvPagina.setText("Pág " + (paginaAtual + 1) + " / " + totalPaginas);
         binding.btnAnterior.setEnabled(paginaAtual > 0);
         binding.btnProximo.setEnabled(paginaAtual < totalPaginas - 1);
     }
 
-    @Override public void onDestroyView() { super.onDestroyView(); binding = null; }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
 }

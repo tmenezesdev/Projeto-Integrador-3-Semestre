@@ -9,7 +9,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/bg_primary"
+       
         android:clipToPadding="false"
         android:paddingBottom="80dp">
 
@@ -31,8 +31,8 @@
                 <com.google.android.material.card.MaterialCardView android:layout_width="0dp"
                     android:layout_height="@dimen/kpi_card_height" android:layout_weight="1"
                     android:layout_marginEnd="4dp"
-                    app:cardBackgroundColor="@color/bg_card" app:cardCornerRadius="@dimen/card_corner_radius"
-                    app:strokeColor="@color/border_default" app:strokeWidth="1dp">
+                    app:cardBackgroundColor="?attr/bgCard" app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:strokeColor="?attr/colorPrimary" app:strokeWidth="1dp">
                     <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
                         android:orientation="vertical" android:gravity="center" android:padding="@dimen/margin_small">
                         <TextView android:id="@+id/tvTotalFerramentas" android:layout_width="wrap_content"
@@ -46,8 +46,8 @@
                 <com.google.android.material.card.MaterialCardView android:layout_width="0dp"
                     android:layout_height="@dimen/kpi_card_height" android:layout_weight="1"
                     android:layout_marginStart="4dp"
-                    app:cardBackgroundColor="@color/bg_card" app:cardCornerRadius="@dimen/card_corner_radius"
-                    app:strokeColor="@color/border_default" app:strokeWidth="1dp">
+                    app:cardBackgroundColor="?attr/bgCard" app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:strokeColor="?attr/colorPrimary" app:strokeWidth="1dp">
                     <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
                         android:orientation="vertical" android:gravity="center" android:padding="@dimen/margin_small">
                         <TextView android:id="@+id/tvEmUso" android:layout_width="wrap_content"
@@ -66,8 +66,8 @@
                 <com.google.android.material.card.MaterialCardView android:layout_width="0dp"
                     android:layout_height="@dimen/kpi_card_height" android:layout_weight="1"
                     android:layout_marginEnd="4dp"
-                    app:cardBackgroundColor="@color/bg_card" app:cardCornerRadius="@dimen/card_corner_radius"
-                    app:strokeColor="@color/border_default" app:strokeWidth="1dp">
+                    app:cardBackgroundColor="?attr/bgCard" app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:strokeColor="?attr/colorPrimary" app:strokeWidth="1dp">
                     <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
                         android:orientation="vertical" android:gravity="center" android:padding="@dimen/margin_small">
                         <TextView android:id="@+id/tvAtrasadas" android:layout_width="wrap_content"
@@ -81,8 +81,8 @@
                 <com.google.android.material.card.MaterialCardView android:layout_width="0dp"
                     android:layout_height="@dimen/kpi_card_height" android:layout_weight="1"
                     android:layout_marginStart="4dp"
-                    app:cardBackgroundColor="@color/bg_card" app:cardCornerRadius="@dimen/card_corner_radius"
-                    app:strokeColor="@color/border_default" app:strokeWidth="1dp">
+                    app:cardBackgroundColor="?attr/bgCard" app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:strokeColor="?attr/colorPrimary" app:strokeWidth="1dp">
                     <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
                         android:orientation="vertical" android:gravity="center" android:padding="@dimen/margin_small">
                         <TextView android:id="@+id/tvAlertasAtivos" android:layout_width="wrap_content"
@@ -100,8 +100,8 @@
 
                 <com.google.android.material.card.MaterialCardView android:layout_width="0dp"
                     android:layout_height="@dimen/kpi_card_height" android:layout_weight="1" android:layout_marginEnd="4dp"
-                    app:cardBackgroundColor="@color/bg_card" app:cardCornerRadius="@dimen/card_corner_radius"
-                    app:strokeColor="@color/border_default" app:strokeWidth="1dp">
+                    app:cardBackgroundColor="?attr/bgCard" app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:strokeColor="?attr/colorPrimary" app:strokeWidth="1dp">
                     <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
                         android:orientation="vertical" android:gravity="center" android:padding="@dimen/margin_small">
                         <TextView android:id="@+id/tvTransacoesHoje" android:layout_width="wrap_content"
@@ -114,8 +114,8 @@
 
                 <com.google.android.material.card.MaterialCardView android:layout_width="0dp"
                     android:layout_height="@dimen/kpi_card_height" android:layout_weight="1" android:layout_marginStart="4dp"
-                    app:cardBackgroundColor="@color/bg_card" app:cardCornerRadius="@dimen/card_corner_radius"
-                    app:strokeColor="@color/border_default" app:strokeWidth="1dp">
+                    app:cardBackgroundColor="?attr/bgCard" app:cardCornerRadius="@dimen/card_corner_radius"
+                    app:strokeColor="?attr/colorPrimary" app:strokeWidth="1dp">
                     <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
                         android:orientation="vertical" android:gravity="center" android:padding="@dimen/margin_small">
                         <TextView android:id="@+id/tvMecanicosAtivos" android:layout_width="wrap_content"
@@ -130,8 +130,8 @@
             <!-- Taxa no Prazo -->
             <com.google.android.material.card.MaterialCardView android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:layout_marginBottom="@dimen/margin_medium"
-                app:cardBackgroundColor="@color/bg_card" app:cardCornerRadius="@dimen/card_corner_radius"
-                app:strokeColor="@color/border_default" app:strokeWidth="1dp">
+                app:cardBackgroundColor="?attr/bgCard" app:cardCornerRadius="@dimen/card_corner_radius"
+                app:strokeColor="?attr/colorPrimary" app:strokeWidth="1dp">
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:gravity="center" android:orientation="vertical" android:padding="@dimen/margin_medium">
                     <TextView android:id="@+id/tvTaxaPrazo"
@@ -146,8 +146,8 @@
             <!-- Gráfico -->
             <com.google.android.material.card.MaterialCardView android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:layout_marginBottom="@dimen/margin_medium"
-                app:cardBackgroundColor="@color/bg_card" app:cardCornerRadius="@dimen/card_corner_radius"
-                app:strokeColor="@color/border_default" app:strokeWidth="1dp">
+                app:cardBackgroundColor="?attr/bgCard" app:cardCornerRadius="@dimen/card_corner_radius"
+                app:strokeColor="?attr/colorPrimary" app:strokeWidth="1dp">
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:orientation="vertical" android:padding="@dimen/margin_medium">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
@@ -159,24 +159,24 @@
                         android:layout_marginBottom="@dimen/margin_small">
                         <com.google.android.material.chip.Chip android:id="@+id/chip7d"
                             style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" android:text="@string/periodo_7d" android:checked="true" />
+                            android:layout_height="wrap_content" android:text="@string/periodo_7d" />
                         <com.google.android.material.chip.Chip android:id="@+id/chip15d"
                             style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" android:text="@string/periodo_15d" />
+                            android:layout_height="wrap_content" android:text="@string/periodo_15d" android:checked="true" />
                         <com.google.android.material.chip.Chip android:id="@+id/chip90d"
                             style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content"
                             android:layout_height="wrap_content" android:text="@string/periodo_90d" />
                     </com.google.android.material.chip.ChipGroup>
                     <com.github.mikephil.charting.charts.LineChart android:id="@+id/chartFluxo"
-                        android:layout_width="match_parent" android:layout_height="200dp" />
+                        android:layout_width="match_parent" android:layout_height="240dp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Ferramentas Fora -->
             <com.google.android.material.card.MaterialCardView android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="@color/bg_card" app:cardCornerRadius="@dimen/card_corner_radius"
-                app:strokeColor="@color/border_default" app:strokeWidth="1dp">
+                app:cardBackgroundColor="?attr/bgCard" app:cardCornerRadius="@dimen/card_corner_radius"
+                app:strokeColor="?attr/colorPrimary" app:strokeWidth="1dp">
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:orientation="vertical" android:padding="@dimen/margin_medium">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"

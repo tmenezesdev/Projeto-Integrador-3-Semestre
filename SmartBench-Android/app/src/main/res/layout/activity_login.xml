@@ -1,133 +1,150 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/bg_primary"
-    android:fillViewport="true">
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <!-- Fundo animado: blobs, partículas, grid, raios -->
+    <com.smartbench.app.ui.auth.LoginBackgroundView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="@dimen/margin_large">
+        android:layout_height="match_parent" />
 
-        <!-- Logo / Ícone -->
-        <ImageView
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_marginBottom="@dimen/margin_medium"
-            android:src="@drawable/ic_build"
-            app:tint="?attr/colorPrimary" />
+    <!-- Conteúdo do login por cima do fundo -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/transparent"
+        android:fillViewport="true">
 
-        <!-- Título -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/login_title"
-            android:textColor="@color/text_primary"
-            android:textSize="32sp"
-            android:textStyle="bold"
-            android:letterSpacing="0.05" />
-
-        <!-- Subtítulo -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="@dimen/margin_xlarge"
-            android:text="@string/login_subtitle"
-            android:textColor="@color/text_secondary"
-            android:textSize="@dimen/text_body" />
-
-        <!-- Card de login -->
-        <com.google.android.material.card.MaterialCardView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="@color/bg_card"
-            app:cardCornerRadius="@dimen/card_corner_radius"
-            app:strokeColor="@color/border_default"
-            app:strokeWidth="1dp">
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="@dimen/margin_large">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <!-- Logo / Ícone -->
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_marginBottom="@dimen/margin_medium"
+                android:src="@drawable/ic_build"
+                app:tint="?attr/colorPrimary" />
+
+            <!-- Título -->
+            <TextView
+                android:id="@+id/tvTitulo"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="@dimen/margin_large">
+                android:text="@string/login_title"
+                android:textColor="@color/text_primary"
+                android:textSize="32sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.05" />
 
-                <!-- Campo Email -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilEmail"
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            <!-- Subtítulo -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="@dimen/margin_xlarge"
+                android:text="@string/login_subtitle"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_body" />
+
+            <!-- Card com borda rotatória -->
+            <com.smartbench.app.ui.auth.AnimatedBorderCard
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/hint_email"
-                    app:boxStrokeColor="?attr/colorPrimary"
-                    app:hintTextColor="?attr/colorPrimary">
+                    app:cardBackgroundColor="#EC0A0816"
+                    app:cardCornerRadius="14dp"
+                    app:strokeWidth="0dp">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etEmail"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="textEmailAddress"
-                        android:textColor="@color/text_primary" />
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:orientation="vertical"
+                        android:padding="@dimen/margin_large">
 
-                <!-- Campo Senha -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilSenha"
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/margin_medium"
-                    android:hint="@string/hint_password"
-                    app:boxStrokeColor="?attr/colorPrimary"
-                    app:endIconMode="password_toggle"
-                    app:hintTextColor="?attr/colorPrimary">
+                        <!-- Campo Email -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilEmail"
+                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/hint_email"
+                            app:boxStrokeColor="?attr/colorPrimary"
+                            app:hintTextColor="?attr/colorPrimary">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etSenha"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textPassword"
-                        android:textColor="@color/text_primary" />
-                </com.google.android.material.textfield.TextInputLayout>
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etEmail"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="textEmailAddress"
+                                android:textColor="@color/text_primary" />
+                        </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Link esqueceu senha -->
-                <TextView
-                    android:id="@+id/tvEsqueceuSenha"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/margin_small"
-                    android:layout_gravity="end"
-                    android:text="@string/link_forgot_password"
-                    android:textColor="?attr/colorPrimary"
-                    android:textSize="@dimen/text_small"
-                    android:clickable="true"
-                    android:focusable="true" />
+                        <!-- Campo Senha -->
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/tilSenha"
+                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            android:hint="@string/hint_password"
+                            app:boxStrokeColor="?attr/colorPrimary"
+                            app:endIconMode="password_toggle"
+                            app:hintTextColor="?attr/colorPrimary">
 
-                <!-- Botão Entrar -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnLogin"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/margin_large"
-                    android:text="@string/btn_login"
-                    android:textColor="@color/white"
-                    app:cornerRadius="@dimen/button_corner_radius" />
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etSenha"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="textPassword"
+                                android:textColor="@color/text_primary" />
+                        </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Progress bar (visível apenas durante o login) -->
-                <ProgressBar
-                    android:id="@+id/progressBar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="@dimen/margin_medium"
-                    android:visibility="gone" />
+                        <!-- Link esqueceu senha -->
+                        <TextView
+                            android:id="@+id/tvEsqueceuSenha"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_small"
+                            android:layout_gravity="end"
+                            android:text="@string/link_forgot_password"
+                            android:textColor="?attr/colorPrimary"
+                            android:textSize="@dimen/text_small"
+                            android:clickable="true"
+                            android:focusable="true" />
 
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+                        <!-- Botão Entrar -->
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnLogin"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin_large"
+                            android:text="@string/btn_login"
+                            android:textColor="@color/white"
+                            app:cornerRadius="@dimen/button_corner_radius" />
 
-    </LinearLayout>
-</ScrollView>
+                        <!-- Progress bar -->
+                        <ProgressBar
+                            android:id="@+id/progressBar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="@dimen/margin_medium"
+                            android:visibility="gone" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </com.smartbench.app.ui.auth.AnimatedBorderCard>
+
+        </LinearLayout>
+    </ScrollView>
+
+</FrameLayout>

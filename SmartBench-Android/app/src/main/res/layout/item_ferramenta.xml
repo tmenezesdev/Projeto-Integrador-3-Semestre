@@ -5,9 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="@dimen/margin_small"
-    app:cardBackgroundColor="@color/bg_card"
+    app:cardBackgroundColor="?attr/bgCard"
     app:cardCornerRadius="@dimen/card_corner_radius"
-    app:strokeColor="@color/border_default"
+    app:strokeColor="?attr/colorPrimary"
     app:strokeWidth="1dp">
 
     <LinearLayout

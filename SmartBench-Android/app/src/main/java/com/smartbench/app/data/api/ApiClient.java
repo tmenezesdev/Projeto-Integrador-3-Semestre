@@ -5,6 +5,7 @@ import android.content.Context;
 import com.smartbench.app.BuildConfig;
 import com.smartbench.app.data.local.SessionManager;
 
+import java.util.concurrent.TimeUnit;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -24,6 +25,9 @@ public class ApiClient {
                 : HttpLoggingInterceptor.Level.NONE);
 
         OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
                 .addInterceptor(new AuthInterceptor(sessionManager))
                 .authenticator(new TokenAuthenticator(context, sessionManager))
                 .addInterceptor(logging)

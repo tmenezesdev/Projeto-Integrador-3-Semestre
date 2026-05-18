@@ -80,7 +80,7 @@ public class FerramentasAdapter extends RecyclerView.Adapter<FerramentasAdapter.
 
         void bind(Ferramenta f) {
             b.tvNome.setText(f.nome != null ? f.nome : "--");
-            b.tvTag.setText(f.tagRfid != null ? f.tagRfid : "--");
+            b.tvTag.setText(f.getTagRfid() != null ? f.getTagRfid() : "--");
             b.tvPeso.setText(f.pesoReferencia != null ? f.pesoReferencia + " g" : "--");
 
             int cor = ColorUtils.getColorForStatus(f.status);

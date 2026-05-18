@@ -14,7 +14,7 @@ public class Alerta {
     public String mensagem;
 
     @SerializedName("status_alerta")
-    public String statusAlerta; // ATIVO | RESOLVIDO
+    public String statusAlerta;
 
     @SerializedName("data_geracao")
     public String dataGeracao;
@@ -22,7 +22,7 @@ public class Alerta {
     // Campos de join
     public String ferramenta;
 
-    @SerializedName("tag_rfid")
+    @SerializedName("tagRfid")
     public String tagRfid;
 
     public String responsavel;

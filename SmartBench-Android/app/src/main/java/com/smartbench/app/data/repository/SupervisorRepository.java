@@ -8,6 +8,8 @@ import com.smartbench.app.data.model.entity.Alerta;
 import com.smartbench.app.data.model.entity.Ferramenta;
 import com.smartbench.app.data.model.entity.FluxoPonto;
 import com.smartbench.app.data.model.entity.Transacao;
+import com.smartbench.app.data.model.entity.Usuario;
+import com.smartbench.app.data.model.request.AlterarSenhaRequest;
 import com.smartbench.app.data.model.request.CriarFuncionarioRequest;
 import com.smartbench.app.data.model.request.DevolucaoRequest;
 import com.smartbench.app.data.model.response.ApiResponse;
@@ -32,13 +34,13 @@ public class SupervisorRepository {
 
     public void getVisaoGeral(MutableLiveData<Resource<DashboardSupervisorResponse>> result) {
         result.setValue(Resource.loading());
-        api.getVisaoGeral().enqueue(new Callback<ApiResponse<DashboardSupervisorResponse>>() {
-            @Override public void onResponse(Call<ApiResponse<DashboardSupervisorResponse>> call, Response<ApiResponse<DashboardSupervisorResponse>> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().sucesso)
-                    result.setValue(Resource.success(response.body().dados));
+        api.getVisaoGeral().enqueue(new Callback<DashboardSupervisorResponse>() {
+            @Override public void onResponse(Call<DashboardSupervisorResponse> call, Response<DashboardSupervisorResponse> response) {
+                if (response.isSuccessful() && response.body() != null)
+                    result.setValue(Resource.success(response.body()));
                 else result.setValue(Resource.error("Erro ao carregar dados"));
             }
-            @Override public void onFailure(Call<ApiResponse<DashboardSupervisorResponse>> call, Throwable t) {
+            @Override public void onFailure(Call<DashboardSupervisorResponse> call, Throwable t) {
                 result.setValue(Resource.error("Sem conexão"));
             }
         });
@@ -46,13 +48,13 @@ public class SupervisorRepository {
 
     public void getFerramentasFora(MutableLiveData<Resource<List<Ferramenta>>> result) {
         result.setValue(Resource.loading());
-        api.getFerramentasFora().enqueue(new Callback<ApiResponse<List<Ferramenta>>>() {
-            @Override public void onResponse(Call<ApiResponse<List<Ferramenta>>> call, Response<ApiResponse<List<Ferramenta>>> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().sucesso)
-                    result.setValue(Resource.success(response.body().dados));
+        api.getFerramentasFora().enqueue(new Callback<List<Ferramenta>>() {
+            @Override public void onResponse(Call<List<Ferramenta>> call, Response<List<Ferramenta>> response) {
+                if (response.isSuccessful() && response.body() != null)
+                    result.setValue(Resource.success(response.body()));
                 else result.setValue(Resource.error("Erro ao carregar ferramentas"));
             }
-            @Override public void onFailure(Call<ApiResponse<List<Ferramenta>>> call, Throwable t) {
+            @Override public void onFailure(Call<List<Ferramenta>> call, Throwable t) {
                 result.setValue(Resource.error("Sem conexão"));
             }
         });
@@ -91,13 +93,13 @@ public class SupervisorRepository {
 
     public void getAlertas(MutableLiveData<Resource<List<Alerta>>> result) {
         result.setValue(Resource.loading());
-        api.getAlertasSupervisor().enqueue(new Callback<ApiResponse<List<Alerta>>>() {
-            @Override public void onResponse(Call<ApiResponse<List<Alerta>>> call, Response<ApiResponse<List<Alerta>>> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().sucesso)
-                    result.setValue(Resource.success(response.body().dados));
+        api.getAlertasSupervisor().enqueue(new Callback<List<Alerta>>() {
+            @Override public void onResponse(Call<List<Alerta>> call, Response<List<Alerta>> response) {
+                if (response.isSuccessful() && response.body() != null)
+                    result.setValue(Resource.success(response.body()));
                 else result.setValue(Resource.error("Erro ao carregar alertas"));
             }
-            @Override public void onFailure(Call<ApiResponse<List<Alerta>>> call, Throwable t) {
+            @Override public void onFailure(Call<List<Alerta>> call, Throwable t) {
                 result.setValue(Resource.error("Sem conexão"));
             }
         });
@@ -112,6 +114,37 @@ public class SupervisorRepository {
                 else result.setValue(Resource.error("Erro ao carregar gráfico"));
             }
             @Override public void onFailure(Call<ApiResponse<List<FluxoPonto>>> call, Throwable t) {
+                result.setValue(Resource.error("Sem conexão"));
+            }
+        });
+    }
+
+    public void getPerfil(MutableLiveData<Resource<Usuario>> result) {
+        result.setValue(Resource.loading());
+        api.getPerfilSupervisor().enqueue(new Callback<ApiResponse<Usuario>>() {
+            @Override public void onResponse(Call<ApiResponse<Usuario>> call, Response<ApiResponse<Usuario>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().sucesso)
+                    result.setValue(Resource.success(response.body().dados));
+                else result.setValue(Resource.error("Erro ao carregar perfil"));
+            }
+            @Override public void onFailure(Call<ApiResponse<Usuario>> call, Throwable t) {
+                result.setValue(Resource.error("Sem conexão"));
+            }
+        });
+    }
+
+    public void alterarSenha(AlterarSenhaRequest req, MutableLiveData<Resource<Void>> result) {
+        result.setValue(Resource.loading());
+        api.alterarSenhaSupervisor(req).enqueue(new Callback<ApiResponse<Void>>() {
+            @Override public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().sucesso)
+                    result.setValue(Resource.success(null));
+                else {
+                    String msg = response.body() != null ? response.body().mensagem : "Erro ao alterar senha";
+                    result.setValue(Resource.error(msg));
+                }
+            }
+            @Override public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
                 result.setValue(Resource.error("Sem conexão"));
             }
         });

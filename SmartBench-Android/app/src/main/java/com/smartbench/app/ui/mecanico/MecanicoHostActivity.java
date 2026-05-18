@@ -2,6 +2,7 @@ package com.smartbench.app.ui.mecanico;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
@@ -10,28 +11,43 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.smartbench.app.R;
 import com.smartbench.app.data.local.SessionManager;
-import com.smartbench.app.databinding.ActivityHostBinding;
+import com.smartbench.app.databinding.ActivityMecanicoHostBinding;
 import com.smartbench.app.ui.auth.LoginActivity;
 
 public class MecanicoHostActivity extends AppCompatActivity {
 
-    private ActivityHostBinding binding;
+    private ActivityMecanicoHostBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityHostBinding.inflate(getLayoutInflater());
+        binding = ActivityMecanicoHostBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.navHostFragment);
 
-        if (navHostFragment != null) {
-            NavController navController = navHostFragment.getNavController();
-            navController.setGraph(R.navigation.nav_mecanico);
-            binding.bottomNavigationView.inflateMenu(R.menu.menu_mecanico_bottom_nav);
-            NavigationUI.setupWithNavController(binding.bottomNavigationView, navController);
-        }
+        if (navHostFragment == null) return;
+
+        NavController navController = navHostFragment.getNavController();
+        NavigationUI.setupWithNavController(binding.bottomNavigationView, navController);
+
+        binding.fabChat.setOnClickListener(v -> {
+            if (navController.getCurrentDestination() != null
+                    && navController.getCurrentDestination().getId() != R.id.chatFragment) {
+                navController.navigate(R.id.chatFragment);
+            }
+        });
+
+        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+            if (destination.getId() == R.id.chatFragment) {
+                binding.fabChat.hide();
+                binding.bottomNavigationView.setVisibility(View.GONE);
+            } else {
+                binding.fabChat.show();
+                binding.bottomNavigationView.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     public void logout() {

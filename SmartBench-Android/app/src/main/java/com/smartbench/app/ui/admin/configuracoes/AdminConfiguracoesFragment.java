@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.smartbench.app.data.model.entity.ConfiguracaoSistema;
+import com.smartbench.app.data.model.response.Resource;
 import com.smartbench.app.databinding.FragmentAdminConfiguracoesBinding;
 
 public class AdminConfiguracoesFragment extends Fragment {
@@ -21,7 +22,8 @@ public class AdminConfiguracoesFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         binding = FragmentAdminConfiguracoesBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -32,7 +34,7 @@ public class AdminConfiguracoesFragment extends Fragment {
         viewModel = new ViewModelProvider(this).get(AdminConfiguracoesViewModel.class);
 
         viewModel.config.observe(getViewLifecycleOwner(), resource -> {
-            if (resource.status == com.smartbench.app.data.model.response.Resource.Status.SUCCESS && resource.data != null) {
+            if (resource.status == Resource.Status.SUCCESS && resource.data != null) {
                 ConfiguracaoSistema c = resource.data;
                 binding.etTempoLimite.setText(String.valueOf(c.tempoLimiteHoras));
                 binding.etTempoAviso.setText(String.valueOf(c.tempoAvisoMinutos));
@@ -42,20 +44,24 @@ public class AdminConfiguracoesFragment extends Fragment {
         });
 
         viewModel.salvarResult.observe(getViewLifecycleOwner(), resource -> {
-            if (resource.status == com.smartbench.app.data.model.response.Resource.Status.SUCCESS) {
+            if (resource.status == Resource.Status.SUCCESS) {
                 Toast.makeText(requireContext(), "Configurações salvas!", Toast.LENGTH_SHORT).show();
-            } else if (resource.status == com.smartbench.app.data.model.response.Resource.Status.ERROR) {
+            } else if (resource.status == Resource.Status.ERROR) {
                 Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show();
             }
         });
 
         binding.btnSalvar.setOnClickListener(v -> {
-            String limiteStr = binding.etTempoLimite.getText() != null ? binding.etTempoLimite.getText().toString() : "4";
-            String avisoStr = binding.etTempoAviso.getText() != null ? binding.etTempoAviso.getText().toString() : "30";
+            String limiteStr = binding.etTempoLimite.getText() != null
+                    ? binding.etTempoLimite.getText().toString() : "4";
+            String avisoStr = binding.etTempoAviso.getText() != null
+                    ? binding.etTempoAviso.getText().toString() : "30";
 
             ConfiguracaoSistema config = new ConfiguracaoSistema();
-            try { config.tempoLimiteHoras = Integer.parseInt(limiteStr); } catch (NumberFormatException e) { config.tempoLimiteHoras = 4; }
-            try { config.tempoAvisoMinutos = Integer.parseInt(avisoStr); } catch (NumberFormatException e) { config.tempoAvisoMinutos = 30; }
+            try { config.tempoLimiteHoras = Integer.parseInt(limiteStr); }
+            catch (NumberFormatException e) { config.tempoLimiteHoras = 4; }
+            try { config.tempoAvisoMinutos = Integer.parseInt(avisoStr); }
+            catch (NumberFormatException e) { config.tempoAvisoMinutos = 30; }
             config.modoManutencao = binding.switchManutencao.isChecked();
             config.chatAtivo = binding.switchChat.isChecked();
 
@@ -65,5 +71,9 @@ public class AdminConfiguracoesFragment extends Fragment {
         viewModel.carregar();
     }
 
-    @Override public void onDestroyView() { super.onDestroyView(); binding = null; }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
 }

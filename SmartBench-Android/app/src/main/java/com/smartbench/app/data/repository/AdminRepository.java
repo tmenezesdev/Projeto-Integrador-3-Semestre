@@ -33,13 +33,13 @@ public class AdminRepository {
 
     public void getDashboard(MutableLiveData<Resource<DashboardAdminResponse>> result) {
         result.setValue(Resource.loading());
-        api.getAdminDashboard().enqueue(new Callback<ApiResponse<DashboardAdminResponse>>() {
-            @Override public void onResponse(Call<ApiResponse<DashboardAdminResponse>> call, Response<ApiResponse<DashboardAdminResponse>> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().sucesso)
-                    result.setValue(Resource.success(response.body().dados));
+        api.getAdminDashboard().enqueue(new Callback<DashboardAdminResponse>() {
+            @Override public void onResponse(Call<DashboardAdminResponse> call, Response<DashboardAdminResponse> response) {
+                if (response.isSuccessful() && response.body() != null)
+                    result.setValue(Resource.success(response.body()));
                 else result.setValue(Resource.error("Erro ao carregar dashboard"));
             }
-            @Override public void onFailure(Call<ApiResponse<DashboardAdminResponse>> call, Throwable t) {
+            @Override public void onFailure(Call<DashboardAdminResponse> call, Throwable t) {
                 result.setValue(Resource.error("Sem conexão"));
             }
         });

@@ -30,8 +30,15 @@
 
         <activity
             android:name=".ui.auth.RedefinirSenhaActivity"
-            android:exported="false"
-            android:theme="@style/Theme.SmartBench.Base" />
+            android:exported="true"
+            android:theme="@style/Theme.SmartBench.Base">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="smartbench" android:host="reset-senha" />
+            </intent-filter>
+        </activity>
 
         <!-- Host Activities por perfil -->
         <activity
