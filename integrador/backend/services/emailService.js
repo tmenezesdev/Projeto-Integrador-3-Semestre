@@ -1,24 +1,13 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
-const transporter = nodemailer.createTransport({
-    host: 'smtp-relay.brevo.com',
-    port: 587,
-    secure: false,
-    auth: {
-        user: process.env.BREVO_USER,
-        pass: process.env.BREVO_PASS,
-    },
-    connectionTimeout: 10000,
-    greetingTimeout: 8000,
-    socketTimeout: 10000,
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function enviarEmailResetSenha(email, nome, token) {
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
     const link = `${frontendUrl}/reset-senha?token=${token}`;
 
-    await transporter.sendMail({
-        from: '"SmartBench System" <aba12d001@smtp-brevo.com>',
+    const { error } = await resend.emails.send({
+        from: 'SmartBench System <onboarding@resend.dev>',
         to: email,
         subject: 'Redefinição de Senha — SmartBench',
         html: `
@@ -70,4 +59,6 @@ export async function enviarEmailResetSenha(email, nome, token) {
 </body>
 </html>`,
     });
+
+    if (error) throw new Error(error.message);
 }
