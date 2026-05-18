@@ -1,24 +1,13 @@
-import nodemailer from 'nodemailer';
-import dotenv from 'dotenv';
-dotenv.config();
+import { Resend } from 'resend';
 
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false, // STARTTLS
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    },
-    tls: { rejectUnauthorized: false },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function enviarEmailResetSenha(email, nome, token) {
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
     const link = `${frontendUrl}/reset-senha?token=${token}`;
 
-    await transporter.sendMail({
-        from: `"SmartBench System" <${process.env.EMAIL_USER}>`,
+    await resend.emails.send({
+        from: 'SmartBench System <onboarding@resend.dev>',
         to: email,
         subject: 'Redefinição de Senha — SmartBench',
         html: `
