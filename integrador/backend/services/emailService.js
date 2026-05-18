@@ -3,15 +3,19 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false, // STARTTLS
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
     },
+    tls: { rejectUnauthorized: false },
 });
 
 export async function enviarEmailResetSenha(email, nome, token) {
-    const link = `http://localhost:3001/reset-senha?token=${token}`;
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
+    const link = `${frontendUrl}/reset-senha?token=${token}`;
 
     await transporter.sendMail({
         from: `"SmartBench System" <${process.env.EMAIL_USER}>`,
