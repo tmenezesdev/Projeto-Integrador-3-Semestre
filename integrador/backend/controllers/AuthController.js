@@ -528,7 +528,7 @@ class AuthController {
                 console.error('Falha ao enviar email de reset:', emailError.message);
                 return res.status(500).json({
                     sucesso: false,
-                    mensagem: 'Não foi possível enviar o e-mail. Verifique se EMAIL_USER e EMAIL_PASS estão configurados corretamente no servidor.',
+                    mensagem: `Erro ao enviar e-mail: ${emailError.message}`,
                 });
             }
 
