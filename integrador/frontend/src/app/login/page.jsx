@@ -1,7 +1,7 @@
 "use client";
 
 import { BASE_URL } from '@/lib/apiConfig';
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
@@ -32,6 +32,11 @@ export default function LoginPage() {
   const [isLoading, setIsLoading]   = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
   const [resetMsg, setResetMsg]         = useState({ tipo: '', texto: '' });
+
+  // Acorda o Railway em background enquanto o usuário vê a tela de login
+  useEffect(() => {
+    fetch(BASE_URL + '/health').catch(() => {});
+  }, []);
 
   const particles = useMemo(() => PARTICLES.map((p, i) => (
     <div key={i} className="particle absolute rounded-full pointer-events-none" style={{

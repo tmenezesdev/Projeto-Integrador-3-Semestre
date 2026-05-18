@@ -32,6 +32,9 @@ const __dirname = path.dirname(__filename);
 const PORT = process.env.PORT || 3000;
 
 
+// Health check — acorda o servidor sem tocar no banco
+app.get('/health', (req, res) => res.json({ ok: true }));
+
 app.use('/api/rfid', rfidRotas);
 
 // Middlewares globais
