@@ -115,63 +115,67 @@ export default function FerramentasForaPage() {
 
   if (isLoading) {
     return (
-      <div className="flex-1 p-8 bg-[#09090A] min-h-screen text-white font-sans">
-        <div className="flex items-start justify-between mb-10">
+      <main className="flex-1 p-4 sm:p-6 md:p-8 bg-[#09090A] min-h-screen text-white font-sans overflow-y-auto">
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6 md:mb-10">
           <div>
             <Sk className="h-3 w-32 mb-2" />
-            <div className="flex items-center gap-3">
-              <Wrench size={28} className="text-teal-400 opacity-30" strokeWidth={1.5} />
-              <h1 className="text-3xl font-bold text-white tracking-tight">Ferramentas Fora</h1>
+            <div className="flex items-center gap-2 md:gap-3">
+              <Wrench size={28} className="text-teal-400 opacity-30 flex-shrink-0" strokeWidth={1.5} />
+              <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Ferramentas Fora</h1>
             </div>
-            <Sk className="h-3 w-64 mt-2 ml-10" />
+            <Sk className="h-3 w-52 md:w-64 mt-2 ml-7 md:ml-10" />
           </div>
-          <Sk className="h-9 w-28 rounded-lg" />
+          <Sk className="h-9 w-28 rounded-lg flex-shrink-0" />
         </div>
-        <div className="grid grid-cols-3 gap-4 mb-10">
+
+        {/* CARDS - Responsivos */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mb-6 md:mb-10">
           {Array(3).fill(0).map((_, i) => (
-            <div key={i} className="bg-white/[0.03] border border-slate-700/30 rounded-xl p-5 flex flex-col gap-3">
-              <Sk className="h-3 w-24" />
-              <Sk className="h-10 w-14" />
+            <div key={i} className="bg-white/[0.03] border border-slate-700/30 rounded-lg md:rounded-xl p-3 md:p-5 flex flex-col gap-3">
+              <Sk className="h-3 w-20 md:w-24" />
+              <Sk className="h-8 md:h-10 w-12 md:w-14" />
             </div>
           ))}
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5">
+
+        {/* FERRAMENTAS - Grid Responsivo */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5">
           {Array(6).fill(0).map((_, i) => (
-            <div key={i} className="bg-[#0a1628] rounded-xl p-6 border border-slate-700/30">
-              <div className="flex justify-between items-start mb-5">
-                <div className="flex flex-col gap-1.5 flex-1 pr-4">
-                  <Sk className="h-5 w-40" />
-                  <Sk className="h-3 w-24" />
+            <div key={i} className="bg-[#0a1628] rounded-lg md:rounded-xl p-4 md:p-6 border border-slate-700/30">
+              <div className="flex justify-between items-start mb-4 md:mb-5">
+                <div className="flex flex-col gap-1.5 flex-1 pr-3 md:pr-4">
+                  <Sk className="h-4 md:h-5 w-32 md:w-40" />
+                  <Sk className="h-3 w-20 md:w-24" />
                 </div>
-                <Sk className="h-6 w-16 rounded flex-shrink-0" />
+                <Sk className="h-6 w-14 md:w-16 rounded flex-shrink-0" />
               </div>
-              <div className="space-y-2.5 mb-5">
-                <div className="flex items-center gap-3">
+              <div className="space-y-2 md:space-y-2.5 mb-4 md:mb-5">
+                <div className="flex items-center gap-2 md:gap-3">
                   <Sk className="w-4 h-4 rounded flex-shrink-0" />
-                  <Sk className="h-4 w-36" />
+                  <Sk className="h-4 w-28 md:w-36" />
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 md:gap-3">
                   <Sk className="w-4 h-4 rounded flex-shrink-0" />
-                  <Sk className="h-4 w-44" />
+                  <Sk className="h-4 w-32 md:w-44" />
                 </div>
               </div>
-              <div className="flex items-center justify-between pt-4 border-t border-slate-700/30">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 pt-4 md:pt-4 border-t border-slate-700/30">
                 <div className="flex flex-col gap-1">
-                  <Sk className="h-3 w-20" />
-                  <Sk className="h-7 w-20" />
+                  <Sk className="h-3 w-16 md:w-20" />
+                  <Sk className="h-6 md:h-7 w-16 md:w-20" />
                 </div>
-                <Sk className="h-9 w-24 rounded-lg" />
+                <Sk className="h-9 w-full md:w-24 rounded-lg" />
               </div>
             </div>
           ))}
         </div>
-      </div>
+      </main>
     );
   }
 
   if (erro) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#09090A]">
+      <main className="flex items-center justify-center min-h-screen bg-[#09090A] p-4">
         <div className="text-center">
           <AlertCircle className="text-red-400 w-10 h-10 mx-auto mb-3" />
           <p className="text-white font-semibold">Erro ao conectar ao servidor</p>
@@ -182,24 +186,25 @@ export default function FerramentasForaPage() {
             Tentar novamente
           </button>
         </div>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="flex-1 p-8 bg-[#09090A] min-h-screen text-white font-sans">
-      <div className="flex items-start justify-between mb-10">
-        <div>
+    <main className="flex-1 p-4 sm:p-6 md:p-8 bg-[#09090A] min-h-screen text-white font-sans overflow-y-auto">
+      {/* HEADER */}
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6 md:mb-10">
+        <div className="flex-1">
           <p className="text-xs font-bold text-teal-500 uppercase tracking-widest mb-1">
             Monitoramento
           </p>
-          <div className="flex items-center gap-3">
-            <Wrench size={28} className="text-teal-400" strokeWidth={1.5} />
-            <h1 className="text-3xl font-bold text-white tracking-tight">
+          <div className="flex items-center gap-2 md:gap-3">
+            <Wrench size={28} className="text-teal-400 flex-shrink-0" strokeWidth={1.5} />
+            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
               Ferramentas Fora
             </h1>
           </div>
-          <p className="text-sm text-slate-500 mt-1 ml-10">
+          <p className="text-xs md:text-sm text-slate-500 mt-1 ml-7 md:ml-10">
             Maquinário retirado da bancada em tempo real.
           </p>
         </div>
@@ -207,72 +212,76 @@ export default function FerramentasForaPage() {
         <button
           onClick={() => fetchFerramentas(true)}
           disabled={isRefreshing}
-          className="flex items-center gap-2 text-xs text-slate-400 hover:text-white border border-slate-700/50 px-3 py-2 rounded-lg hover:border-teal-500/30 transition-all cursor-pointer disabled:cursor-not-allowed"
+          className="flex items-center justify-center md:justify-start gap-2 text-xs text-slate-400 hover:text-white border border-slate-700/50 px-3 py-2 rounded-lg hover:border-teal-500/30 transition-all cursor-pointer disabled:cursor-not-allowed w-full md:w-auto flex-shrink-0"
         >
           <RefreshCw
             size={13}
             className={isRefreshing ? 'animate-spin' : ''}
           />
-          Atualizar
+          <span className="md:inline">Atualizar</span>
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mb-10">
-        <div className="bg-white/[0.03] border border-slate-700/30 rounded-xl p-5">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-widest mb-3">
+      {/* STATS CARDS - Responsivos */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mb-6 md:mb-10">
+        <div className="bg-white/[0.03] border border-slate-700/30 rounded-lg md:rounded-xl p-3 md:p-5">
+          <p className="text-[10px] md:text-xs text-slate-500 font-semibold uppercase tracking-widest mb-2 md:mb-3">
             Total Fora
           </p>
-          <p className="text-4xl font-bold text-white">{totalFora}</p>
+          <p className="text-3xl md:text-4xl font-bold text-white">{totalFora}</p>
         </div>
 
-        <div className="bg-teal-500/5 border border-teal-500/20 rounded-xl p-5">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-widest mb-3">
+        <div className="bg-teal-500/5 border border-teal-500/20 rounded-lg md:rounded-xl p-3 md:p-5">
+          <p className="text-[10px] md:text-xs text-slate-500 font-semibold uppercase tracking-widest mb-2 md:mb-3">
             Em Uso Regular
           </p>
-          <p className="text-4xl font-bold text-teal-400">{emUso}</p>
+          <p className="text-3xl md:text-4xl font-bold text-teal-400">{emUso}</p>
         </div>
 
-        <div className="bg-red-500/5 border border-red-500/20 rounded-xl p-5">
-          <p className="text-xs text-slate-500 font-semibold uppercase tracking-widest mb-3">
+        <div className="bg-red-500/5 border border-red-500/20 rounded-lg md:rounded-xl p-3 md:p-5">
+          <p className="text-[10px] md:text-xs text-slate-500 font-semibold uppercase tracking-widest mb-2 md:mb-3">
             Atrasadas
           </p>
-          <p className="text-4xl font-bold text-red-400">{atrasadas}</p>
+          <p className="text-3xl md:text-4xl font-bold text-red-400">{atrasadas}</p>
         </div>
       </div>
 
+      {/* LISTA VAZIA */}
       {ferramentasProcessadas.length === 0 ? (
-        <div className="bg-white/[0.02] border border-dashed border-slate-700/40 rounded-2xl p-20 text-center">
-          <CheckCircle2 className="w-14 h-14 text-emerald-500 mx-auto mb-4 opacity-40" />
-          <p className="text-slate-400 text-lg font-semibold">Bancada completa!</p>
-          <p className="text-slate-600 text-sm mt-1">
+        <div className="bg-white/[0.02] border border-dashed border-slate-700/40 rounded-lg md:rounded-2xl p-8 md:p-20 text-center">
+          <CheckCircle2 className="w-12 md:w-14 h-12 md:h-14 text-emerald-500 mx-auto mb-4 opacity-40" />
+          <p className="text-slate-400 text-base md:text-lg font-semibold">Bancada completa!</p>
+          <p className="text-slate-600 text-xs md:text-sm mt-1">
             Nenhuma ferramenta fora da bancada no momento.
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5">
+        /* CARDS DE FERRAMENTAS */
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5">
           {ferramentasProcessadas.map((f) => {
             const atrasada = f.statusCorrigido === 'ATRASADO';
 
             return (
               <div
                 key={f._uniqueKey}
-                className={`bg-[#0a1628] rounded-xl p-6 border transition-all duration-300 hover:shadow-lg ${atrasada
+                className={`bg-[#0a1628] rounded-lg md:rounded-xl p-4 md:p-6 border transition-all duration-300 hover:shadow-lg ${atrasada
                     ? 'border-red-500/20 hover:border-red-500/40'
                     : 'border-slate-700/30 hover:border-teal-500/30'
                   }`}
               >
-                <div className="flex justify-between items-start mb-5">
-                  <div className="pr-4">
-                    <h3 className="text-base font-semibold text-white leading-snug">
+                {/* NOME E STATUS */}
+                <div className="flex justify-between items-start gap-3 mb-4 md:mb-5">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm md:text-base font-semibold text-white leading-snug break-words">
                       {f.nome}
                     </h3>
-                    <p className="text-[11px] text-slate-500 font-mono tracking-wider mt-1">
+                    <p className="text-[10px] md:text-[11px] text-slate-500 font-mono tracking-wider mt-1 truncate">
                       {f.tagRfid}
                     </p>
                   </div>
 
                   <span
-                    className={`flex-shrink-0 px-2.5 py-1 rounded text-[10px] font-bold uppercase border ${atrasada
+                    className={`flex-shrink-0 px-2 md:px-2.5 py-1 rounded text-[9px] md:text-[10px] font-bold uppercase border ${atrasada
                         ? 'bg-red-500/10 text-red-400 border-red-500/20'
                         : 'bg-teal-500/10 text-teal-400 border-teal-500/20'
                       }`}
@@ -281,28 +290,29 @@ export default function FerramentasForaPage() {
                   </span>
                 </div>
 
-                <div className="space-y-2.5 mb-5">
-                  <div className="flex items-center gap-3">
+                {/* INFORMAÇÕES */}
+                <div className="space-y-2 md:space-y-2.5 mb-4 md:mb-5">
+                  <div className="flex items-start md:items-center gap-2 md:gap-3">
                     <User
-                      size={15}
-                      className={atrasada ? 'text-red-400' : 'text-teal-400'}
+                      size={14}
+                      className={`${atrasada ? 'text-red-400' : 'text-teal-400'} flex-shrink-0 mt-0.5 md:mt-0`}
                     />
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-slate-200">
+                    <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-2 min-w-0 flex-1">
+                      <span className="text-xs md:text-sm font-medium text-slate-200 truncate">
                         {f.responsavel}
                       </span>
-                      <span className="text-[9px] bg-white/5 border border-white/10 px-2 py-0.5 rounded text-slate-500 font-bold uppercase tracking-widest">
+                      <span className="text-[8px] md:text-[9px] bg-white/5 border border-white/10 px-2 py-0.5 rounded text-slate-500 font-bold uppercase tracking-widest w-fit">
                         {f.cargo}
                       </span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 md:gap-3">
                     <ShieldAlert
-                      size={15}
-                      className={atrasada ? 'text-red-400/60' : 'text-slate-600'}
+                      size={14}
+                      className={`${atrasada ? 'text-red-400/60' : 'text-slate-600'} flex-shrink-0`}
                     />
-                    <span className="text-xs text-slate-500">
+                    <span className="text-xs md:text-xs text-slate-500 break-words">
                       Retirada em{" "}
                       <span className="text-slate-300 font-medium">
                         {f.horaRetirada}
@@ -311,13 +321,14 @@ export default function FerramentasForaPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-4 border-t border-slate-700/30">
-                  <div>
-                    <div className="flex items-center gap-1.5 text-[10px] text-slate-600 font-semibold uppercase tracking-widest mb-1">
-                      <Clock size={11} /> Tempo fora
+                {/* FOOTER COM BOTÃO */}
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 pt-3 md:pt-4 border-t border-slate-700/30">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1 text-[9px] md:text-[10px] text-slate-600 font-semibold uppercase tracking-widest mb-1">
+                      <Clock size={10} /> Tempo fora
                     </div>
                     <span
-                      className={`text-2xl font-bold ${atrasada ? 'text-red-400' : 'text-teal-400'}`}
+                      className={`text-xl md:text-2xl font-bold block ${atrasada ? 'text-red-400' : 'text-teal-400'}`}
                     >
                       {f.tempoForaLabel || f.tempoFora}
                     </span>
@@ -325,10 +336,11 @@ export default function FerramentasForaPage() {
 
                   <button
                     onClick={() => abrirModal(f)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold border transition-all duration-200 bg-white/5 text-slate-400 border-slate-700/50 hover:bg-emerald-500/10 hover:text-emerald-400 hover:border-emerald-500/20 cursor-pointer"
+                    className="flex items-center justify-center gap-1 md:gap-2 w-full md:w-auto px-3 md:px-4 py-2 rounded-lg text-xs md:text-xs font-bold border transition-all duration-200 bg-white/5 text-slate-400 border-slate-700/50 hover:bg-emerald-500/10 hover:text-emerald-400 hover:border-emerald-500/20 cursor-pointer flex-shrink-0"
                   >
-                    <CheckCircle2 size={15} />
-                    Devolver
+                    <CheckCircle2 size={14} />
+                    <span className="hidden sm:inline">Devolver</span>
+                    <span className="sm:hidden">Dev</span>
                   </button>
                 </div>
               </div>
@@ -343,6 +355,6 @@ export default function FerramentasForaPage() {
         onConfirm={handleConfirmarDevolucao}
         ferramenta={ferramentaSelecionada}
       />
-    </div>
+    </main>
   );
 }

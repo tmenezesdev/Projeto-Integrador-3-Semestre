@@ -2,6 +2,7 @@
 
 import { LayoutDashboard, Users, Wrench, History, AlertOctagon, Settings, ShieldCheck } from 'lucide-react';
 import SidebarBase from '@/components/SidebarBase/sidebarbase';
+import { useState, useEffect } from 'react';
 
 const navItems = [
   { href: '/Admin/Dashboard',     label: 'Dashboard',     icon: LayoutDashboard, exact: true },
@@ -28,6 +29,22 @@ const theme = {
 };
 
 export default function SidebarAdmin() {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const isSmall = window.innerWidth < 1024;
+      setIsMobile(isSmall);
+      setIsCollapsed(isSmall);
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
   return (
     <SidebarBase
       navItems={navItems}
@@ -35,6 +52,8 @@ export default function SidebarAdmin() {
       role="Admin"
       LogoIcon={ShieldCheck}
       profileHref="/Admin/Perfil"
+      isCollapsed={isCollapsed}
+      setIsCollapsed={setIsCollapsed}
     />
   );
 }

@@ -13,7 +13,9 @@ import {
   Radio,
   LogOut,
   Menu,
-  X
+  X,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 
 export default function SidebarNav() {
@@ -26,11 +28,27 @@ export default function SidebarNav() {
   // =====================
 
   const [isOpen, setIsOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   
   // Estados para guardar os dados do usuário
   const [userName, setUserName] = useState("Carregando...");
   const [userRole, setUserRole] = useState("");
   const [userInitials, setUserInitials] = useState("--");
+
+  // Detectar tamanho da tela
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const isSmall = window.innerWidth < 1024;
+      setIsMobile(isSmall);
+      setIsCollapsed(isSmall);
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
 
   // useEffect roda apenas no navegador, buscando os dados salvos no login
   useEffect(() => {
@@ -79,6 +97,7 @@ export default function SidebarNav() {
 
   return (
     <>
+      {/* Botão flutuante - Mobile */}
       <button
         onClick={() => setIsOpen(true)}
         className="md:hidden fixed bottom-6 right-6 z-40 bg-[#7033ff] text-white p-3 rounded-full shadow-lg shadow-[#7033ff]/30 hover:bg-[#5a28cc] transition-transform active:scale-95"
@@ -87,6 +106,7 @@ export default function SidebarNav() {
         <Menu size={24} />
       </button>
 
+      {/* Overlay - Mobile */}
       {isOpen && (
         <div 
           className="md:hidden fixed inset-0 bg-black/60 z-40 backdrop-blur-sm transition-opacity"
@@ -94,40 +114,55 @@ export default function SidebarNav() {
         />
       )}
 
+      {/* Sidebar */}
       <aside 
         className={`
           fixed md:static top-0 left-0 z-50
-          w-[260px] h-screen bg-[#121212] border-r border-[#2a2a2a] 
+          h-screen bg-[#121212] border-r border-[#2a2a2a] 
           flex flex-col justify-between select-none font-['Inter',sans-serif]
-          transition-transform duration-300 ease-in-out
+          transition-all duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+          ${isCollapsed ? 'w-[80px] md:w-[80px]' : 'w-[260px] md:w-[260px]'}
         `}
       >
         <div>
-          <div className="flex items-center justify-between px-6 pt-8 pb-10">
-            <div className="flex items-center gap-3">
-              <div className="bg-[#7033ff] p-2 rounded-xl flex items-center justify-center shadow-lg shadow-[#7033ff]/20">
+          {/* Logo/Header */}
+          <div className={`flex items-center gap-3 px-6 pt-8 pb-10 border-b border-[#2a2a2a] justify-between ${isCollapsed ? 'px-4' : ''}`}>
+            <div className={`flex items-center gap-3 ${isCollapsed ? 'justify-center w-full' : ''}`}>
+              <div className="bg-[#7033ff] p-2 rounded-xl flex items-center justify-center shadow-lg shadow-[#7033ff]/20 flex-shrink-0">
                 <Radio className="text-white" size={24} />
               </div>
-              <div className="flex flex-col">
-                <h1 className="text-white text-xl font-bold tracking-tight leading-none m-0">
-                  SmartBench
-                </h1>
-                <p className="text-[#888888] text-[11px] font-medium uppercase tracking-wider mt-1.5 m-0">
-                  Sistema RFID
-                </p>
-              </div>
+              {!isCollapsed && (
+                <div className="flex flex-col">
+                  <h1 className="text-white text-xl font-bold tracking-tight leading-none m-0">
+                    SmartBench
+                  </h1>
+                  <p className="text-[#888888] text-[11px] font-medium uppercase tracking-wider mt-1.5 m-0">
+                    Sistema RFID
+                  </p>
+                </div>
+              )}
             </div>
 
+            {/* Close button - Mobile */}
             <button 
               className="md:hidden text-gray-500 hover:text-white p-1"
               onClick={() => setIsOpen(false)}
             >
               <X size={20} />
             </button>
+
+            {/* Toggle collapse - Desktop */}
+            <button
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="hidden md:flex items-center justify-center text-gray-500 hover:text-white p-1 transition-colors"
+            >
+              {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+            </button>
           </div>
 
-          <nav className="px-4">
+          {/* Nav */}
+          <nav className={`px-4 py-5 ${isCollapsed ? 'px-2' : ''}`}>
             <ul className="flex flex-col gap-1.5 list-none p-0 m-0">
               {navItems.map((item) => {
                 const Icon = item.icon;
@@ -138,14 +173,20 @@ export default function SidebarNav() {
                     <Link
                       href={item.href}
                       onClick={() => setIsOpen(false)}
-                      className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-[14px] font-medium transition-all duration-200 border-none cursor-pointer no-underline ${
+                      title={isCollapsed ? item.label : undefined}
+                      className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-[14px] font-medium transition-all duration-200 border-none cursor-pointer no-underline group relative ${
                         isActive
                           ? "bg-[#7033ff] text-white shadow-md shadow-segundaria/20"
                           : "bg-transparent text-[#a1a1aa] hover:bg-[#8b5cf6]/10 hover:text-[#8b5cf6]"
-                      }`}
+                      } ${isCollapsed ? 'justify-center px-0' : ''}`}
                     >
-                      <Icon size={18} strokeWidth={isActive ? 2.5 : 2} />
-                      {item.label}
+                      <Icon size={18} strokeWidth={isActive ? 2.5 : 2} className="flex-shrink-0" />
+                      {!isCollapsed && <span>{item.label}</span>}
+                      {isCollapsed && (
+                        <div className={`absolute left-full ml-3 px-2.5 py-1.5 text-white text-xs rounded-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 bg-[#1e1e1e] border border-[#7033ff]/20`}>
+                          {item.label}
+                        </div>
+                      )}
                     </Link>
                   </li>
                 );
@@ -154,24 +195,27 @@ export default function SidebarNav() {
           </nav>
         </div>
 
-        <div className="p-4 border-t border-[#2a2a2a]">
-          <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1e1e1e] transition-colors cursor-default">
-            <div className="h-10 w-10 min-w-[40px] rounded-full bg-[#7033ff]/10 border border-[#7033ff]/30 flex items-center justify-center text-[#7033ff] font-bold text-sm">
+        {/* User Section */}
+        <div className={`p-4 border-t border-[#2a2a2a] ${isCollapsed ? 'flex justify-center' : ''}`}>
+          <div className={`flex items-center gap-3 p-2 rounded-lg hover:bg-[#1e1e1e] transition-colors ${isCollapsed ? 'justify-center' : ''}`}>
+            <div className="h-10 w-10 min-w-[40px] rounded-full bg-[#7033ff]/10 border border-[#7033ff]/30 flex items-center justify-center text-[#7033ff] font-bold text-sm flex-shrink-0">
               {userInitials}
             </div>
 
-            <div className="flex flex-col flex-1 overflow-hidden">
-              <span className="text-sm font-semibold text-white truncate">
-                {userName}
-              </span>
-              <span className="text-[11px] text-gray-400 truncate">
-                {userRole}
-              </span>
-            </div>
+            {!isCollapsed && (
+              <div className="flex flex-col flex-1 overflow-hidden">
+                <span className="text-sm font-semibold text-white truncate">
+                  {userName}
+                </span>
+                <span className="text-[11px] text-gray-400 truncate">
+                  {userRole}
+                </span>
+              </div>
+            )}
 
             <button
               onClick={handleLogout}
-              className="text-gray-500 hover:text-red-400 hover:bg-red-500/10 p-2 rounded-md transition-all"
+              className={`text-gray-500 hover:text-red-400 hover:bg-red-500/10 p-2 rounded-md transition-all flex-shrink-0 ${isCollapsed ? '' : ''}`}
               title="Sair do sistema"
             >
               <LogOut size={18} />

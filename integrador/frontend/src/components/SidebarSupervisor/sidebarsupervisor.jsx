@@ -2,6 +2,7 @@
 
 import { LayoutDashboard, Wrench, History, AlertOctagon, UserPlus, ShieldCheck } from 'lucide-react';
 import SidebarBase from '@/components/SidebarBase/sidebarbase';
+import { useState, useEffect } from 'react';
 
 const navItems = [
   { href: '/Supervisor/VisaoGeral',       label: 'Visão Geral',      icon: LayoutDashboard, exact: true },
@@ -27,6 +28,26 @@ const theme = {
 };
 
 export default function SidebarSupervisor() {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    // Detectar tamanho inicial da tela
+    const checkScreenSize = () => {
+      const isSmall = window.innerWidth < 1024; // lg breakpoint do Tailwind
+      setIsMobile(isSmall);
+      setIsCollapsed(isSmall); // Contrai automaticamente em telas pequenas
+    };
+
+    // Verificar no mount
+    checkScreenSize();
+
+    // Listener para redimensionamento
+    window.addEventListener('resize', checkScreenSize);
+
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
   return (
     <SidebarBase
       navItems={navItems}
@@ -34,6 +55,8 @@ export default function SidebarSupervisor() {
       role="Supervisor"
       LogoIcon={ShieldCheck}
       profileHref="/Supervisor/Perfil"
+      isCollapsed={isCollapsed}
+      setIsCollapsed={setIsCollapsed}
     />
   );
 }
