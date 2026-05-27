@@ -1,39 +1,23 @@
-import { SerialPort, ReadlineParser } from 'serialport';
+import { SerialPort } from 'serialport';
+import { ReadlineParser } from '@serialport/parser-readline';
 
-// ATENÇÃO: Mude 'COM3' para a porta USB que o seu ESP32 usa!
-const PORTA_USB = 'COM3'; 
-const URL_BACKEND = 'http://localhost:3000/api/rfid';
+// Substitua 'COM3' pela porta real do seu ESP32
+const portaUSB = 'COM5'; 
 
-console.log(`🔌 Iniciando escuta na porta USB: ${PORTA_USB}...`);
-
-const port = new SerialPort({ path: PORTA_USB, baudRate: 115200 });
-const parser = port.pipe(new ReadlineParser({ delimiter: '\n' }));
-
-port.on('open', () => {
-  console.log('✅ Conexão Serial Aberta! Aguardando o crachá...');
+const port = new SerialPort({ 
+    path: portaUSB, 
+    baudRate: 9600 
 });
 
-parser.on('data', async (dados) => {
-  const linha = dados.toString().trim();
-  
-  // 👉 MODO RAIO-X: Mostra TUDO que chega do cabo, mesmo se for lixo ou erro
-  console.log(`[Cabo USB diz]: ${linha}`); 
-  
-  if (linha.startsWith('{') && linha.endsWith('}')) {
-    try {
-      const payload = JSON.parse(linha);
-      console.log('💳 Cartão lido pelo cabo:', payload.rfidTag);
+const parser = port.pipe(new ReadlineParser({ delimiter: '\r\n' }));
 
-      const res = await fetch(URL_BACKEND, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
+console.log(`🔌 Ponte USB iniciada! Escutando a porta ${portaUSB}...`);
 
-      if (res.ok) console.log('📤 Repassado para o Backend com sucesso!');
-      
-    } catch (error) {
-      console.error('Erro ao processar:', error);
-    }
-  }
+parser.on('data', (linha) => {
+    // Tudo o que o ESP32 imprimir no console vai aparecer aqui no Node.js
+    console.log(`[ESP32] ${linha}`);
+});
+
+port.on('error', (err) => {
+    console.log('❌ Erro na porta USB: ', err.message);
 });
