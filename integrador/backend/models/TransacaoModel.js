@@ -1,16 +1,17 @@
 import { getConnection } from '../config/database.js';
 
 class TransacaoModel {
-    static async registrar(usuario_id, ferramenta_id, tipo) {
+    static async registrar({ usuarioId, ferramentaId, tipo }) {
         const connection = await getConnection();
         try {
-            const [result] = await connection.execute(
-                'INSERT INTO transacoes (usuario_id, ferramenta_id, tipo, metodo) VALUES (?, ?, ?, ?)',
-                [usuario_id, ferramenta_id, tipo, 'RFID_AUTOMATICO']
-            );
+            const sql = `
+        INSERT INTO transacoes (usuario_id, ferramenta_id, tipo, metodo) 
+        VALUES (?, ?, ?, 'RFID_AUTOMATICO')
+      `;
+            const [result] = await connection.execute(sql, [usuarioId, ferramentaId, tipo]);
             return result.insertId;
         } catch (error) {
-            console.error('Erro ao registrar transação:', error);
+            console.error('Erro ao executar insert de transação:', error);
             throw error;
         } finally {
             connection.release();
