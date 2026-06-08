@@ -61,6 +61,22 @@ class UsuarioModel {
         }
     }
 
+    // Buscar usuário pela tag do crachá (usado pela ponte serial do IoT)
+    static async buscarPorCracha(tagCracha) {
+        const connection = await getConnection();
+        try {
+            const [rows] = await connection.execute(
+                'SELECT * FROM usuarios WHERE tag_cracha = ?', [tagCracha]
+            );
+            return rows[0] || null;
+        } catch (error) {
+            console.error('Erro ao buscar usuário por crachá:', error);
+            throw error;
+        } finally {
+            connection.release();
+        }
+    }
+
     // Criar novo usuário
     static async criar(dadosUsuario) {
         try {

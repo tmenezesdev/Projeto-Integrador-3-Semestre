@@ -1,97 +1,113 @@
-import { SerialPort } from 'serialport';
-import { ReadlineParser } from '@serialport/parser-readline';
+// =========================================================================
+// PONTE SERIAL — SMARTBENCH IOT
+// Lê os eventos do ESP32 (firmware em integrador/iot/firmware-esp32.js) pela
+// porta USB/serial e registra a transação correta (RETIRADA ou DEVOLUCAO)
+// no banco de dados. A trigger trg_atualiza_status_ferramenta cuida de
+// mudar o status da ferramenta (EM_USO / DISPONIVEL) automaticamente.
+//
+// O firmware envia, para cada movimentação confirmada por crachá, UMA linha
+// estruturada no formato:
+//   EVENTO {"tag":"RFID-FER-001","cracha":"AB-CD-12-34","tipo":"RETIRADA"}
+// =========================================================================
+
+import { SerialPort, ReadlineParser } from 'serialport';
 import FerramentaModel from './models/FerramentaModel.js';
 import UsuarioModel from './models/UsuarioModel.js';
 import TransacaoModel from './models/TransacaoModel.js';
 
-// Configuração da porta serial do Windows
-const PORTA_COM = 'COM3'; 
+// Porta e velocidade configuráveis pelo .env (default: COM3 a 9600 baud).
+// Em servidores sem hardware (deploy), defina IOT_SERIAL_ENABLED=false.
+const PORTA_COM = process.env.PORTA_SERIAL || 'COM3';
+const BAUD_RATE = Number(process.env.BAUD_SERIAL) || 9600;
+const SERIAL_HABILITADO = process.env.IOT_SERIAL_ENABLED !== 'false';
 
-const port = new SerialPort({ 
-  path: PORTA_COM, 
-  baudRate: 9600 
-});
+const PREFIXO_EVENTO = 'EVENTO ';
 
-const parser = port.pipe(new ReadlineParser({ delimiter: '\r\n' }));
+let port = null;
 
-// Dicionário de mapeamento: Traduz o texto do ESP32 para a tag_rfid do Banco de Dados
-const mapeamentoFerramentas = {
-  "Ferramenta 1 (Parafusadeira)": "RFID-FER-001", // Mapeado para o Torquímetro ou outra ferramenta do seed
-  "Ferramenta 2 (Chave de Impacto)": "RFID-FER-003" // Mapeado para a Chave de Impacto Pneumática
-};
+if (!SERIAL_HABILITADO) {
+  console.log('🔌 Ponte Serial desativada (IOT_SERIAL_ENABLED=false).');
+} else {
+  try {
+    port = new SerialPort({ path: PORTA_COM, baudRate: BAUD_RATE });
 
-// Variáveis temporárias para segurar o estado entre as linhas lidas do console
-let uuidCapturado = null;
+    const parser = port.pipe(new ReadlineParser({ delimiter: '\r\n' }));
+    parser.on('data', (linha) => processarLinha(linha));
 
-console.log(`🔌 Ponte Serial ativa. Monitorando a bancada na porta ${PORTA_COM}...`);
+    // Erros de conexão (porta ocupada / inexistente) não derrubam o backend.
+    port.on('error', (err) => {
+      console.error('❌ Erro na porta serial do IoT:', err.message);
+    });
 
-parser.on('data', async (linha) => {
-  const texto = linha.trim();
-  
-  // Exibe o log nativo do hardware no console do Node.js para monitoramento
+    console.log(`🔌 Ponte Serial ativa. Monitorando a bancada em ${PORTA_COM} (${BAUD_RATE} baud)...`);
+  } catch (err) {
+    console.error(`⚠️ Não foi possível abrir a porta serial ${PORTA_COM}: ${err.message}`);
+    console.error('   O backend continuará funcionando normalmente, mas sem o IoT.');
+  }
+}
+
+// -------------------------------------------------------------------------
+// Processamento das linhas recebidas do ESP32
+// -------------------------------------------------------------------------
+
+async function processarLinha(linha) {
+  const texto = (linha || '').trim();
+  if (!texto) return;
+
+  // Espelha o log do hardware no console do backend (útil para depurar)
   console.log(`[Hardware] ${texto}`);
 
-  // 1. Detecta a linha do Crachá Confirmado
-  if (texto.includes("CRACHÁ CONFIRMADO:")) {
-    uuidCapturado = texto.replace("CRACHÁ CONFIRMADO:", "").trim();
+  // Só as linhas estruturadas geram transação; o resto é log legível
+  if (!texto.startsWith(PREFIXO_EVENTO)) return;
+
+  let evento;
+  try {
+    evento = JSON.parse(texto.slice(PREFIXO_EVENTO.length));
+  } catch (err) {
+    console.error('⚠️ Linha EVENTO com JSON inválido:', texto);
+    return;
   }
 
-  // 2. Detecta a linha de Registro da Ferramenta vinculada
-  if (texto.includes("REGISTRO:") && texto.includes("vinculada ao funcionário!")) {
-    // Extrai o nome da ferramenta que está entre "REGISTRO: " e " vinculada..."
-    const nomeFerramentaHardware = texto
-      .replace("REGISTRO:", "")
-      .replace("vinculada ao funcionário!", "")
-      .trim();
+  await registrarEvento(evento);
+}
 
-    if (uuidCapturado && nomeFerramentaHardware) {
-      try {
-        console.log(`\n⚙️ Processando integração: Crachá [${uuidCapturado}] + [${nomeFerramentaHardware}]`);
-
-        // Traduz o nome do botão do hardware para a tag cadastrada no banco
-        const tagRfidBanco = mapeamentoFerramentas[nomeFerramentaHardware];
-        if (!tagRfidBanco) {
-          console.error(`⚠️ Erro: O nome '${nomeFerramentaHardware}' não está mapeado no dicionário.`);
-          return;
-        }
-
-        // Busca os IDs correspondentes no banco de dados
-        const ferramenta = await FerramentaModel.buscarPorTagRfid(tagRfidBanco);
-        const connection = await import('../config/database.js').then(m => m.getConnection());
-        
-        // Busca direta do usuário usando o mysql2
-        const [usuarios] = await connection.execute('SELECT * FROM usuarios WHERE tag_cracha = ?', [uuidCapturado]);
-        connection.release();
-        const usuario = usuarios[0] || null;
-
-        if (!ferramenta) {
-          console.error(`❌ Falha: Ferramenta com tag ${tagRfidBanco} não encontrada no banco.`);
-          return;
-        }
-        if (!usuario) {
-          console.error(`❌ Falha: Usuário com crachá ${uuidCapturado} não encontrado no banco.`);
-          return;
-        }
-
-        // Insere a movimentação como 'RETIRADA' (conforme a lógica do hardware)
-        await TransacaoModel.registrar({
-          usuarioId: usuario.id,
-          ferramentaId: ferramenta.id,
-          tipo: 'RETIRADA'
-        });
-
-        console.log(`✅ Banco de Dados Atualizado! ${ferramenta.nome} retirada por ${usuario.nome}.\n`);
-
-      } catch (erro) {
-        console.error('❌ Erro ao salvar transação no banco:', erro.message);
-      } finally {
-        // Limpa as variáveis para a próxima leitura
-        uuidCapturado = null;
-      }
+async function registrarEvento({ tag, cracha, tipo } = {}) {
+  try {
+    if (!tag || !cracha || !tipo) {
+      console.error('⚠️ Evento incompleto recebido do hardware:', { tag, cracha, tipo });
+      return;
     }
-  }
-});
 
-port.on('error', (err) => {
-  console.error('❌ Erro de conexão física na porta USB:', err.message);
-});
+    const tipoNormalizado = String(tipo).toUpperCase();
+    if (tipoNormalizado !== 'RETIRADA' && tipoNormalizado !== 'DEVOLUCAO') {
+      console.error(`⚠️ Tipo de evento desconhecido: "${tipo}"`);
+      return;
+    }
+
+    const ferramenta = await FerramentaModel.buscarPorTagRfid(tag);
+    if (!ferramenta) {
+      console.error(`❌ Ferramenta com tag "${tag}" não encontrada no banco.`);
+      return;
+    }
+
+    const usuario = await UsuarioModel.buscarPorCracha(cracha);
+    if (!usuario) {
+      console.error(`❌ Crachá não cadastrado: "${cracha}".`);
+      console.error('   Cadastre este UID na coluna usuarios.tag_cracha para vincular ao funcionário.');
+      return;
+    }
+
+    await TransacaoModel.registrar({
+      usuarioId: usuario.id,
+      ferramentaId: ferramenta.id,
+      tipo: tipoNormalizado
+    });
+
+    const verbo = tipoNormalizado === 'RETIRADA' ? 'retirada por' : 'devolvida por';
+    console.log(`✅ ${ferramenta.nome} ${verbo} ${usuario.nome}.\n`);
+  } catch (erro) {
+    console.error('❌ Erro ao salvar transação no banco:', erro.message);
+  }
+}
+
+export default port;
