@@ -16,8 +16,6 @@ import UsuarioModel from './models/UsuarioModel.js';
 import TransacaoModel from './models/TransacaoModel.js';
 import { setCartaoPendente } from './controllers/RfidController.js';
 
-// Porta e velocidade configuráveis pelo .env (default: COM3 a 9600 baud).
-// Em servidores sem hardware (deploy), defina IOT_SERIAL_ENABLED=false.
 const PORTA_COM = process.env.PORTA_SERIAL || 'COM3';
 const BAUD_RATE = Number(process.env.BAUD_SERIAL) || 9600;
 const SERIAL_HABILITADO = process.env.IOT_SERIAL_ENABLED !== 'false';
@@ -33,33 +31,34 @@ if (!SERIAL_HABILITADO) {
   try {
     port = new SerialPort({ path: PORTA_COM, baudRate: BAUD_RATE });
 
-    const parser = port.pipe(new ReadlineParser({ delimiter: '\r\n' }));
+    // Delimiter '\n' aceita tanto \n quanto \r\n (o trim em processarLinha
+    // remove o \r remanescente). Mais robusto que exigir os dois bytes juntos.
+    const parser = port.pipe(new ReadlineParser({ delimiter: '\n' }));
     parser.on('data', (linha) => processarLinha(linha));
+
+    // O log de "ativa" só sai quando a porta ABRE de fato. Antes ele saía
+    // mesmo com a porta negada (erro é assíncrono), dando falso positivo.
+    port.on('open', () => {
+      console.log(`🔌 Ponte Serial ativa. Monitorando a bancada em ${PORTA_COM} (${BAUD_RATE} baud)...`);
+    });
 
     // Erros de conexão (porta ocupada / inexistente) não derrubam o backend.
     port.on('error', (err) => {
       console.error('❌ Erro na porta serial do IoT:', err.message);
+      console.error('   Cadastro/movimentação por crachá ficará INDISPONÍVEL até liberar a porta.');
     });
-
-    console.log(`🔌 Ponte Serial ativa. Monitorando a bancada em ${PORTA_COM} (${BAUD_RATE} baud)...`);
   } catch (err) {
     console.error(`⚠️ Não foi possível abrir a porta serial ${PORTA_COM}: ${err.message}`);
     console.error('   O backend continuará funcionando normalmente, mas sem o IoT.');
   }
 }
 
-// -------------------------------------------------------------------------
-// Processamento das linhas recebidas do ESP32
-// -------------------------------------------------------------------------
-
 async function processarLinha(linha) {
   const texto = (linha || '').trim();
   if (!texto) return;
 
-  // Espelha o log do hardware no console do backend (útil para depurar)
   console.log(`[Hardware] ${texto}`);
 
-  // Crachá lido sem movimentação pendente → disponibiliza para cadastro de usuário
   if (texto.startsWith(PREFIXO_CRACHA)) {
     try {
       const { uid } = JSON.parse(texto.slice(PREFIXO_CRACHA.length));
@@ -73,7 +72,6 @@ async function processarLinha(linha) {
     return;
   }
 
-  // Só as linhas de evento geram transação; o resto é log legível
   if (!texto.startsWith(PREFIXO_EVENTO)) return;
 
   let evento;
