@@ -34,7 +34,10 @@ const PORT = process.env.PORT || 3000;
 
 
 // Middlewares globais
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: false,
+  crossOriginOpenerPolicy: false,
+}));
 
 app.use(cors({
     origin: '*',
