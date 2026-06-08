@@ -1,5 +1,9 @@
 let cartaoPendente = null;
 
+export function setCartaoPendente(tag) {
+  cartaoPendente = tag;
+}
+
 class RfidController {
   async receberTag(req, res) {
     try {

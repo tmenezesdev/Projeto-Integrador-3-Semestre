@@ -21,15 +21,11 @@
 
 // ----------------------------- CONFIGURAÇÃO ------------------------------
 
-// Mapeia cada botão (pino do ESP32) para a ferramenta cadastrada no banco.
-// O campo "tag" DEVE ser igual ao tag_rfid da tabela ferramentas.
 var FERRAMENTAS = [
   { pino: D13, tag: "RFID-FER-001", nome: "Torquimetro Digital 200Nm" },
   { pino: D14, tag: "RFID-FER-003", nome: "Chave de Impacto Pneumatica" }
 ];
 
-// Tempo (ms) que o sistema aguarda o crachá depois de mover a ferramenta.
-// Passado esse tempo sem leitura, o evento pendente é cancelado.
 var TIMEOUT_CONFIRMACAO_MS = 30000;
 
 // ------------------------------- LEITOR RFID -----------------------------
@@ -37,8 +33,6 @@ var TIMEOUT_CONFIRMACAO_MS = 30000;
 SPI2.setup();
 var nfc = require("MFRC522.js").connect(SPI2);
 
-// Evento aguardando confirmação por crachá:
-//   { tag, nome, tipo: "RETIRADA"|"DEVOLUCAO", criadoEm }
 var eventoPendente = null;
 
 // --------------------------------- BOTÕES --------------------------------
@@ -48,19 +42,17 @@ function definirPendente(ferramenta, tipo) {
     tag: ferramenta.tag,
     nome: ferramenta.nome,
     tipo: tipo,
-    criadoEm: getTime() // segundos
+    criadoEm: getTime()
   };
 }
 
 function configurarBotao(ferramenta) {
   setWatch(function (evento) {
     if (!evento.state) {
-      // Ferramenta saiu da bancada
       definirPendente(ferramenta, "RETIRADA");
       console.log("[ALERTA] " + ferramenta.nome + " foi retirada da bancada!");
       console.log(">> Aproxime o cracha no leitor para confirmar a RETIRADA...\n");
     } else {
-      // Ferramenta voltou para a bancada
       definirPendente(ferramenta, "DEVOLUCAO");
       console.log("[OK] " + ferramenta.nome + " recolocada na bancada.");
       console.log(">> Aproxime o cracha no leitor para confirmar a DEVOLUCAO...\n");
@@ -75,7 +67,6 @@ FERRAMENTAS.forEach(function (ferramenta) {
 
 // ------------------------------ LEITURA RFID -----------------------------
 
-// Normaliza o UID retornado pelo RC522 para uma string estável.
 function formatarCracha(uuid) {
   if (uuid && typeof uuid === "object" && uuid.join) {
     return uuid.join("-");
@@ -103,7 +94,6 @@ function confirmarComCracha(cracha) {
 }
 
 setInterval(function () {
-  // Expira evento pendente antigo (operador moveu a ferramenta e nao passou o cracha)
   if (eventoPendente &&
     (getTime() - eventoPendente.criadoEm) * 1000 > TIMEOUT_CONFIRMACAO_MS) {
     console.log("[INFO] Tempo esgotado para " + eventoPendente.nome +
@@ -119,8 +109,9 @@ setInterval(function () {
     if (eventoPendente) {
       confirmarComCracha(cracha);
     } else {
-      console.log("[AVISO] Cracha lido (" + cracha +
-        "), mas nenhuma ferramenta foi movimentada.\n");
+      // Linha consumida pela ponte-usb.js para cadastro de usuário.
+      console.log("CRACHA " + JSON.stringify({ uid: cracha }));
+      console.log("[INFO] Cracha lido (" + cracha + ") sem movimentacao pendente.\n");
     }
   });
 }, 500);

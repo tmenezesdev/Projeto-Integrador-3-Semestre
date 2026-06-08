@@ -14,6 +14,7 @@ import { SerialPort, ReadlineParser } from 'serialport';
 import FerramentaModel from './models/FerramentaModel.js';
 import UsuarioModel from './models/UsuarioModel.js';
 import TransacaoModel from './models/TransacaoModel.js';
+import { setCartaoPendente } from './controllers/RfidController.js';
 
 // Porta e velocidade configuráveis pelo .env (default: COM3 a 9600 baud).
 // Em servidores sem hardware (deploy), defina IOT_SERIAL_ENABLED=false.
@@ -22,6 +23,7 @@ const BAUD_RATE = Number(process.env.BAUD_SERIAL) || 9600;
 const SERIAL_HABILITADO = process.env.IOT_SERIAL_ENABLED !== 'false';
 
 const PREFIXO_EVENTO = 'EVENTO ';
+const PREFIXO_CRACHA = 'CRACHA ';
 
 let port = null;
 
@@ -57,7 +59,21 @@ async function processarLinha(linha) {
   // Espelha o log do hardware no console do backend (útil para depurar)
   console.log(`[Hardware] ${texto}`);
 
-  // Só as linhas estruturadas geram transação; o resto é log legível
+  // Crachá lido sem movimentação pendente → disponibiliza para cadastro de usuário
+  if (texto.startsWith(PREFIXO_CRACHA)) {
+    try {
+      const { uid } = JSON.parse(texto.slice(PREFIXO_CRACHA.length));
+      if (uid) {
+        setCartaoPendente(uid);
+        console.log(`🪪 Crachá disponível para cadastro: ${uid}`);
+      }
+    } catch {
+      console.error('⚠️ Linha CRACHA com JSON inválido:', texto);
+    }
+    return;
+  }
+
+  // Só as linhas de evento geram transação; o resto é log legível
   if (!texto.startsWith(PREFIXO_EVENTO)) return;
 
   let evento;
