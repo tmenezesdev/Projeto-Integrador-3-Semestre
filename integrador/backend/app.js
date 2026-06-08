@@ -33,23 +33,21 @@ const __dirname = path.dirname(__filename);
 const PORT = process.env.PORT || 3000;
 
 
-// Health check — acorda o servidor sem tocar no banco
-app.get('/health', (req, res) => res.json({ ok: true }));
-
-app.use('/api/rfid', rfidRotas);
-
 // Middlewares globais
-app.use(helmet()); // Segurança HTTP headers
+app.use(helmet());
 
-// Configurar CORS para permitir que rotas OPTIONS específicas sejam processadas
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    preflightContinue: false, // Deixa as rotas OPTIONS específicas serem processadas
-    optionsSuccessStatus: 200 // Retorna 200 para OPTIONS em vez de 204
+    preflightContinue: false,
+    optionsSuccessStatus: 200
 }));
 
+// Health check
+app.get('/health', (req, res) => res.json({ ok: true }));
+
+app.use('/api/rfid', rfidRotas);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
