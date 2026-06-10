@@ -54,20 +54,25 @@ if (!SERIAL_HABILITADO) {
 }
 
 async function processarLinha(linha) {
-  const texto = (linha || '').trim();
+  const texto = (linha || '').replace(/\x1b\[[0-9;]*[A-Za-z]/g, '').replace(/^[>\s]+/, '').replace(/[\r\n]/g, '').trim();
   if (!texto) return;
 
   console.log(`[Hardware] ${texto}`);
+  console.log('DEBUG texto hex:', Buffer.from(texto).toString('hex'));
+
 
   if (texto.startsWith(PREFIXO_CRACHA)) {
     try {
-      const { uid } = JSON.parse(texto.slice(PREFIXO_CRACHA.length));
+      const json = texto.slice(PREFIXO_CRACHA.length);
+      console.log('DEBUG cracha raw:', json);
+      const { uid } = JSON.parse(json);
+      console.log('DEBUG uid extraido:', uid);
       if (uid) {
         setCartaoPendente(uid);
         console.log(`🪪 Crachá disponível para cadastro: ${uid}`);
       }
-    } catch {
-      console.error('⚠️ Linha CRACHA com JSON inválido:', texto);
+    } catch (e) {
+      console.error('⚠️ Linha CRACHA com JSON inválido:', texto, e.message);
     }
     return;
   }

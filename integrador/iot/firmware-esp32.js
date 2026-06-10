@@ -26,18 +26,15 @@ function definirPendente(ferramenta, tipo) {
 }
 
 function configurarBotao(ferramenta) {
-  setWatch(function (evento) {
-    // input_pullup + GND no botão:
-    //   HIGH (true)  = botão solto  = ferramenta RETIRADA
-    //   LOW  (false) = botão pressionado = ferramenta DEVOLVIDA
-    if (evento.state) {
-      definirPendente(ferramenta, "RETIRADA");
-      console.log("[ALERTA] " + ferramenta.nome + " foi retirada da bancada!");
-      console.log(">> Aproxime o cracha no leitor para confirmar a RETIRADA...\n");
-    } else {
+  setWatch(function (e) {
+    if (e.state) {
       definirPendente(ferramenta, "DEVOLUCAO");
-      console.log("[OK] " + ferramenta.nome + " recolocada na bancada.");
-      console.log(">> Aproxime o cracha no leitor para confirmar a DEVOLUCAO...\n");
+      console.log("[OK] " + ferramenta.nome + " devolvida.");
+      console.log(">> Aproxime o cracha...\n");
+    } else {
+      definirPendente(ferramenta, "RETIRADA");
+      console.log("[ALERTA] " + ferramenta.nome + " retirada!");
+      console.log(">> Aproxime o cracha...\n");
     }
   }, ferramenta.pino, { repeat: true, edge: "both", debounce: 50 });
 }
