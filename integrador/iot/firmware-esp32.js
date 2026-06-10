@@ -1,25 +1,3 @@
-// =========================================================================
-// SMARTBENCH — FIRMWARE DO ESP32 (Espruino)
-// -------------------------------------------------------------------------
-// Hardware:
-//   - ESP32
-//   - Leitor RFID RC522 (SPI)
-//   - 1 Chave Push Button (6 pinos) por ferramenta, embaixo da ferramenta
-//
-// Lógica da bancada (almoxarifado):
-//   - Com a ferramenta na bancada, o peso dela mantém o botão pressionado.
-//   - Quando a ferramenta SAI da bancada  -> registra um evento RETIRADA pendente.
-//   - Quando a ferramenta VOLTA p/ bancada -> registra um evento DEVOLUCAO pendente.
-//   - Ao aproximar o crachá no RC522, o evento pendente é CONFIRMADO e enviado
-//     pela serial vinculado ao funcionário daquele crachá.
-//
-// Comunicação com o backend (ponte-usb.js):
-//   Para cada movimentação confirmada, é enviada UMA linha estruturada:
-//     EVENTO {"tag":"RFID-FER-001","cracha":"AB-CD-12-34","tipo":"RETIRADA"}
-//   As demais linhas são apenas logs legíveis para acompanhamento.
-// =========================================================================
-
-// ----------------------------- CONFIGURAÇÃO ------------------------------
 
 var FERRAMENTAS = [
   { pino: D13, tag: "RFID-FER-001", nome: "Torquimetro Digital 200Nm" },
@@ -28,11 +6,12 @@ var FERRAMENTAS = [
 
 var TIMEOUT_CONFIRMACAO_MS = 30000;
 
-// ------------------------------- LEITOR RFID -----------------------------
 
 SPI2.setup();
 var nfc = require("MFRC522.js").connect(SPI2);
 
+// Evento aguardando confirmação por crachá:
+//   { tag, nome, tipo: "RETIRADA"|"DEVOLUCAO", criadoEm }
 var eventoPendente = null;
 
 // --------------------------------- BOTÕES --------------------------------
@@ -42,13 +21,16 @@ function definirPendente(ferramenta, tipo) {
     tag: ferramenta.tag,
     nome: ferramenta.nome,
     tipo: tipo,
-    criadoEm: getTime()
+    criadoEm: getTime() // segundos
   };
 }
 
 function configurarBotao(ferramenta) {
   setWatch(function (evento) {
-    if (!evento.state) {
+    // input_pullup + GND no botão:
+    //   HIGH (true)  = botão solto  = ferramenta RETIRADA
+    //   LOW  (false) = botão pressionado = ferramenta DEVOLVIDA
+    if (evento.state) {
       definirPendente(ferramenta, "RETIRADA");
       console.log("[ALERTA] " + ferramenta.nome + " foi retirada da bancada!");
       console.log(">> Aproxime o cracha no leitor para confirmar a RETIRADA...\n");
@@ -67,6 +49,7 @@ FERRAMENTAS.forEach(function (ferramenta) {
 
 // ------------------------------ LEITURA RFID -----------------------------
 
+// Normaliza o UID retornado pelo RC522 para uma string estável.
 function formatarCracha(uuid) {
   if (uuid && typeof uuid === "object" && uuid.join) {
     return uuid.join("-");
@@ -94,6 +77,7 @@ function confirmarComCracha(cracha) {
 }
 
 setInterval(function () {
+  // Expira evento pendente antigo (operador moveu a ferramenta e nao passou o cracha)
   if (eventoPendente &&
     (getTime() - eventoPendente.criadoEm) * 1000 > TIMEOUT_CONFIRMACAO_MS) {
     console.log("[INFO] Tempo esgotado para " + eventoPendente.nome +

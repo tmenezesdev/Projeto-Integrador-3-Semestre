@@ -16,8 +16,8 @@ import UsuarioModel from './models/UsuarioModel.js';
 import TransacaoModel from './models/TransacaoModel.js';
 import { setCartaoPendente } from './controllers/RfidController.js';
 
-const PORTA_COM = process.env.PORTA_SERIAL || 'COM3';
-const BAUD_RATE = Number(process.env.BAUD_SERIAL) || 9600;
+const PORTA_COM = 'COM7';
+const BAUD_RATE = 115200;
 const SERIAL_HABILITADO = process.env.IOT_SERIAL_ENABLED !== 'false';
 
 const PREFIXO_EVENTO = 'EVENTO ';
