@@ -217,7 +217,9 @@ export default function AdminPerfil() {
       });
       const data = await res.json();
       if (!res.ok) return showToast(data.erro || 'Erro ao enviar foto.', 'erro');
-      setPerfil(p => ({ ...p, foto_filename: data.foto_filename }));
+      setPerfil(p => ({ ...p, foto_url: data.foto_url }));
+      const u = JSON.parse(localStorage.getItem('smartbench_user') || '{}');
+      localStorage.setItem('smartbench_user', JSON.stringify({ ...u, foto_url: data.foto_url }));
       showToast('Foto atualizada!');
     } catch { showToast('Erro de conexão.', 'erro'); }
     finally { setUploadingFoto(false); }
@@ -232,9 +234,7 @@ export default function AdminPerfil() {
   const loginTime = getLoginTime(getToken());
   const browser   = getBrowserInfo();
 
-  const fotoUrl = perfil?.foto_filename
-    ? `${BASE_URL}/uploads/imagens/${perfil.foto_filename}`
-    : null;
+  const fotoUrl = perfil?.foto_url || null;
 
   return (
     <div className="p-6 md:p-10 font-sans min-h-full bg-white dark:bg-[#0f0900]">

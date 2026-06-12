@@ -1,4 +1,4 @@
-import { create, read, update, deleteRecord, comparePassword, hashPassword, getConnection } from '../config/database.js';
+import { create, comparePassword, hashPassword, getConnection } from '../config/database.js';
 
 // Model para operações com usuários
 class UsuarioModel {
@@ -94,25 +94,43 @@ class UsuarioModel {
         }
     }
 
-    // Atualizar usuário
+    // Atualizar usuário (usa prepared statements — sem interpolar o id na SQL)
     static async atualizar(id, dadosUsuario) {
         try {
             // Se a senha foi fornecida, fazer hash
             if (dadosUsuario.senha) {
                 dadosUsuario.senha = await hashPassword(dadosUsuario.senha);
             }
-            
-            return await update('usuarios', dadosUsuario, `id = ${id}`);
+
+            const connection = await getConnection();
+            try {
+                const campos = Object.keys(dadosUsuario).map(k => `${k} = ?`).join(', ');
+                const valores = [...Object.values(dadosUsuario), id];
+                const [result] = await connection.execute(
+                    `UPDATE usuarios SET ${campos} WHERE id = ?`, valores
+                );
+                return result.affectedRows;
+            } finally {
+                connection.release();
+            }
         } catch (error) {
             console.error('Erro ao atualizar usuário:', error);
             throw error;
         }
     }
 
-    // Excluir usuário
+    // Excluir usuário (usa prepared statements — sem interpolar o id na SQL)
     static async excluir(id) {
         try {
-            return await deleteRecord('usuarios', `id = ${id}`);
+            const connection = await getConnection();
+            try {
+                const [result] = await connection.execute(
+                    'DELETE FROM usuarios WHERE id = ?', [id]
+                );
+                return result.affectedRows;
+            } finally {
+                connection.release();
+            }
         } catch (error) {
             console.error('Erro ao excluir usuário:', error);
             throw error;

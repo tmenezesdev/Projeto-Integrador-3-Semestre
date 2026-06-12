@@ -1,11 +1,12 @@
 import express from 'express';
 import MecanicoController from '../controllers/MecanicoController.js';
-import { authMiddleware } from '../middlewares/authMiddleware.js';
+import { authMiddleware, mecanicoMiddleware } from '../middlewares/authMiddleware.js';
 import { uploadImagens, handleUploadError } from '../middlewares/uploadMiddleware.js';
 
 const router = express.Router();
 
 router.use(authMiddleware);
+router.use(mecanicoMiddleware);
 
 router.get('/perfil',       MecanicoController.obterPerfil);
 router.put('/perfil',       MecanicoController.atualizarPerfil);

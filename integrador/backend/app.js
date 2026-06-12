@@ -7,10 +7,7 @@ import { fileURLToPath } from 'url';
 
 // Importar rotas
 import './ponte-usb.js';
-import produtoRotas from './routes/produtoRotas.js';
 import authRotas from './routes/authRotas.js';
-import criptografiaRotas from './routes/criptografiaRotas.js';
-import usuarioRotas from './routes/usuarioRotas.js';
 import supervisorRotas from './routes/supervisorRotas.js';
 import adminRotas from './routes/adminRotas.js';
 import mecanicoRotas from './routes/mecanicoRotas.js';
@@ -39,8 +36,14 @@ app.use(helmet({
   crossOriginOpenerPolicy: false,
 }));
 
+// Origem do CORS configurável por env (CORS_ORIGIN). Padrão '*' para manter o
+// comportamento atual (API consumida por web + app mobile via Bearer token).
+const corsOrigin = process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
+    : '*';
+
 app.use(cors({
-    origin: '*',
+    origin: corsOrigin,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     preflightContinue: false,
@@ -60,14 +63,11 @@ app.use('/uploads', (req, res, next) => {
   next();
 }, express.static(path.join(__dirname, 'uploads')));
 
-// Middleware para log de requisições (salva no banco de dados)
+// Middleware para log de requisições
 app.use(logMiddleware);
 
 // Rotas da API
 app.use('/api/auth', authRotas);
-app.use('/api/produtos', produtoRotas);
-app.use('/api/criptografia', criptografiaRotas);
-app.use('/api/usuarios', usuarioRotas);
 app.use('/api/supervisor', supervisorRotas);
 app.use('/api/admin', adminRotas);
 app.use('/api/mecanico', mecanicoRotas);
@@ -77,24 +77,21 @@ app.use('/api/chat', chatRotas);
 app.get('/', (req, res) => {
     res.json({
         sucesso: true,
-        mensagem: 'API de Produtos - Sistema de Gestão',
+        mensagem: 'SmartBench API - Sistema de Gestão de Ferramentas',
         versao: '1.0.0',
         rotas: {
             autenticacao: '/api/auth',
-            produtos: '/api/produtos',
-            criptografia: '/api/criptografia'
+            admin: '/api/admin',
+            supervisor: '/api/supervisor',
+            mecanico: '/api/mecanico',
+            chat: '/api/chat',
+            rfid: '/api/rfid'
         },
         documentacao: {
             login: 'POST /api/auth/login',
-            registrar: 'POST /api/auth/registrar',
             perfil: 'GET /api/auth/perfil',
-            listarProdutos: 'GET /api/produtos',
-            buscarProduto: 'GET /api/produtos/:id',
-            criarProduto: 'POST /api/produtos',
-            atualizarProduto: 'PUT /api/produtos/:id',
-            excluirProduto: 'DELETE /api/produtos/:id',
-            infoCriptografia: 'GET /api/criptografia/info',
-            cadastrarUsuario: 'POST /api/criptografia/cadastrar-usuario'
+            esqueceuSenha: 'POST /api/auth/esqueceu-senha',
+            redefinirSenha: 'POST /api/auth/redefinir-senha'
         }
     });
 });
@@ -115,7 +112,7 @@ app.use(errorMiddleware);
 app.listen(PORT, () => {
     console.log(`🚀 Servidor rodando na porta ${PORT}`);
     console.log(`📱 Acesse: http://localhost:${PORT}`);
-    console.log(`📚 API de Produtos - Sistema de Gestão`);
+    console.log(`📚 SmartBench API - Sistema de Gestão de Ferramentas`);
     console.log(`🔧 Ambiente: ${process.env.NODE_ENV || 'development'}`);
 });
 

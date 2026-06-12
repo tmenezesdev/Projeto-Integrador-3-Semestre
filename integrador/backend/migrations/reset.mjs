@@ -7,7 +7,7 @@ import readline from 'readline';
 const __filename = fileURLToPath(import.meta.url); // ✅ Define __filename primeiro
 const __dirname = path.dirname(__filename); // ✅ Depois define __dirname
 
-dotenv.config({ path: path.resolve(__dirname, '../../.env') }); // ✅ Só uma chamada!
+dotenv.config({ path: path.resolve(__dirname, '../.env') }); // carrega backend/.env
 
 const config = {
     host:     process.env.DB_HOST,

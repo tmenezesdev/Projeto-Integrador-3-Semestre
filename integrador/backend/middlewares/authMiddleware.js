@@ -58,16 +58,25 @@ const authMiddleware = (req, res, next) => {
     }
 };
 
-// Middleware para verificar se o usuário é administrador
-const adminMiddleware = (req, res, next) => {
-    if (req.usuario.tipo_perfil !== 'ADMIN') {
+// Gera um middleware que só deixa passar os perfis informados
+const exigirPerfil = (...perfisPermitidos) => (req, res, next) => {
+    if (!req.usuario || !perfisPermitidos.includes(req.usuario.tipo_perfil)) {
         return res.status(403).json({
             erro: 'Acesso negado',
-            mensagem: 'Apenas administradores podem acessar este recurso'
+            mensagem: 'Você não tem permissão para acessar este recurso'
         });
     }
     next();
 };
 
-export { authMiddleware, adminMiddleware };
+// Middleware para verificar se o usuário é administrador
+const adminMiddleware = exigirPerfil('ADMIN');
+
+// Supervisor e Admin podem acessar recursos de supervisão
+const supervisorMiddleware = exigirPerfil('SUPERVISOR', 'ADMIN');
+
+// Mecânico, Supervisor e Admin podem acessar recursos de mecânico
+const mecanicoMiddleware = exigirPerfil('MECANICO', 'SUPERVISOR', 'ADMIN');
+
+export { authMiddleware, adminMiddleware, supervisorMiddleware, mecanicoMiddleware, exigirPerfil };
 

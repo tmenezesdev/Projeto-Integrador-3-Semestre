@@ -1,10 +1,11 @@
 import express from 'express';
 import SupervisorController from '../controllers/SupervisorController.js';
-import { authMiddleware } from '../middlewares/authMiddleware.js';
+import { authMiddleware, supervisorMiddleware } from '../middlewares/authMiddleware.js';
 import { uploadImagens, handleUploadError } from '../middlewares/uploadMiddleware.js';
 
 const router = express.Router();
 router.use(authMiddleware);
+router.use(supervisorMiddleware);
 
 router.get('/perfil',       SupervisorController.obterPerfil);
 router.put('/perfil',       SupervisorController.atualizarPerfil);

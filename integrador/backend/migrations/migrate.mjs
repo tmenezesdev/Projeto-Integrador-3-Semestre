@@ -1,17 +1,27 @@
 import mysql from 'mysql2/promise';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const config = {
-    host:     'trolley.proxy.rlwy.net',
-    port:     31089,
-    user:     'root',
-    password: 'vqFYStjMgtmwuEngmHIUWOZkgCYzGxIp',
-    database: 'SmartBench_DB',
+    host:     process.env.DB_HOST,
+    port:     process.env.DB_PORT,
+    user:     process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
     multipleStatements: true,
 };
 
 async function run() {
+    if (!config.host || !config.user || !config.database) {
+        throw new Error('Variáveis de banco ausentes. Configure o arquivo .env (veja env.example) antes de rodar a migration.');
+    }
+
     const db = await mysql.createConnection(config);
-    console.log('Conectado ao Railway MySQL ✓');
+    console.log(`Conectado ao MySQL (${config.host}) ✓`);
 
     // ── SCHEMA ──────────────────────────────────────────────────────────────
     console.log('\n[ 1/2 ] Criando tabelas...');

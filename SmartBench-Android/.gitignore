@@ -1,0 +1,17 @@
+# Arquivos gerados pelo Gradle / Android Studio
+.gradle/
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Configuração local da máquina (NÃO versionar — contém o caminho do SDK)
+local.properties
+
+# IDE
+.idea/
+*.iml
+.DS_Store
+
+# Logs
+*.log

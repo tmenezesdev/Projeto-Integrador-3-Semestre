@@ -5,8 +5,10 @@ import { authMiddleware, adminMiddleware } from '../middlewares/authMiddleware.j
 const router = express.Router();
 
 // Rotas públicas de autenticação
+// OBS: não existe rota pública de cadastro. Usuários são criados apenas por
+// ADMIN (/api/admin/usuarios) ou SUPERVISOR (/api/supervisor/funcionarios),
+// ambas protegidas — isso evita que qualquer um se registre como ADMIN.
 router.post('/login',           AuthController.login);
-router.post('/registrar',       AuthController.registrar);
 router.post('/esqueceu-senha',  AuthController.esqueceuSenha);
 router.post('/redefinir-senha', AuthController.redefinirSenha);
 
@@ -15,13 +17,6 @@ router.get('/perfil', authMiddleware, AuthController.obterPerfil);
 
 // Rotas OPTIONS para CORS (preflight requests)
 router.options('/login', (req, res) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type');
-    res.sendStatus(200);
-});
-
-router.options('/registrar', (req, res) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type');

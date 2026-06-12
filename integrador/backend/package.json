@@ -1,7 +1,7 @@
 {
-  "name": "api-produtos",
+  "name": "smartbench-api",
   "version": "1.0.0",
-  "description": "API RESTful para gestão de produtos com Node.js, Express e MySQL",
+  "description": "API REST do SmartBench — gestão de ferramentas com Node.js, Express e MySQL",
   "main": "app.js",
   "type": "module",
   "scripts": {

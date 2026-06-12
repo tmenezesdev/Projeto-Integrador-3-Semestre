@@ -236,13 +236,14 @@ class SupervisorController {
   }
 
   async registrarDevolucaoManual(req, res) {
-    const { ferramentaId, supervisorId, observacao } = req.body;
-    if (!ferramentaId || !supervisorId) {
-      return res.status(400).json({ sucesso: false, erro: 'ferramentaId e supervisorId são obrigatórios.' });
+    const { ferramentaId, observacao } = req.body;
+    if (!ferramentaId) {
+      return res.status(400).json({ sucesso: false, erro: 'ferramentaId é obrigatório.' });
     }
     try {
+      // O autor da devolução é sempre o usuário autenticado (não confiar no corpo).
       await create('transacoes', {
-        usuario_id: supervisorId,
+        usuario_id: req.usuario.id,
         ferramenta_id: ferramentaId,
         tipo: 'DEVOLUCAO',
         metodo: 'MANUAL',
@@ -318,7 +319,8 @@ class SupervisorController {
       return res.status(400).json({ sucesso: false, erro: 'Formato de email inválido.' });
     }
 
-    const perfilValido = ['MECANICO', 'SUPERVISOR', 'ADMIN'];
+    // Supervisor só pode cadastrar MECANICO ou SUPERVISOR — nunca ADMIN
+    const perfilValido = ['MECANICO', 'SUPERVISOR'];
     const perfil = tipo_perfil && perfilValido.includes(tipo_perfil.toUpperCase())
       ? tipo_perfil.toUpperCase()
       : 'MECANICO';
