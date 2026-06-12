@@ -10,6 +10,13 @@ import { useAuth } from '@/hooks/useAuth';
 const API_URL = BASE_URL + '/api/supervisor/historico';
 const PAGE_SIZE = 20;
 
+function fmtDuracao(min) {
+  if (min == null) return null;
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  return h > 0 ? `${h}h ${String(m).padStart(2, '0')}min` : `${m}min`;
+}
+
 function gerarGraficoBase64(labels, retiradas, devolucoes) {
   const canvas = document.createElement('canvas');
   canvas.width  = 900;
@@ -153,6 +160,7 @@ export default function HistoricoPage() {
       { header: 'Responsável', key: 'responsavel',  width: 24 },
       { header: 'Cargo',       key: 'cargo',        width: 14 },
       { header: 'Operação',    key: 'operacao',     width: 14 },
+      { header: 'Duração',     key: 'duracao',      width: 14 },
       { header: 'Método',      key: 'metodo',       width: 14 },
       { header: 'Observação',  key: 'observacao',   width: 38 },
     ];
@@ -174,6 +182,7 @@ export default function HistoricoPage() {
         responsavel: log.responsavel,
         cargo:       log.cargo,
         operacao:    log.operacao,
+        duracao:     log.operacao !== 'RETIRADA' ? '' : (log.duracaoMinutos == null ? 'Em uso' : fmtDuracao(log.duracaoMinutos)),
         metodo:      log.metodo === 'RFID_AUTOMATICO' ? 'RFID AUTO' : 'MANUAL',
         observacao:  log.observacao || '',
       });
@@ -372,6 +381,7 @@ export default function HistoricoPage() {
                 <th className="px-6 py-4 font-bold">Ferramenta</th>
                 <th className="px-6 py-4 font-bold">Responsável</th>
                 <th className="px-6 py-4 font-bold text-center">Operação</th>
+                <th className="px-6 py-4 font-bold">Duração</th>
                 <th className="px-6 py-4 font-bold">Método</th>
                 <th className="px-6 py-4 font-bold">Observação</th>
               </tr>
@@ -394,6 +404,13 @@ export default function HistoricoPage() {
                       {log.operacao === 'RETIRADA' ? <ArrowUpRight size={11} /> : <ArrowDownLeft size={11} />}
                       {log.operacao}
                     </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {log.operacao !== 'RETIRADA'
+                      ? <span className="text-slate-700">—</span>
+                      : log.duracaoMinutos == null
+                        ? <span className="text-xs font-semibold text-teal-400">Em uso</span>
+                        : <span className="text-xs text-slate-300">{fmtDuracao(log.duracaoMinutos)}</span>}
                   </td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded border ${log.metodo === 'MANUAL' ? 'border-amber-500/20 text-amber-400 bg-amber-500/5' : 'border-teal-500/20 text-teal-400 bg-teal-500/5'}`}>
@@ -473,6 +490,17 @@ export default function HistoricoPage() {
                     </span>
                   </div>
                 </div>
+
+                {log.operacao === 'RETIRADA' && (
+                  <div>
+                    <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Duração</p>
+                    <p className="text-sm text-slate-300">
+                      {log.duracaoMinutos == null
+                        ? <span className="text-teal-400 font-semibold">Em uso</span>
+                        : fmtDuracao(log.duracaoMinutos)}
+                    </p>
+                  </div>
+                )}
 
                 {log.observacao && (
                   <div>

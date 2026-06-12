@@ -51,6 +51,49 @@ class AdminController {
     }
   }
 
+  // ─── Ferramentas em uso agora ─────────────────────────────────────────────
+
+  static async listarEmUso(req, res) {
+    let connection;
+    try {
+      connection = await getConnection();
+      const [rows] = await connection.execute(`
+        SELECT
+          f.id,
+          f.nome AS ferramenta,
+          f.tag_rfid AS tagRfid,
+          u.nome AS responsavel,
+          u.tipo_perfil AS cargo,
+          DATE_FORMAT(t.data_hora, '%d/%m/%Y %H:%i') AS horaRetirada,
+          TIMESTAMPDIFF(MINUTE, t.data_hora, NOW()) AS minutosFora,
+          IF(
+            TIMESTAMPDIFF(MINUTE, t.data_hora, NOW()) > (c.tempo_limite_horas * 60),
+            'ATRASADA',
+            'EM_USO'
+          ) AS statusAlerta
+        FROM ferramentas f
+        JOIN transacoes t ON f.id = t.ferramenta_id
+        JOIN usuarios u ON t.usuario_id = u.id
+        JOIN configuracoes_sistema c ON c.id = 1
+        WHERE f.status = 'EM_USO'
+          AND t.tipo = 'RETIRADA'
+          AND t.id = (SELECT MAX(id) FROM transacoes WHERE ferramenta_id = f.id)
+        ORDER BY t.data_hora ASC
+      `);
+      const resultado = rows.map(f => {
+        const horas = Math.floor(f.minutosFora / 60);
+        const mins = f.minutosFora % 60;
+        return { ...f, tempoForaLabel: `${String(horas).padStart(2, '0')}:${String(mins).padStart(2, '0')}h` };
+      });
+      res.json({ sucesso: true, dados: resultado });
+    } catch (error) {
+      console.error('Erro em AdminController.listarEmUso:', error);
+      res.status(500).json({ sucesso: false, erro: 'Erro ao buscar ferramentas em uso.' });
+    } finally {
+      if (connection) connection.release();
+    }
+  }
+
   // ─── Usuários ─────────────────────────────────────────────────────────────
 
   static async listarUsuarios(req, res) {
@@ -393,6 +436,14 @@ class AdminController {
           t.tipo AS operacao,
           t.metodo,
           t.observacao,
+          CASE WHEN t.tipo = 'RETIRADA' THEN
+            TIMESTAMPDIFF(MINUTE, t.data_hora, (
+              SELECT MIN(t2.data_hora) FROM transacoes t2
+              WHERE t2.ferramenta_id = t.ferramenta_id
+                AND t2.tipo = 'DEVOLUCAO'
+                AND t2.data_hora > t.data_hora
+            ))
+          ELSE NULL END AS duracaoMinutos,
           t.data_hora AS dataRaw,
           DATE_FORMAT(t.data_hora, '%d/%m/%Y %H:%i') AS dataHora
         FROM transacoes t

@@ -157,6 +157,7 @@ export default function AdminDashboard() {
   const { getToken, getUser } = useAuth();
   const [kpis,        setKpis]        = useState(null);
   const [historico,   setHistorico]   = useState([]);
+  const [emUsoLista,  setEmUsoLista]  = useState([]);
   const [alertas,     setAlertas]     = useState([]);
   const [nomeUsuario, setNomeUsuario] = useState('');
   const [isLoading,   setIsLoading]   = useState(true);
@@ -171,18 +172,21 @@ export default function AdminDashboard() {
     const load = async () => {
       try {
         const h = { Authorization: `Bearer ${getToken()}` };
-        const [dashRes, histRes, alertRes] = await Promise.all([
-          fetch(`${API}/dashboard`, { headers: h }),
-          fetch(`${API}/historico`, { headers: h }),
-          fetch(`${API}/alertas`,   { headers: h }),
+        const [dashRes, histRes, alertRes, emUsoRes] = await Promise.all([
+          fetch(`${API}/dashboard`,         { headers: h }),
+          fetch(`${API}/historico`,         { headers: h }),
+          fetch(`${API}/alertas`,           { headers: h }),
+          fetch(`${API}/ferramentas-em-uso`, { headers: h }),
         ]);
         if (!dashRes.ok) throw new Error();
         const d = await dashRes.json();
         const hist  = await histRes.json();
         const alert = await alertRes.json();
+        const emUsoJson = await emUsoRes.json();
         setKpis(d.dados ?? d);
         setHistorico((hist.dados  ?? hist).slice(0, 8));
         setAlertas((alert.dados ?? alert).filter(a => a.status_alerta === 'ATIVO').slice(0, 6));
+        setEmUsoLista(emUsoJson.dados ?? (Array.isArray(emUsoJson) ? emUsoJson : []));
       } catch { setErro(true); }
       finally  { setIsLoading(false); }
     };
@@ -337,6 +341,46 @@ export default function AdminDashboard() {
               </AreaChart>
             </ResponsiveContainer>
           )}
+        </div>
+      </div>
+
+      {/* Ferramentas em uso agora */}
+      <div className="bg-[#13102a] border border-[#7033ff]/10 rounded-xl shadow-xl overflow-hidden mb-6">
+        <div className="px-6 py-4 border-b border-[#7033ff]/10 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <TrendingUp size={16} className="text-[#7033ff]" />
+            <h2 className="text-sm font-semibold text-white">Ferramentas em Uso Agora</h2>
+          </div>
+          <span className="text-xs text-slate-500">{emUsoLista.length} em campo</span>
+        </div>
+        <div className="divide-y divide-[#7033ff]/5 max-h-[420px] overflow-y-auto">
+          {emUsoLista.length === 0 ? (
+            <div className="px-6 py-10 text-center">
+              <CheckCircle2 size={28} className="text-emerald-500 mx-auto mb-2 opacity-50" />
+              <p className="text-slate-500 text-sm">Nenhuma ferramenta em uso no momento.</p>
+            </div>
+          ) : emUsoLista.map((f) => {
+            const atrasada = f.statusAlerta === 'ATRASADA';
+            return (
+              <div key={f.id} className="px-6 py-3.5 flex items-center justify-between hover:bg-[#7033ff]/5 transition-colors">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className={`w-2 h-2 rounded-full flex-shrink-0 ${atrasada ? 'bg-red-400 animate-pulse' : 'bg-[#7033ff]'}`} />
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-white truncate">{f.ferramenta}</p>
+                    <p className="text-[11px] text-slate-500 truncate">
+                      <span className="font-mono">{f.tagRfid}</span> · {f.responsavel} · {f.horaRetirada}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  <span className={`text-sm font-bold ${atrasada ? 'text-red-400' : 'text-[#a87fff]'}`}>{f.tempoForaLabel}</span>
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold border whitespace-nowrap ${atrasada ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-[#7033ff]/10 text-[#a87fff] border-[#7033ff]/20'}`}>
+                    {atrasada ? 'Atrasada' : 'Em Uso'}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 

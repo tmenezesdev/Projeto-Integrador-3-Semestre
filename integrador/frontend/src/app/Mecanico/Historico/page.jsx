@@ -9,6 +9,13 @@ import { useAuth } from '@/hooks/useAuth';
 const API = BASE_URL + '/api/mecanico/historico';
 const PAGE_SIZE = 20;
 
+function fmtDuracao(min) {
+  if (min == null) return null;
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  return h > 0 ? `${h}h ${String(m).padStart(2, '0')}min` : `${m}min`;
+}
+
 export default function MecanicoHistorico() {
   const { getToken } = useAuth();
   const [historico, setHistorico] = useState([]);
@@ -58,7 +65,7 @@ export default function MecanicoHistorico() {
           <table className="w-full min-w-[700px] text-sm">
             <thead>
               <tr className="border-b border-amber-500/10">
-                {['#', 'Data/Hora', 'Ferramenta', 'Operação', 'Método'].map(h => (
+                {['#', 'Data/Hora', 'Ferramenta', 'Operação', 'Duração', 'Método'].map(h => (
                   <th key={h} className="text-left px-5 py-3 text-xs text-slate-500 font-medium uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
@@ -70,6 +77,7 @@ export default function MecanicoHistorico() {
                   <td className="px-5 py-3"><Sk className="h-4 w-32" /></td>
                   <td className="px-5 py-3"><div className="flex flex-col gap-1"><Sk className="h-4 w-32" /><Sk className="h-3 w-20 mt-0.5" /></div></td>
                   <td className="px-5 py-3"><Sk className="h-6 w-24 rounded-full" /></td>
+                  <td className="px-5 py-3"><Sk className="h-4 w-16" /></td>
                   <td className="px-5 py-3"><Sk className="h-6 w-24 rounded" /></td>
                 </tr>
               ))}
@@ -118,7 +126,7 @@ export default function MecanicoHistorico() {
           <table className="w-full min-w-[700px] text-sm">
             <thead>
               <tr className="border-b border-amber-500/10">
-                {['#', 'Data/Hora', 'Ferramenta', 'Operação', 'Método'].map(h => (
+                {['#', 'Data/Hora', 'Ferramenta', 'Operação', 'Duração', 'Método'].map(h => (
                   <th key={h} className="text-left px-5 py-3 text-xs text-slate-500 font-medium uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
@@ -141,6 +149,13 @@ export default function MecanicoHistorico() {
                       {item.operacao}
                     </span>
                   </td>
+                  <td className="px-5 py-3 whitespace-nowrap">
+                    {item.operacao !== 'RETIRADA'
+                      ? <span className="text-slate-700">—</span>
+                      : item.duracaoMinutos == null
+                        ? <span className="text-xs font-semibold text-amber-400">Em uso</span>
+                        : <span className="text-xs text-slate-300">{fmtDuracao(item.duracaoMinutos)}</span>}
+                  </td>
                   <td className="px-5 py-3">
                     <span className="text-xs font-mono text-slate-400 bg-[#0f0900] px-2 py-1 rounded border border-amber-500/10 flex items-center gap-2 w-max whitespace-nowrap">
                       <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${item.metodo === 'RFID_AUTOMATICO' ? 'bg-green-500' : 'bg-yellow-500'}`} />
@@ -150,7 +165,7 @@ export default function MecanicoHistorico() {
                 </tr>
               ))}
               {paginados.length === 0 && (
-                <tr><td colSpan={5} className="px-5 py-10 text-center text-slate-600">Nenhum registro encontrado.</td></tr>
+                <tr><td colSpan={6} className="px-5 py-10 text-center text-slate-600">Nenhum registro encontrado.</td></tr>
               )}
             </tbody>
           </table>

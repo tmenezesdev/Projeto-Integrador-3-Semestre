@@ -118,6 +118,7 @@ export default function MecanicoPerfil() {
   const { getToken } = useAuth();
   const [perfil, setPerfil] = useState(null);
   const [stats, setStats] = useState(null);
+  const [emUso, setEmUso] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [savingSenha, setSavingSenha] = useState(false);
@@ -137,14 +138,16 @@ export default function MecanicoPerfil() {
     const headers = { Authorization: `Bearer ${token}` };
 
     Promise.all([
-      fetch(`${BASE}/perfil`,       { headers }).then(r => r.json()),
-      fetch(`${BASE}/perfil/stats`, { headers }).then(r => r.json()),
+      fetch(`${BASE}/perfil`,           { headers }).then(r => r.json()),
+      fetch(`${BASE}/perfil/stats`,     { headers }).then(r => r.json()),
+      fetch(`${BASE}/minhas-retiradas`, { headers }).then(r => r.json()).catch(() => ({ dados: [] })),
     ])
-      .then(([perfilRes, statsRes]) => {
+      .then(([perfilRes, statsRes, retiradasRes]) => {
         const dados = perfilRes.dados ?? perfilRes;
         setPerfil(dados);
         setForm({ nome: dados.nome || '', email: dados.email || '' });
         setStats(statsRes.dados ?? null);
+        setEmUso(retiradasRes.dados ?? (Array.isArray(retiradasRes) ? retiradasRes : []));
       })
       .catch(() => showToast('Erro ao carregar perfil.', 'erro'))
       .finally(() => setLoading(false));
@@ -315,6 +318,40 @@ export default function MecanicoPerfil() {
                   <p className="text-2xl font-black text-green-400">{stats.devolucoes ?? 0}</p>
                   <p className="text-[10px] text-slate-500 uppercase tracking-wider mt-1">Devolvidas</p>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Ferramentas em mãos agora */}
+          {emUso.length > 0 && (
+            <div className="bg-[#1a1000] border border-amber-500/10 rounded-2xl p-6">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <PackageOpen size={12} className="text-amber-400" /> Em mãos agora
+                </p>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                  {emUso.length}
+                </span>
+              </div>
+              <div className="flex flex-col gap-2">
+                {emUso.map((f) => {
+                  const atrasada = f.statusAlerta === 'ATRASADA';
+                  return (
+                    <div key={f.id} className="flex items-center gap-3 p-3 bg-amber-500/5 border border-amber-500/10 rounded-xl">
+                      <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
+                        <Wrench size={13} className="text-amber-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold text-slate-200 truncate">{f.ferramenta}</p>
+                        <p className="text-[10px] text-slate-500 font-mono truncate">{f.horaRetirada}</p>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className={`text-xs font-bold ${atrasada ? 'text-red-400' : 'text-amber-400'}`}>{f.tempoForaLabel}</p>
+                        {atrasada && <p className="text-[9px] text-red-400 font-bold uppercase tracking-wider">Atrasada</p>}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}

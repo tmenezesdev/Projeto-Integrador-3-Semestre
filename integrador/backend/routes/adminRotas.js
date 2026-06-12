@@ -14,6 +14,7 @@ router.get('/perfil/stats', AdminController.obterStats);
 router.post('/perfil/foto', uploadImagens.single('foto'), handleUploadError, AdminController.uploadFoto);
 
 router.get('/dashboard', AdminController.dashboard);
+router.get('/ferramentas-em-uso', AdminController.listarEmUso);
 router.get('/usuarios', AdminController.listarUsuarios);
 router.post('/usuarios', AdminController.criarUsuario);
 router.put('/usuarios/:id', AdminController.atualizarUsuario);

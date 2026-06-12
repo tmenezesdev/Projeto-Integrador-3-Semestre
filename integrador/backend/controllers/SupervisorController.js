@@ -159,6 +159,14 @@ class SupervisorController {
           t.tipo AS operacao,
           t.metodo,
           t.observacao,
+          CASE WHEN t.tipo = 'RETIRADA' THEN
+            TIMESTAMPDIFF(MINUTE, t.data_hora, (
+              SELECT MIN(t2.data_hora) FROM transacoes t2
+              WHERE t2.ferramenta_id = t.ferramenta_id
+                AND t2.tipo = 'DEVOLUCAO'
+                AND t2.data_hora > t.data_hora
+            ))
+          ELSE NULL END AS duracaoMinutos,
           t.data_hora AS dataRaw,
           DATE_FORMAT(t.data_hora, '%d/%m/%Y %H:%i') AS dataHora
         FROM transacoes t

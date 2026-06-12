@@ -14,16 +14,20 @@ export default function MinhasRetiradas() {
   const [erro, setErro] = useState(false);
 
   useEffect(() => {
+    let primeira = true;
     const load = async () => {
       try {
         const res = await fetch(API, { headers: { Authorization: `Bearer ${token()}` } });
         if (!res.ok) throw new Error();
         const data = await res.json();
         setRetiradas(data.dados ?? data);
-      } catch { setErro(true); }
-      finally { setIsLoading(false); }
+        setErro(false);
+      } catch { if (primeira) setErro(true); }
+      finally { if (primeira) setIsLoading(false); primeira = false; }
     };
     load();
+    const id = setInterval(load, 30000); // atualiza a cada 30s
+    return () => clearInterval(id);
   }, []);
 
   if (isLoading) return (
