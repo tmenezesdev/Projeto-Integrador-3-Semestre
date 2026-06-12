@@ -21,7 +21,8 @@
         <activity
             android:name=".ui.auth.LoginActivity"
             android:exported="true"
-            android:theme="@style/Theme.SmartBench.Base">
+            android:theme="@style/Theme.SmartBench.Base"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -31,7 +32,8 @@
         <activity
             android:name=".ui.auth.RedefinirSenhaActivity"
             android:exported="true"
-            android:theme="@style/Theme.SmartBench.Base">
+            android:theme="@style/Theme.SmartBench.Base"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -44,17 +46,20 @@
         <activity
             android:name=".ui.admin.AdminHostActivity"
             android:exported="false"
-            android:theme="@style/Theme.SmartBench.Admin" />
+            android:theme="@style/Theme.SmartBench.Admin"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".ui.supervisor.SupervisorHostActivity"
             android:exported="false"
-            android:theme="@style/Theme.SmartBench.Supervisor" />
+            android:theme="@style/Theme.SmartBench.Supervisor"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".ui.mecanico.MecanicoHostActivity"
             android:exported="false"
-            android:theme="@style/Theme.SmartBench.Mecanico" />
+            android:theme="@style/Theme.SmartBench.Mecanico"
+            android:windowSoftInputMode="adjustResize" />
 
         <!-- FileProvider para compartilhar arquivos CSV -->
         <provider

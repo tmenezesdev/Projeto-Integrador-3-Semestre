@@ -13,6 +13,7 @@ import com.smartbench.app.databinding.ActivityLoginBinding;
 import com.smartbench.app.ui.admin.AdminHostActivity;
 import com.smartbench.app.ui.mecanico.MecanicoHostActivity;
 import com.smartbench.app.ui.supervisor.SupervisorHostActivity;
+import com.smartbench.app.utils.InsetsUtils;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -30,8 +31,12 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
+        InsetsUtils.setupEdgeToEdge(this);
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        // Mantém o formulário entre a status bar e a barra de navegação.
+        InsetsUtils.applyAll(binding.scrollLogin);
 
         viewModel = new ViewModelProvider(this).get(LoginViewModel.class);
         setupObservers();

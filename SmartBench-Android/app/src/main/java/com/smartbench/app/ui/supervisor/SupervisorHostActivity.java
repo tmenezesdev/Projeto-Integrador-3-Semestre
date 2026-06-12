@@ -13,6 +13,7 @@ import com.smartbench.app.R;
 import com.smartbench.app.data.local.SessionManager;
 import com.smartbench.app.databinding.ActivitySupervisorHostBinding;
 import com.smartbench.app.ui.auth.LoginActivity;
+import com.smartbench.app.utils.InsetsUtils;
 
 public class SupervisorHostActivity extends AppCompatActivity {
 
@@ -21,8 +22,13 @@ public class SupervisorHostActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        InsetsUtils.setupEdgeToEdge(this);
         binding = ActivitySupervisorHostBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        // Edge-to-edge: trata status bar (topo) e barra de navegação (rodapé).
+        InsetsUtils.applyAll(binding.navHostFragment);
+        InsetsUtils.applyBottom(binding.bottomNavigationView);
 
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.navHostFragment);

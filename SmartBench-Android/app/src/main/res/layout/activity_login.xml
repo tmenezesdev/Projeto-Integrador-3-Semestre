@@ -11,6 +11,7 @@
 
     <!-- Conteúdo do login por cima do fundo -->
     <ScrollView
+        android:id="@+id/scrollLogin"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/transparent"

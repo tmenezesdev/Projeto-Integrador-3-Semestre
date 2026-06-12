@@ -13,6 +13,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.smartbench.app.R;
 import com.smartbench.app.data.api.ApiClient;
+import com.smartbench.app.utils.InsetsUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +29,10 @@ public class RedefinirSenhaActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        InsetsUtils.setupEdgeToEdge(this);
         setContentView(R.layout.activity_redefinir_senha);
+
+        InsetsUtils.applyAll(findViewById(R.id.rootRedefinir));
 
         if (getSupportActionBar() != null) getSupportActionBar().hide();
         View backBtn = findViewById(R.id.btnBack);

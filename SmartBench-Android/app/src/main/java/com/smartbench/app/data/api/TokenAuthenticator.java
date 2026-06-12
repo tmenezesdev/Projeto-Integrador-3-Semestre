@@ -27,6 +27,14 @@ public class TokenAuthenticator implements Authenticator {
     @Nullable
     @Override
     public Request authenticate(@Nullable Route route, @NonNull Response response) {
+        // Só trata como sessão expirada se a request original carregava token.
+        // Login / esqueceu-senha / redefinir-senha não enviam Authorization, então um
+        // 401 deles (ex.: senha errada) deve fluir normal para o repository mostrar o erro,
+        // sem limpar sessão nem relançar a tela de login.
+        if (response.request().header("Authorization") == null) {
+            return null;
+        }
+
         // Token expirado ou inválido — limpa sessão e redireciona para Login
         sessionManager.clearSession();
         Intent intent = new Intent(context, LoginActivity.class);

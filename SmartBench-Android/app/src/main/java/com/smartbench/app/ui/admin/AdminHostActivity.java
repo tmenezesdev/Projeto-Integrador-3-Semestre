@@ -12,6 +12,7 @@ import com.smartbench.app.R;
 import com.smartbench.app.data.local.SessionManager;
 import com.smartbench.app.databinding.ActivityAdminHostBinding;
 import com.smartbench.app.ui.auth.LoginActivity;
+import com.smartbench.app.utils.InsetsUtils;
 
 public class AdminHostActivity extends AppCompatActivity {
 
@@ -20,8 +21,14 @@ public class AdminHostActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        InsetsUtils.setupEdgeToEdge(this);
         binding = ActivityAdminHostBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        // Edge-to-edge: empurra o conteúdo para baixo da status bar e a bottom
+        // nav para cima da barra de navegação do sistema.
+        InsetsUtils.applyAll(binding.navHostFragment);
+        InsetsUtils.applyBottom(binding.bottomNavigationView);
 
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.navHostFragment);
