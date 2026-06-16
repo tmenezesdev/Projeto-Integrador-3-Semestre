@@ -1,6 +1,3 @@
-// URL base da API.
-// - Em desenvolvimento, usa http://localhost:3000 por padrão.
-// - Em produção/deploy, defina NEXT_PUBLIC_API_URL (ex.: na Vercel/Railway)
-//   com a URL pública do backend, sem precisar editar este arquivo.
-export const BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL?.trim() || 'http://localhost:3000';
+// ↓ Mude APENAS esta linha para alternar entre os ambientes
+export const BASE_URL = 'https://projeto-integrador-3-semestre-production-197e.up.railway.app';  //NUVEM
+// export const BASE_URL = 'http://localhost:3000'; // LOCAL
