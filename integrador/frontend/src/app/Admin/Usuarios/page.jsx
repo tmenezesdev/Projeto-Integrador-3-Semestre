@@ -46,8 +46,6 @@ export default function AdminUsuarios() {
   const [showSenha, setShowSenha] = useState(false);
   const [saving, setSaving] = useState(false);
   const [formErro, setFormErro] = useState('');
-  
-  // NOVO ESTADO: Controla se estamos esperando o RFID do ESP32
   const [escutandoRfid, setEscutandoRfid] = useState(false);
 
   const load = useCallback(async () => {
@@ -62,21 +60,18 @@ export default function AdminUsuarios() {
 
   useEffect(() => { load(); }, [load]);
 
-  // NOVO EFEITO: Escuta o cartão apenas quando o modal de criar está aberto
   useEffect(() => {
     let intervalo;
     if (modalCriar) {
       setEscutandoRfid(true);
       intervalo = setInterval(async () => {
         try {
-          // 👇 MUDE ESTA LINHA AQUI 👇
           const res = await fetch(BASE_URL + '/api/rfid');
           const data = await res.json();
-          
           if (data.tag) {
-            // Achou o cartão! Preenche o formulário e para de escutar
             setForm(f => ({ ...f, tag_cracha: data.tag }));
             setEscutandoRfid(false);
+            clearInterval(intervalo);
           }
         } catch (error) {
           console.error("Erro ao buscar tag RFID:", error);
@@ -85,7 +80,6 @@ export default function AdminUsuarios() {
     } else {
       setEscutandoRfid(false);
     }
-
     return () => clearInterval(intervalo);
   }, [modalCriar]);
 
@@ -164,9 +158,7 @@ export default function AdminUsuarios() {
         <Sk className="h-10 w-32 rounded-lg" />
       </header>
       <div className="bg-[#13102a] border border-[#7033ff]/10 rounded-xl shadow-xl">
-        <div className="p-4 border-b border-[#7033ff]/10">
-          <Sk className="h-10 w-72 rounded-lg" />
-        </div>
+        <div className="p-4 border-b border-[#7033ff]/10"><Sk className="h-10 w-72 rounded-lg" /></div>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[700px] text-sm">
             <thead>
@@ -272,7 +264,6 @@ export default function AdminUsuarios() {
         </div>
       </div>
 
-      {/* Modal Criar */}
       {modalCriar && (
         <Modal title="Novo Usuário" onClose={() => { setModalCriar(false); resetForm(); }}>
           <div className="flex flex-col gap-4">
@@ -283,12 +274,11 @@ export default function AdminUsuarios() {
               <input className={inputCls} type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="email@exemplo.com" />
             </Field>
             <Field label="Tag Crachá">
-              <input 
-                className={inputCls} 
-                value={form.tag_cracha} 
-                onChange={e => setForm(f => ({ ...f, tag_cracha: e.target.value.toUpperCase() }))} 
-                // Única alteração visual: O placeholder avisa dinamicamente que estamos escutando o leitor
-                placeholder={escutandoRfid ? "Aproxime o cartão do leitor..." : "TAG001"} 
+              <input
+                className={inputCls}
+                value={form.tag_cracha}
+                onChange={e => setForm(f => ({ ...f, tag_cracha: e.target.value.toUpperCase() }))}
+                placeholder={escutandoRfid ? "Aproxime o cartão do leitor..." : "TAG001"}
               />
             </Field>
             <Field label="Perfil">
@@ -315,7 +305,6 @@ export default function AdminUsuarios() {
         </Modal>
       )}
 
-      {/* Modal Editar */}
       {modalEditar && (
         <Modal title={`Editar — ${modalEditar.nome}`} onClose={() => { setModalEditar(null); resetForm(); }}>
           <div className="flex flex-col gap-4">
@@ -352,7 +341,6 @@ export default function AdminUsuarios() {
         </Modal>
       )}
 
-      {/* Modal Deletar */}
       {modalDeletar && (
         <Modal title="Confirmar Exclusão" onClose={() => setModalDeletar(null)}>
           <div className="flex flex-col gap-4">

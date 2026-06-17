@@ -16,7 +16,7 @@ import UsuarioModel from './models/UsuarioModel.js';
 import TransacaoModel from './models/TransacaoModel.js';
 import { setCartaoPendente } from './controllers/RfidController.js';
 
-const PORTA_COM = 'COM4';
+const PORTA_COM = 'COM3';
 const BAUD_RATE = 115200;
 const SERIAL_HABILITADO = process.env.IOT_SERIAL_ENABLED !== 'false';
 
