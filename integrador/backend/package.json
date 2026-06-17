@@ -34,7 +34,9 @@
     "multer-storage-cloudinary": "^4.0.0",
     "mysql2": "^3.6.5",
     "nodemailer": "^6.9.16",
-    "resend": "^6.12.3",
+    "resend": "^6.12.3"
+  },
+  "optionalDependencies": {
     "serialport": "^13.0.0"
   },
   "engines": {
