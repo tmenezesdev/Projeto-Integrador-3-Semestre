@@ -16,18 +16,55 @@ import UsuarioModel from './models/UsuarioModel.js';
 import TransacaoModel from './models/TransacaoModel.js';
 import { setCartaoPendente } from './controllers/RfidController.js';
 
-const PORTA_COM = 'COM3';
-const BAUD_RATE = 115200;
+// Porta e velocidade configuráveis pelo .env (default: COM3 a 115200 baud,
+// que é o que o firmware Espruino usa). Voltou a ser configurável depois de
+// ter sido revertido para valores hardcoded.
+const PORTA_COM = process.env.PORTA_SERIAL || 'COM3';
+const BAUD_RATE = Number(process.env.BAUD_SERIAL) || 115200;
 const SERIAL_HABILITADO = process.env.IOT_SERIAL_ENABLED !== 'false';
+const RECONNECT_MS = 3000;
 
 const PREFIXO_EVENTO = 'EVENTO ';
 const PREFIXO_CRACHA = 'CRACHA ';
 
 let port = null;
+let reconectando = null; // guarda o timer para não empilhar reconexões
 
-if (!SERIAL_HABILITADO) {
-  console.log('🔌 Ponte Serial desativada (IOT_SERIAL_ENABLED=false).');
-} else {
+// Loga uma mensagem acionável quando a porta não abre. O motivo nº 1 é a porta
+// estar ocupada por outro programa (Espruino Web IDE / Serial Monitor) — só um
+// processo por vez consegue abrir uma COM.
+async function diagnosticarErroPorta(mensagem) {
+  const msg = String(mensagem || '');
+  const ocupada = /access denied|cannot open|resource|busy|in use|permission/i.test(msg);
+
+  console.error('❌ Erro na porta serial do IoT:', msg);
+  if (ocupada) {
+    console.error(`   ⚠️ A porta ${PORTA_COM} parece OCUPADA por outro programa.`);
+    console.error('   Feche o Espruino Web IDE / Serial Monitor (só 1 processo por COM) e tente de novo.');
+  }
+  console.error('   Cadastro/movimentação por crachá ficará INDISPONÍVEL até liberar a porta.');
+
+  try {
+    const portas = await SerialPort.list();
+    if (portas.length) {
+      console.error('   Portas seriais disponíveis no momento:');
+      portas.forEach((p) => console.error(`     - ${p.path}${p.manufacturer ? ` (${p.manufacturer})` : ''}`));
+    } else {
+      console.error('   Nenhuma porta serial encontrada — verifique se o ESP32 está plugado.');
+    }
+  } catch { /* SerialPort.list pode falhar em alguns ambientes; ignorar */ }
+}
+
+function agendarReconexao() {
+  if (reconectando) return; // já há uma reconexão agendada
+  console.error(`   ↻ Nova tentativa de abrir ${PORTA_COM} em ${RECONNECT_MS / 1000}s...`);
+  reconectando = setTimeout(() => {
+    reconectando = null;
+    abrirPorta();
+  }, RECONNECT_MS);
+}
+
+function abrirPorta() {
   try {
     port = new SerialPort({ path: PORTA_COM, baudRate: BAUD_RATE });
 
@@ -43,14 +80,29 @@ if (!SERIAL_HABILITADO) {
     });
 
     // Erros de conexão (porta ocupada / inexistente) não derrubam o backend.
-    port.on('error', (err) => {
-      console.error('❌ Erro na porta serial do IoT:', err.message);
-      console.error('   Cadastro/movimentação por crachá ficará INDISPONÍVEL até liberar a porta.');
+    // Diagnostica e reagenda a abertura — assim, ao liberar a porta (fechar o
+    // IDE), a ponte volta sozinha sem precisar reiniciar o backend.
+    port.on('error', async (err) => {
+      await diagnosticarErroPorta(err.message);
+      agendarReconexao();
+    });
+
+    // Se a porta fechar (cabo removido, outro programa assumiu), tenta reabrir.
+    port.on('close', () => {
+      console.error(`🔌 Porta ${PORTA_COM} fechada.`);
+      agendarReconexao();
     });
   } catch (err) {
     console.error(`⚠️ Não foi possível abrir a porta serial ${PORTA_COM}: ${err.message}`);
     console.error('   O backend continuará funcionando normalmente, mas sem o IoT.');
+    agendarReconexao();
   }
+}
+
+if (!SERIAL_HABILITADO) {
+  console.log('🔌 Ponte Serial desativada (IOT_SERIAL_ENABLED=false).');
+} else {
+  abrirPorta();
 }
 
 async function processarLinha(linha) {

@@ -44,9 +44,11 @@ app.use(helmet({
 
 app.get('/health', (req, res) => res.json({ ok: true }));
 
-app.use('/api/rfid', rfidRotas);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// rfid montado DEPOIS do express.json() para que POST /api/rfid consiga ler req.body
+app.use('/api/rfid', rfidRotas);
 
 app.use('/uploads', (req, res, next) => {
     res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
