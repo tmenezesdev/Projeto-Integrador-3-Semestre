@@ -1,28 +1,55 @@
 // =========================================================================
-// PONTE SERIAL — SMARTBENCH IOT
+// AGENTE SERIAL — SMARTBENCH IOT (roda LOCALMENTE, na máquina com o ESP32)
 // Lê os eventos do ESP32 (firmware em integrador/iot/firmware-esp32.js) pela
-// porta USB/serial e registra a transação correta (RETIRADA ou DEVOLUCAO)
-// no banco de dados. A trigger trg_atualiza_status_ferramenta cuida de
-// mudar o status da ferramenta (EM_USO / DISPONIVEL) automaticamente.
+// porta USB/serial e os ENCAMINHA para o backend na nuvem via HTTP. O backend
+// (que tem acesso ao banco) registra a transação; a trigger
+// trg_atualiza_status_ferramenta cuida do status da ferramenta.
 //
-// O firmware envia, para cada movimentação confirmada por crachá, UMA linha
-// estruturada no formato:
+// Por que separado do backend: um servidor na nuvem (Railway) não tem porta
+// USB, então a leitura serial precisa rodar onde o hardware está plugado.
+// Execução: `npm run bridge` (com o Espruino Web IDE / Serial Monitor FECHADO,
+// pois só 1 processo por vez consegue abrir uma COM).
+//
+// Linhas consumidas (uma por linha, vindas do firmware):
 //   EVENTO {"tag":"RFID-FER-001","cracha":"AB-CD-12-34","tipo":"RETIRADA"}
+//   CRACHA {"uid":"AB-CD-12-34"}
 // =========================================================================
 
+import dotenv from 'dotenv';
 import { SerialPort, ReadlineParser } from 'serialport';
-import FerramentaModel from './models/FerramentaModel.js';
-import UsuarioModel from './models/UsuarioModel.js';
-import TransacaoModel from './models/TransacaoModel.js';
-import { setCartaoPendente } from './controllers/RfidController.js';
+
+dotenv.config();
 
 // Porta e velocidade configuráveis pelo .env (default: COM3 a 115200 baud,
-// que é o que o firmware Espruino usa). Voltou a ser configurável depois de
-// ter sido revertido para valores hardcoded.
+// que é o que o firmware Espruino usa).
 const PORTA_COM = process.env.PORTA_SERIAL || 'COM3';
 const BAUD_RATE = Number(process.env.BAUD_SERIAL) || 115200;
 const SERIAL_HABILITADO = process.env.IOT_SERIAL_ENABLED !== 'false';
 const RECONNECT_MS = 3000;
+
+// Backend na nuvem para onde os eventos são empurrados, e o token compartilhado.
+const API_URL = (process.env.API_URL || 'https://projeto-integrador-3-semestre-production-197e.up.railway.app').replace(/\/+$/, '');
+const IOT_TOKEN = process.env.IOT_INGEST_TOKEN || '';
+
+// Encaminha um payload para o backend na nuvem. Erros de rede são logados sem
+// derrubar o agente — a próxima leitura tenta de novo.
+async function enviarParaNuvem(caminho, payload) {
+  try {
+    const resp = await fetch(API_URL + caminho, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-iot-token': IOT_TOKEN },
+      body: JSON.stringify(payload)
+    });
+    const corpo = await resp.json().catch(() => ({}));
+    if (resp.ok) {
+      console.log(`☁️  POST ${caminho} → ${resp.status}`, corpo.status || corpo.ferramenta || '');
+    } else {
+      console.error(`❌ POST ${caminho} → ${resp.status}:`, corpo.erro || corpo);
+    }
+  } catch (err) {
+    console.error(`❌ Falha de rede ao enviar para a nuvem (${caminho}):`, err.message);
+  }
+}
 
 const PREFIXO_EVENTO = 'EVENTO ';
 const PREFIXO_CRACHA = 'CRACHA ';
@@ -79,9 +106,9 @@ function abrirPorta() {
       console.log(`🔌 Ponte Serial ativa. Monitorando a bancada em ${PORTA_COM} (${BAUD_RATE} baud)...`);
     });
 
-    // Erros de conexão (porta ocupada / inexistente) não derrubam o backend.
+    // Erros de conexão (porta ocupada / inexistente) não derrubam o agente.
     // Diagnostica e reagenda a abertura — assim, ao liberar a porta (fechar o
-    // IDE), a ponte volta sozinha sem precisar reiniciar o backend.
+    // IDE), o agente volta sozinho sem precisar reiniciá-lo.
     port.on('error', async (err) => {
       await diagnosticarErroPorta(err.message);
       agendarReconexao();
@@ -94,7 +121,6 @@ function abrirPorta() {
     });
   } catch (err) {
     console.error(`⚠️ Não foi possível abrir a porta serial ${PORTA_COM}: ${err.message}`);
-    console.error('   O backend continuará funcionando normalmente, mas sem o IoT.');
     agendarReconexao();
   }
 }
@@ -110,18 +136,13 @@ async function processarLinha(linha) {
   if (!texto) return;
 
   console.log(`[Hardware] ${texto}`);
-  console.log('DEBUG texto hex:', Buffer.from(texto).toString('hex'));
-
 
   if (texto.startsWith(PREFIXO_CRACHA)) {
     try {
-      const json = texto.slice(PREFIXO_CRACHA.length);
-      console.log('DEBUG cracha raw:', json);
-      const { uid } = JSON.parse(json);
-      console.log('DEBUG uid extraido:', uid);
+      const { uid } = JSON.parse(texto.slice(PREFIXO_CRACHA.length));
       if (uid) {
-        setCartaoPendente(uid);
-        console.log(`🪪 Crachá disponível para cadastro: ${uid}`);
+        console.log(`🪪 Crachá lido para cadastro: ${uid}`);
+        await enviarParaNuvem('/api/rfid', { rfidTag: uid });
       }
     } catch (e) {
       console.error('⚠️ Linha CRACHA com JSON inválido:', texto, e.message);
@@ -139,46 +160,10 @@ async function processarLinha(linha) {
     return;
   }
 
-  await registrarEvento(evento);
-}
-
-async function registrarEvento({ tag, cracha, tipo } = {}) {
-  try {
-    if (!tag || !cracha || !tipo) {
-      console.error('⚠️ Evento incompleto recebido do hardware:', { tag, cracha, tipo });
-      return;
-    }
-
-    const tipoNormalizado = String(tipo).toUpperCase();
-    if (tipoNormalizado !== 'RETIRADA' && tipoNormalizado !== 'DEVOLUCAO') {
-      console.error(`⚠️ Tipo de evento desconhecido: "${tipo}"`);
-      return;
-    }
-
-    const ferramenta = await FerramentaModel.buscarPorTagRfid(tag);
-    if (!ferramenta) {
-      console.error(`❌ Ferramenta com tag "${tag}" não encontrada no banco.`);
-      return;
-    }
-
-    const usuario = await UsuarioModel.buscarPorCracha(cracha);
-    if (!usuario) {
-      console.error(`❌ Crachá não cadastrado: "${cracha}".`);
-      console.error('   Cadastre este UID na coluna usuarios.tag_cracha para vincular ao funcionário.');
-      return;
-    }
-
-    await TransacaoModel.registrar({
-      usuarioId: usuario.id,
-      ferramentaId: ferramenta.id,
-      tipo: tipoNormalizado
-    });
-
-    const verbo = tipoNormalizado === 'RETIRADA' ? 'retirada por' : 'devolvida por';
-    console.log(`✅ ${ferramenta.nome} ${verbo} ${usuario.nome}.\n`);
-  } catch (erro) {
-    console.error('❌ Erro ao salvar transação no banco:', erro.message);
+  const { tag, cracha, tipo } = evento || {};
+  if (!tag || !cracha || !tipo) {
+    console.error('⚠️ Evento incompleto recebido do hardware:', evento);
+    return;
   }
+  await enviarParaNuvem('/api/rfid/evento', { tag, cracha, tipo });
 }
-
-export default port;

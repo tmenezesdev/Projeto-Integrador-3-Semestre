@@ -5,7 +5,9 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import './ponte-usb.js';
+// A leitura serial NÃO roda mais dentro do backend (servidor na nuvem não tem
+// porta USB). Ela vira um agente local: `npm run bridge` (ponte-usb.js), que
+// lê o ESP32 e empurra os eventos pra cá via HTTP (POST /api/rfid[/evento]).
 import authRotas from './routes/authRotas.js';
 import supervisorRotas from './routes/supervisorRotas.js';
 import adminRotas from './routes/adminRotas.js';
