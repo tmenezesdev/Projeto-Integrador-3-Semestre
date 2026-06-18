@@ -41,6 +41,58 @@ class MecanicoController {
     }
   }
 
+  async registrarDevolucao(req, res) {
+    const usuarioId = req.usuario.id;
+    const { ferramentaId, tagCracha } = req.body;
+
+    if (!ferramentaId) {
+      return res.status(400).json({ sucesso: false, erro: 'ferramentaId é obrigatório.' });
+    }
+    if (!tagCracha?.trim()) {
+      return res.status(400).json({ sucesso: false, erro: 'Crachá é obrigatório.' });
+    }
+
+    let connection;
+    try {
+      connection = await getConnection();
+
+      // Valida o crachá digitado contra o cadastro do mecânico logado
+      const [[user]] = await connection.execute(
+        'SELECT tag_cracha FROM usuarios WHERE id = ?', [usuarioId]
+      );
+      if (!user) return res.status(404).json({ sucesso: false, erro: 'Usuário não encontrado.' });
+      if (user.tag_cracha?.trim().toUpperCase() !== tagCracha.trim().toUpperCase()) {
+        return res.status(401).json({ sucesso: false, erro: 'Crachá não confere com o seu cadastro.' });
+      }
+
+      // Confirma que a ferramenta está EM_USO e é a retirada ativa deste mecânico
+      const [[ferr]] = await connection.execute(
+        `SELECT f.id FROM ferramentas f
+         JOIN transacoes t ON f.id = t.ferramenta_id
+         WHERE f.id = ? AND f.status = 'EM_USO' AND t.usuario_id = ? AND t.tipo = 'RETIRADA'
+           AND t.id = (SELECT MAX(id) FROM transacoes WHERE ferramenta_id = f.id)`,
+        [ferramentaId, usuarioId]
+      );
+      if (!ferr) {
+        return res.status(400).json({ sucesso: false, erro: 'Esta ferramenta não está entre as suas retiradas ativas.' });
+      }
+
+      // Registra a devolução. A trigger trg_atualiza_status_ferramenta volta o status p/ DISPONIVEL
+      await connection.execute(
+        `INSERT INTO transacoes (usuario_id, ferramenta_id, tipo, metodo, observacao)
+         VALUES (?, ?, 'DEVOLUCAO', 'MANUAL', 'Devolução via crachá (digitado)')`,
+        [usuarioId, ferramentaId]
+      );
+
+      res.json({ sucesso: true, mensagem: 'Ferramenta devolvida com sucesso.' });
+    } catch (error) {
+      console.error('Erro em registrarDevolucao:', error);
+      res.status(500).json({ sucesso: false, erro: 'Erro ao registrar devolução.' });
+    } finally {
+      if (connection) connection.release();
+    }
+  }
+
   async meuHistorico(req, res) {
     const usuarioId = req.usuario.id;
     let connection;

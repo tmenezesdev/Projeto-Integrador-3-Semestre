@@ -15,6 +15,7 @@ router.get('/perfil/stats', MecanicoController.obterStats);
 router.post('/perfil/foto', uploadImagens.single('foto'), handleUploadError, MecanicoController.uploadFoto);
 
 router.get('/minhas-retiradas', MecanicoController.minhasRetiradas);
+router.post('/devolucao', MecanicoController.registrarDevolucao);
 router.get('/historico', MecanicoController.meuHistorico);
 router.get('/alertas', MecanicoController.meusAlertas);
 router.get('/ferramentas', MecanicoController.listarFerramentas);
