@@ -145,6 +145,23 @@ class SupervisorController {
     }
   }
 
+  async listarFerramentas(req, res) {
+    let connection;
+    try {
+      connection = await getConnection();
+      const [rows] = await connection.execute(
+        `SELECT id, nome, tag_rfid AS tagRfid, status AS statusAlerta
+         FROM ferramentas ORDER BY id DESC`
+      );
+      res.json({ sucesso: true, dados: rows });
+    } catch (error) {
+      console.error('Erro em listarFerramentas (supervisor):', error);
+      res.status(500).json({ sucesso: false, erro: 'Erro ao buscar ferramentas.' });
+    } finally {
+      if (connection) connection.release();
+    }
+  }
+
   async listarHistorico(req, res) {
     let connection;
     try {
@@ -159,6 +176,7 @@ class SupervisorController {
           t.tipo AS operacao,
           t.metodo,
           t.observacao,
+          DATE(t.data_hora) = CURDATE() AS ehHoje,
           CASE WHEN t.tipo = 'RETIRADA' THEN
             TIMESTAMPDIFF(MINUTE, t.data_hora, (
               SELECT MIN(t2.data_hora) FROM transacoes t2

@@ -13,6 +13,7 @@ router.put('/perfil/senha', SupervisorController.alterarSenha);
 router.get('/perfil/stats', SupervisorController.obterStats);
 router.post('/perfil/foto', uploadImagens.single('foto'), handleUploadError, SupervisorController.uploadFoto);
 
+router.get('/ferramentas', SupervisorController.listarFerramentas);
 router.get('/ferramentas-fora', SupervisorController.listarFerramentasFora);
 router.post('/ferramentas-fora/devolucao', SupervisorController.registrarDevolucaoManual);
 
