@@ -9,6 +9,7 @@ import com.smartbench.app.data.model.entity.Transacao;
 import com.smartbench.app.data.model.entity.Usuario;
 import com.smartbench.app.data.model.request.AlterarSenhaRequest;
 import com.smartbench.app.data.model.request.CriarFuncionarioRequest;
+import com.smartbench.app.data.model.request.DevolucaoMecanicoRequest;
 import com.smartbench.app.data.model.request.DevolucaoRequest;
 import com.smartbench.app.data.model.request.LoginRequest;
 import com.smartbench.app.data.model.response.ApiResponse;
@@ -166,6 +167,9 @@ public interface ApiService {
 
     @GET("api/mecanico/ferramentas")
     Call<ApiResponse<List<Ferramenta>>> getFerramentasMecanico();
+
+    @POST("api/mecanico/devolucao")
+    Call<ApiResponse<Void>> registrarDevolucaoMecanico(@Body DevolucaoMecanicoRequest body);
 
     @GET("api/mecanico/alertas")
     Call<ApiResponse<List<Alerta>>> getAlertasMecanico();

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/bgSecondary"
+    android:orientation="vertical"
+    android:padding="@dimen/margin_large">
+
+    <View android:layout_width="40dp" android:layout_height="4dp"
+        android:layout_gravity="center_horizontal" android:layout_marginBottom="@dimen/margin_medium"
+        android:background="@color/border_light" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/dialog_devolver_titulo"
+        android:textColor="@color/text_primary"
+        android:textSize="@dimen/text_large"
+        android:textStyle="bold"
+        android:layout_marginBottom="@dimen/margin_medium" />
+
+    <!-- Info da ferramenta -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_medium"
+        app:cardBackgroundColor="?attr/bgCard"
+        app:cardCornerRadius="@dimen/card_corner_radius"
+        app:strokeColor="?attr/colorPrimary"
+        app:strokeWidth="1dp">
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="@dimen/margin_medium">
+
+            <TextView android:id="@+id/tvFerramenta"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:textColor="@color/text_primary" android:textStyle="bold"
+                android:textSize="@dimen/text_medium" />
+
+            <TextView android:id="@+id/tvTag"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:textColor="@color/text_muted" android:textSize="@dimen/text_small"
+                android:fontFamily="monospace" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Crachá -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilCracha"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_small"
+        android:hint="@string/hint_cracha"
+        app:boxStrokeColor="?attr/colorPrimary"
+        app:hintTextColor="?attr/colorPrimary">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etCracha"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textCapCharacters"
+            android:textColor="@color/text_primary"
+            android:fontFamily="monospace" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="O crachá ainda é digitado manualmente (leitura por IoT não disponível). Informe o código do seu crachá para confirmar a devolução."
+        android:textColor="@color/text_muted"
+        android:textSize="@dimen/text_small"
+        android:layout_marginBottom="@dimen/margin_large" />
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <com.google.android.material.button.MaterialButton android:id="@+id/btnCancelar"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:layout_marginEnd="@dimen/margin_small"
+            android:text="@string/btn_cancelar" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/btnConfirmar"
+            android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_weight="1" android:layout_marginStart="@dimen/margin_small"
+            android:text="@string/btn_confirmar" android:textColor="@color/white"
+            app:cornerRadius="@dimen/button_corner_radius" />
+    </LinearLayout>
+</LinearLayout>

@@ -16,8 +16,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.smartbench.app.data.model.entity.Ferramenta;
+import com.smartbench.app.data.model.request.DevolucaoMecanicoRequest;
+import com.smartbench.app.data.model.response.Resource;
 import com.smartbench.app.databinding.FragmentListSearchBinding;
 import com.smartbench.app.ui.common.adapters.FerramentasAdapter;
+import com.smartbench.app.ui.mecanico.ferramentas.dialogs.DevolucaoMecanicoBottomSheet;
 import com.smartbench.app.utils.DateUtils;
 
 import android.widget.TextView;
@@ -79,6 +82,15 @@ public class MecanicoFerramentasFragment extends Fragment {
             }
         });
 
+        viewModel.devolucaoResult.observe(getViewLifecycleOwner(), resource -> {
+            if (resource.status == Resource.Status.SUCCESS) {
+                Toast.makeText(requireContext(), "Ferramenta devolvida", Toast.LENGTH_SHORT).show();
+                viewModel.carregar();
+            } else if (resource.status == Resource.Status.ERROR) {
+                Toast.makeText(requireContext(), resource.message, Toast.LENGTH_LONG).show();
+            }
+        });
+
         viewModel.carregar();
     }
 
@@ -94,8 +106,18 @@ public class MecanicoFerramentasFragment extends Fragment {
         ((TextView) detView.findViewById(R.id.tvTempoFora)).setText(DateUtils.formatTempoFora(f.minutosFora));
 
         detView.findViewById(R.id.btnFechar).setOnClickListener(v -> dialog.dismiss());
+        detView.findViewById(R.id.btnDevolver).setOnClickListener(v -> {
+            dialog.dismiss();
+            abrirDevolucao(f);
+        });
         dialog.setContentView(detView);
         dialog.show();
+    }
+
+    private void abrirDevolucao(Ferramenta f) {
+        DevolucaoMecanicoBottomSheet sheet = DevolucaoMecanicoBottomSheet.newInstance(f);
+        sheet.setOnConfirmar(cracha -> viewModel.devolver(new DevolucaoMecanicoRequest(f.id, cracha)));
+        sheet.show(getChildFragmentManager(), "devolucao_mecanico");
     }
 
     @Override public void onDestroyView() { super.onDestroyView(); binding = null; }

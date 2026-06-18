@@ -9,6 +9,7 @@ import com.smartbench.app.data.model.entity.Ferramenta;
 import com.smartbench.app.data.model.entity.Transacao;
 import com.smartbench.app.data.model.entity.Usuario;
 import com.smartbench.app.data.model.request.AlterarSenhaRequest;
+import com.smartbench.app.data.model.request.DevolucaoMecanicoRequest;
 import com.smartbench.app.data.model.response.ApiResponse;
 import com.smartbench.app.data.model.response.Resource;
 
@@ -51,6 +52,24 @@ public class MecanicoRepository {
                 else result.setValue(Resource.error("Erro ao carregar ferramentas"));
             }
             @Override public void onFailure(Call<ApiResponse<List<Ferramenta>>> call, Throwable t) {
+                result.setValue(Resource.error("Sem conexão"));
+            }
+        });
+    }
+
+    public void registrarDevolucao(DevolucaoMecanicoRequest req, MutableLiveData<Resource<Void>> result) {
+        result.setValue(Resource.loading());
+        api.registrarDevolucaoMecanico(req).enqueue(new Callback<ApiResponse<Void>>() {
+            @Override public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().sucesso)
+                    result.setValue(Resource.success(null));
+                else {
+                    ApiResponse<Void> body = response.body();
+                    String msg = body != null ? (body.erro != null ? body.erro : body.mensagem) : "Erro na devolução";
+                    result.setValue(Resource.error(msg));
+                }
+            }
+            @Override public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
                 result.setValue(Resource.error("Sem conexão"));
             }
         });

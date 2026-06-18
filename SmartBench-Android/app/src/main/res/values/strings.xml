@@ -64,6 +64,9 @@
     <string name="btn_sair">Sair</string>
     <string name="btn_confirmar">Confirmar</string>
 
+    <string name="hint_cracha">Crachá</string>
+    <string name="dialog_devolver_titulo">Devolver ferramenta</string>
+
     <!-- Mensagens -->
     <string name="msg_campo_obrigatorio">Campo obrigatório</string>
     <string name="msg_email_invalido">E-mail inválido</string>
