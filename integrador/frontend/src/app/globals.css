@@ -128,6 +128,15 @@
   }
 }
 
+/* Esconde a barra de rolagem visualmente, mantendo o scroll com a roda do mouse */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE e Edge antigo */
+  scrollbar-width: none;     /* Firefox */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;             /* Chrome, Safari, Edge */
+}
+
 @theme {
   --color-primaria: #121212;
   --color-segundaria: #7033ff;

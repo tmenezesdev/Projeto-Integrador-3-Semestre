@@ -102,9 +102,8 @@ export default function SupervisorVisaoGeral() {
         setAlertas(Array.isArray(alert) ? alert : alert.dados ?? []);
         setKpis(dash.dados ?? dash);
 
-        const hoje_str = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
         const transacoesHoje = (Array.isArray(hist) ? hist : hist.dados ?? [])
-          .filter(t => t.dataHora?.startsWith(hoje_str));
+          .filter(t => Number(t.ehHoje) === 1);
         setHistorico(transacoesHoje);
       } catch { setErro(true); }
       finally  { setIsLoading(false); }

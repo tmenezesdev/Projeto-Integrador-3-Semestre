@@ -10,7 +10,7 @@ export default function MecanicoLayout({ children }) {
     <AuthGuard perfisPermitidos={['MECANICO', 'SUPERVISOR', 'ADMIN']}>
       <div className="flex h-screen bg-[#09090A] text-gray-100 overflow-hidden font-sans">
         <SidebarMecanico />
-        <main className="flex-1 overflow-y-auto bg-[#09090A]">
+        <main className="flex-1 overflow-y-auto no-scrollbar bg-[#09090A]">
           {children}
         </main>
         <ChatWidget />

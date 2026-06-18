@@ -66,7 +66,6 @@ async function run() {
         // ── LIMPAR DADOS ─────────────────────────────────────────────────────
         console.log('[ 1/2 ] Limpando dados existentes...');
 
-        // Ordem importante (respeita foreign keys)
         const truncateTables = [
             'mensagens_chat',
             'alertas',
@@ -77,17 +76,25 @@ async function run() {
             'logs'
         ];
 
-        for (const table of truncateTables) {
-            try {
-                await db.query(`TRUNCATE TABLE ${table}`);
-                console.log(`  ✓ ${table} limpo`);
-            } catch (error) {
-                if (error.code === 'ER_NO_REFERENCED_TABLE') {
-                    console.log(`  ⚠️  ${table} skipped (não existe)`);
-                } else {
-                    throw error;
+        // Desativa checagem de FK para permitir TRUNCATE em tabelas referenciadas
+        await db.query('SET FOREIGN_KEY_CHECKS = 0');
+
+        try {
+            for (const table of truncateTables) {
+                try {
+                    await db.query(`TRUNCATE TABLE ${table}`);
+                    console.log(`  ✓ ${table} limpo`);
+                } catch (error) {
+                    if (error.code === 'ER_NO_SUCH_TABLE' || error.code === 'ER_NO_REFERENCED_TABLE') {
+                        console.log(`  ⚠️  ${table} skipped (não existe)`);
+                    } else {
+                        throw error;
+                    }
                 }
             }
+        } finally {
+            // Reativa a checagem de FK mesmo se algo falhar
+            await db.query('SET FOREIGN_KEY_CHECKS = 1');
         }
 
         console.log('\n✓ Todas as tabelas limpas\n');
