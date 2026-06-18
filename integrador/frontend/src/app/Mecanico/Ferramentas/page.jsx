@@ -2,7 +2,7 @@
 import { BASE_URL } from '@/lib/apiConfig';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Wrench, Search, AlertCircle, X, Clock, User, Hash, Timer, PackageCheck } from 'lucide-react';
+import { Wrench, Search, AlertCircle, X, Clock, User, Hash, Timer, PackageCheck, RotateCcw, CreditCard, Loader2 } from 'lucide-react';
 import { Sk } from '@/components/ui/skeleton';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -87,7 +87,78 @@ function ModalDetalhe({ ferramenta, onClose }) {
   );
 }
 
-function CardMinhaFerramenta({ item }) {
+function ModalDevolucao({ item, cracha, setCracha, onClose, onConfirm, loading, erro }) {
+  if (!item) return null;
+  const podeConfirmar = cracha.trim().length > 0 && !loading;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
+      <div className="bg-[#1a1000] border border-amber-500/20 rounded-2xl p-6 w-full max-w-sm shadow-2xl mx-4" onClick={e => e.stopPropagation()}>
+        <div className="flex items-start justify-between mb-5">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center flex-shrink-0">
+              <RotateCcw size={18} className="text-amber-400" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-white leading-tight">Devolver ferramenta</h3>
+              <p className="text-xs text-slate-500 mt-0.5">{item.ferramenta}</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="cursor-pointer text-slate-500 hover:text-white transition-colors">
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="mb-4 p-3 rounded-xl bg-amber-500/5 border border-amber-500/10">
+          <p className="text-[11px] text-slate-500 uppercase tracking-wider font-semibold">Ferramenta</p>
+          <p className="text-sm font-semibold text-white">{item.ferramenta}</p>
+          <p className="text-[11px] font-mono text-slate-500 mt-0.5">{item.tagRfid}</p>
+        </div>
+
+        <label className="block mb-1.5 text-xs font-semibold text-slate-300">Crachá do mecânico</label>
+        <div className="relative">
+          <CreditCard className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
+          <input
+            type="text"
+            autoFocus
+            value={cracha}
+            onChange={(e) => setCracha(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter' && podeConfirmar) onConfirm(); }}
+            placeholder="Digite o crachá"
+            className="h-10 w-full rounded-lg border border-amber-500/20 bg-[#0f0900] pl-9 pr-3 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all"
+          />
+        </div>
+        <p className="mt-2 text-[11px] text-slate-500 leading-relaxed">
+          Normalmente lido pelo leitor RFID/IoT — como ainda não está integrado, digite o crachá manualmente.
+        </p>
+
+        {erro && (
+          <p className="mt-3 flex items-center gap-1.5 text-xs text-red-400">
+            <AlertCircle size={13} className="flex-shrink-0" /> {erro}
+          </p>
+        )}
+
+        <div className="mt-5 flex gap-2">
+          <button
+            onClick={onClose}
+            className="flex-1 h-10 rounded-lg border border-amber-500/20 text-slate-300 text-sm font-semibold hover:bg-amber-500/5 transition-colors cursor-pointer"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={!podeConfirmar}
+            className="flex-1 h-10 rounded-lg bg-amber-500 text-[#1a1000] text-sm font-bold hover:bg-amber-400 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            {loading ? <Loader2 size={16} className="animate-spin" /> : <RotateCcw size={15} />}
+            Confirmar devolução
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CardMinhaFerramenta({ item, onDevolver }) {
   const atrasada = item.statusAlerta === 'ATRASADA';
   return (
     <div className={`flex flex-col gap-3 p-4 rounded-xl border ${atrasada ? 'bg-red-500/5 border-red-500/20' : 'bg-orange-500/5 border-orange-500/20'}`}>
@@ -129,6 +200,13 @@ function CardMinhaFerramenta({ item }) {
         </div>
       </div>
       <p className="text-[11px] font-mono text-slate-600">{item.tagRfid}</p>
+
+      <button
+        onClick={() => onDevolver(item)}
+        className="mt-1 w-full h-9 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 text-sm font-bold hover:bg-amber-500/20 transition-colors cursor-pointer flex items-center justify-center gap-2"
+      >
+        <RotateCcw size={15} /> Devolver
+      </button>
     </div>
   );
 }
@@ -141,6 +219,11 @@ export default function MecanicoFerramentas() {
   const [isLoading, setIsLoading] = useState(true);
   const [erro, setErro] = useState(false);
   const [selecionada, setSelecionada] = useState(null);
+
+  const [devolvendo, setDevolvendo] = useState(null);
+  const [crachaInput, setCrachaInput] = useState('');
+  const [loadingDev, setLoadingDev] = useState(false);
+  const [erroDev, setErroDev] = useState('');
 
   const carregar = useCallback(() => {
     const headers = { Authorization: `Bearer ${getToken()}` };
@@ -162,6 +245,36 @@ export default function MecanicoFerramentas() {
     const intervalo = setInterval(carregar, 15000);
     return () => clearInterval(intervalo);
   }, [carregar]);
+
+  const abrirDevolucao = (item) => { setDevolvendo(item); setCrachaInput(''); setErroDev(''); };
+  const fecharDevolucao = () => {
+    if (loadingDev) return;
+    setDevolvendo(null); setCrachaInput(''); setErroDev('');
+  };
+  const confirmarDevolucao = async () => {
+    if (!devolvendo) return;
+    setLoadingDev(true);
+    setErroDev('');
+    try {
+      const r = await fetch(`${BASE}/devolucao`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+        body: JSON.stringify({ ferramentaId: devolvendo.id, tagCracha: crachaInput }),
+      });
+      const json = await r.json();
+      if (!r.ok || !json.sucesso) {
+        setErroDev(json.erro || 'Erro ao registrar devolução.');
+        return;
+      }
+      setDevolvendo(null);
+      setCrachaInput('');
+      carregar();
+    } catch {
+      setErroDev('Erro de conexão. Tente novamente.');
+    } finally {
+      setLoadingDev(false);
+    }
+  };
 
   const filtradas = ferramentas.filter(f =>
     f.nome?.toLowerCase().includes(busca.toLowerCase()) ||
@@ -261,7 +374,7 @@ export default function MecanicoFerramentas() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {minhasRetiradas.map((item) => (
-                <CardMinhaFerramenta key={item.id} item={item} />
+                <CardMinhaFerramenta key={item.id} item={item} onDevolver={abrirDevolucao} />
               ))}
             </div>
           </div>
@@ -326,6 +439,16 @@ export default function MecanicoFerramentas() {
       </div>
 
       <ModalDetalhe ferramenta={selecionada} onClose={() => setSelecionada(null)} />
+
+      <ModalDevolucao
+        item={devolvendo}
+        cracha={crachaInput}
+        setCracha={setCrachaInput}
+        onClose={fecharDevolucao}
+        onConfirm={confirmarDevolucao}
+        loading={loadingDev}
+        erro={erroDev}
+      />
     </>
   );
 }
